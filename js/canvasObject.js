@@ -2,11 +2,12 @@
  * Created by takovoy on 22.11.2014.
  */
 
-var CanvasObject = function(x,y,id,drawingObject,parameters){
+var CanvasObject = function(x,y,id,drawingObject){
     this.id = id || '' + Math.random();
     this.x = x || 0;
     this.y = y || 0;
-    this.parameters = parameters || {};
+    this.before = {};
+    this.after = {};
     this.start = function(){
         drawingObject.stack.append(this);
     };

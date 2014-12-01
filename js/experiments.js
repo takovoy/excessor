@@ -2,12 +2,11 @@
  * Created by takovoy on 30.11.2014.
  */
 
-var Circle = function(x,y,radius,id,drawingObject,parameters){
+var Circle = function(x,y,radius,id,drawingObject){
     this.radius = radius;
     this.id = id || '' + Math.random();
     this.x = x || 0;
     this.y = y || 0;
-    this.parameters = parameters || {};
     this.start = function(){
         drawingObject.stack.append(this);
     };
