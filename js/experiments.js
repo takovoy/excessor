@@ -3,6 +3,17 @@
  */
 
 var Circle = function(x,y,radius,id,drawingObject){
+    Object.defineProperties(this,{
+        radius: {
+            get: function(){
+                return this.now.radius;
+            },
+            set: function(value){
+                this.now.radius = value;
+            }
+        }
+    });
+    this.now = {};
     this.radius = radius;
     this.id = id || '' + Math.random();
     this.x = x || 0;

@@ -3,10 +3,28 @@
  */
 
 var CanvasObject = function(x,y,id,drawingObject){
-    this.id = id || '' + Math.random();
+    Object.defineProperties(this,{
+        x: {
+            get: function(){
+                return this.now.x;
+            },
+            set: function(value){
+                this.now.x = value;
+            }
+        },
+        y: {
+            get: function(){
+                return this.now.y;
+            },
+            set: function(value){
+                this.now.y = value;
+            }
+        }
+    });
     this.x = x || 0;
     this.y = y || 0;
-    this.before = {};
+    this.id = id || '' + Math.random();
+    this.now = {};
     this.after = {};
     this.start = function(){
         drawingObject.stack.append(this);
@@ -25,6 +43,3 @@ CanvasObject.prototype.removeChild = function(id){
 };
 
 CanvasObject.prototype.animate = function(){};
-CanvasObject.prototype.moveTo = function(x,y){
-
-};
