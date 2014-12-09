@@ -2,7 +2,7 @@
  * Created by takovoy on 22.11.2014.
  */
 
-var CanvasObject = function(x,y,id,drawingObject){
+var CanvasObject = function(id,drawingObject){
     Object.defineProperties(this,{
         x: {
             get: function(){
@@ -21,8 +21,8 @@ var CanvasObject = function(x,y,id,drawingObject){
             }
         }
     });
-    this.x = x || 0;
-    this.y = y || 0;
+    this.x = 0;
+    this.y = 0;
     this.id = id || '' + Math.random();
     this.now = {};
     this.after = {};
