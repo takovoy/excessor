@@ -13,6 +13,7 @@ var Circle = function(radius,id,drawingObject){
             }
         }
     });
+    this.now = {};
     this.radius = radius;
     this.id = id || '' + Math.random();
     this.start = function(){
@@ -25,6 +26,8 @@ var Circle = function(radius,id,drawingObject){
 Circle.prototype = Object.create(CanvasObject.prototype);
 
 Circle.prototype.animate = function(context){
+    context.beginPath();
     context.arc(this.x,this.y,this.radius,0,Math.PI*2);
     context.fill();
+    context.closePath();
 };

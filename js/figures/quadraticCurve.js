@@ -2,7 +2,7 @@
  * Created by takovoy on 11.01.2015.
  */
 
-var QuadraticCurve = function(points,id,drawingObject){
+var QuadraticCurve = function(points,id,drawingObject,moveTo){
     Object.defineProperties(this,{
         points: {
             get: function(){
@@ -14,7 +14,8 @@ var QuadraticCurve = function(points,id,drawingObject){
         }
     });
     this.now = {};
-    this.points = points;
+    this.now.moveTo = moveTo || false;
+    this.points = points || [];
     this.id = id || '' + Math.random();
     this.start = function(){
         drawingObject.stack.append(this);
@@ -26,10 +27,27 @@ var QuadraticCurve = function(points,id,drawingObject){
 QuadraticCurve.prototype = Object.create(CanvasObject.prototype);
 
 QuadraticCurve.prototype.animate = function(context){
-    if(this.points.length < 2){return;}
     context.beginPath();
-    for(var i = 1;this.points[i];i += 2){
-
+    if(this.now.moveTo){
+        if(this.points.length == 0){
+            context.closePath();
+            return;
+        }
+        context.moveTo(this.now.moveTo[0],this.now.moveTo[1]);
+    } else {
+        if(this.points.length < 2){
+            context.closePath();
+            return;
+        }
     }
+    for(var i = 1;this.points[i];i += 2){
+        context.quadraticCurveTo(
+            this.points[i - 1][0],
+            this.points[i - 1][1],
+            this.points[i][0],
+            this.points[i][1]
+        );
+    }
+    context.stroke();
     context.closePath();
 };

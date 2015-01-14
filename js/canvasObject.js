@@ -2,7 +2,8 @@
  * Created by takovoy on 22.11.2014.
  */
 
-var CanvasObject = function(id,drawingObject){
+var CanvasObject = function(id,drawingObject,parameters){
+    this.now = parameters || {};
     Object.defineProperties(this,{
         x: {
             get: function(){
@@ -24,8 +25,19 @@ var CanvasObject = function(id,drawingObject){
     this.x = 0;
     this.y = 0;
     this.id = id || '' + Math.random();
-    this.now = {};
-    this.after = {};
+    this.after = {
+        list: {},
+        append: function(name,value,time,type){
+            this.list[name] = {
+                value: value,
+                time: time,
+                type: type
+            };
+        },
+        remove: function(name){
+            delete this.list[name];
+        }
+    };
     this.start = function(){
         drawingObject.stack.append(this);
     };
