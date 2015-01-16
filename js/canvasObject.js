@@ -48,6 +48,7 @@ var CanvasObject = function(id,drawingObject,parameters){
 
 CanvasObject.prototype.childrens = {};
 CanvasObject.prototype.appendChild = function(canvasObject){
+    canvasObject.parent = this.now;
     this.childrens[canvasObject.id] = canvasObject;
 };
 CanvasObject.prototype.removeChild = function(id){

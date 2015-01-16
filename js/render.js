@@ -18,14 +18,17 @@ var Drawing = function(width,height,DOMObject){
             delete this.list[id];
         }
     };
-    this.render = function(){
+    this.render = function(canvasObject){
         self.context.clearRect(0,0,self.canvas.width,self.canvas.height);
         for (var key in self.stack.list) {
             self.context.beginPath();
             self.context.fillStyle = '#000000';
             self.context.strokeStyle = '#000000';
             self.context.closePath();
-            moveTo(self.stack.list[key]);
+            //moveTo(self.stack.list[key]);
+            for(var child in self.stack.list[key].childrens){
+
+            }
             self.stack.list[key].animate(self.context);
         }
     };

@@ -60,12 +60,7 @@ for(var i = 1;i<5;i++){
 }
 
 (function(){
-    var palmTrunk = new CanvasObject('palmTrunk',canvas);
-    palmTrunk.animate = function(context){
-        context.beginPath();
-        context.rect(this.now.parentX,this.now.parentY,20,70);
-        context.closePath();
-    };
+    var palmTrunk = new Circle(5,'palmBranch',canvas,{fill: '#994433'});
     palm.appendChild(palmTrunk);
 })();
 
