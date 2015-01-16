@@ -13,7 +13,6 @@ var Circle = function(radius,id,drawingObject){
             }
         }
     });
-    this.now = {};
     this.radius = radius;
     this.id = id || '' + Math.random();
     this.start = function(){
