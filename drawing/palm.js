@@ -8,11 +8,6 @@ var random = function(min,max){
 
 var palm = new CanvasObject('myLittlePalm',canvas);
 palm.x = palm.y = 50;
-palm.animate = function(context){
-    for(var key in this.childrens){
-        this.childrens[key].animate(context);
-    }
-};
 var palmBranchAnimate = function(context){
     var index = this.now.index;
     context.beginPath();
