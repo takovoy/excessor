@@ -8,11 +8,6 @@ var random = function(min,max){
 
 var palm = new CanvasObject('myLittlePalm',canvas);
 palm.x = palm.y = 50;
-palm.animate = function(context){
-    for(var key in this.childrens){
-        this.childrens[key].animate(context);
-    }
-};
 var palmBranchAnimate = function(context){
     var index = this.now.index;
     context.beginPath();
@@ -53,14 +48,16 @@ for(var i = 1;i<5;i++){
         stepUp: random(5,10) / 10,
         stepDown: random(5,10) / 10
     });
-    branch.x = palm.x;
-    branch.y = palm.y;
+    branch.x = 0;
+    branch.y = 0;
     branch.animate = palmBranchAnimate;
     palm.appendChild(branch);
 }
 
 (function(){
-    var palmTrunk = new Circle(5,'palmBranch',canvas,{fill: '#994433'});
+    var palmTrunk = new Circle(10,'palmTrunk',canvas,
+        {fill: '#994433',stroke: '#000000'}
+    );
     palm.appendChild(palmTrunk);
 })();
 

@@ -7,6 +7,9 @@ var CanvasObject = function(id,drawingObject,parameters){
     Object.defineProperties(this,{
         x: {
             get: function(){
+                if(this.parent){
+                    return this.parent.x + this.now.x;
+                }
                 return this.now.x;
             },
             set: function(value){
@@ -15,6 +18,9 @@ var CanvasObject = function(id,drawingObject,parameters){
         },
         y: {
             get: function(){
+                if(this.parent){
+                    return this.parent.y + this.now.y;
+                }
                 return this.now.y;
             },
             set: function(value){
@@ -22,8 +28,8 @@ var CanvasObject = function(id,drawingObject,parameters){
             }
         }
     });
-    this.x = 0;
-    this.y = 0;
+    this.x = this.now.x || 0;
+    this.y = this.now.y || 0;
     this.id = id || '' + Math.random();
     this.after = {
         list: {},
@@ -44,15 +50,13 @@ var CanvasObject = function(id,drawingObject,parameters){
     this.stop = function(){
         drawingObject.stack.remove(this.id);
     };
+    this.childrens = {};
+    this.appendChild = function(canvasObject){
+        canvasObject.parent = this.now;
+        this.childrens[canvasObject.id] = canvasObject;
+    };
+    this.removeChild = function(id){
+        delete this.childrens[id];
+    };
+    this.animate = function(){};
 };
-
-CanvasObject.prototype.childrens = {};
-CanvasObject.prototype.appendChild = function(canvasObject){
-    canvasObject.parent = this.now;
-    this.childrens[canvasObject.id] = canvasObject;
-};
-CanvasObject.prototype.removeChild = function(id){
-    delete this.childrens[id];
-};
-
-CanvasObject.prototype.animate = function(){};
