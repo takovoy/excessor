@@ -17,7 +17,7 @@ var hat = new CanvasObject('paperHat',canvas);
         ],
         'hatContour',
         canvas,
-        [70,80]
+        {moveTo: [70,80]}
     );
     hat.appendChild(hatContour);
 })();

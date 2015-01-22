@@ -2,7 +2,7 @@
  * Created by takovoy on 11.01.2015.
  */
 
-var QuadraticCurve = function(points,id,drawingObject,moveTo){
+var QuadraticCurve = function(points,id,drawingObject,parameters){
     Object.defineProperties(this,{
         points: {
             get: function(){
@@ -13,8 +13,7 @@ var QuadraticCurve = function(points,id,drawingObject,moveTo){
             }
         }
     });
-    this.now = {};
-    this.now.moveTo = moveTo || false;
+    this.now = parameters || {};
     this.points = points || [];
     this.id = id || '' + Math.random();
     this.start = function(){
