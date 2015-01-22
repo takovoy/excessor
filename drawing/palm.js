@@ -2,10 +2,6 @@
  * Created by takovoy on 29.12.2014.
  */
 
-var random = function(min,max){
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-};
-
 var palm = new CanvasObject('myLittlePalm',canvas);
 palm.x = palm.y = 50;
 var palmBranchAnimate = function(context){
@@ -37,29 +33,28 @@ var palmBranchAnimate = function(context){
     else {this.now.index -= this.now.stepUp}
 };
 
-for(var i = 1;i<5;i++){
-    var index = 1;
-    if(i > 2){index = -1}
-    var branch = new CanvasObject('branch' + i,canvas,{
-        shiftX: 5 * index,
-        shiftY: 5 + (i % 2) * i / 2,
-        index: (i % 2) * 10,
-        checked: !!(i % 2),
-        stepUp: random(5,10) / 10,
-        stepDown: random(5,10) / 10
-    });
-    branch.x = palm.x;
-    branch.y = palm.y;
-    branch.animate = palmBranchAnimate;
-    palm.appendChild(branch);
-}
-
 (function(){
+    for(var i = 1;i<5;i++){
+        var index = 1;
+        if(i > 2){index = -1}
+        var branch = new CanvasObject('branch' + i,canvas,{
+            shiftX: 5 * index,
+            shiftY: 5 + (i % 2) * i / 2,
+            index: (i % 2) * 10,
+            checked: !!(i % 2),
+            stepUp: random(5,10) / 10,
+            stepDown: random(5,10) / 10
+        });
+        branch.x = branch.y = 0;
+        branch.animate = palmBranchAnimate;
+        palm.appendChild(branch);
+    }
+
     var palmTrunk = new Circle(5,'palmBranch',canvas,{fill: '#994433'});
+    palmTrunk.y = 3;
     palm.appendChild(palmTrunk);
 })();
-
-window.addEventListener('load',function(){
-    palm.start();
-    hat.start();
-});
+//
+//window.addEventListener('load',function(){
+//    palm.start();
+//});

@@ -7,6 +7,9 @@ var CanvasObject = function(id,drawingObject,parameters){
     Object.defineProperties(this,{
         x: {
             get: function(){
+                if(this.parent){
+                    return this.now.x + this.parent.x;
+                }
                 return this.now.x;
             },
             set: function(value){
@@ -15,6 +18,9 @@ var CanvasObject = function(id,drawingObject,parameters){
         },
         y: {
             get: function(){
+                if(this.parent){
+                    return this.now.y + this.parent.y;
+                }
                 return this.now.y;
             },
             set: function(value){
@@ -44,9 +50,10 @@ var CanvasObject = function(id,drawingObject,parameters){
     this.stop = function(){
         drawingObject.stack.remove(this.id);
     };
+    this.childrens = {};
+    this.animate = function(context){};
 };
 
-CanvasObject.prototype.childrens = {};
 CanvasObject.prototype.appendChild = function(canvasObject){
     canvasObject.parent = this.now;
     this.childrens[canvasObject.id] = canvasObject;

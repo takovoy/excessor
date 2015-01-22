@@ -2,6 +2,14 @@
  * Created by takovoy on 22.11.2014.
  */
 
+var random = function(min,max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
+var getRandomRGB = function(min,max){
+    return 'rgb(' + random(min,max) + ',' + random(min,max) + ',' + random(min,max) + ')'
+};
+
 var Drawing = function(width,height,DOMObject){
     var self = this;
     this.canvas = document.createElement('canvas');
@@ -32,6 +40,7 @@ var Drawing = function(width,height,DOMObject){
     Object.defineProperty(this,'fps',{
         set: function(value){
             var self = this;
+            if(this.core){clearInterval(this.core)}
             self.core = setInterval(function(){
                 self.context.clearRect(0,0,self.canvas.width,self.canvas.height);
                 for (var key in self.stack.list) {
