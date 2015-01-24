@@ -12,5 +12,5 @@ var polygon = new Polygon(5,'myLittlePolygon',canvas,
 polygon.x = polygon.y = 100;
 
 window.addEventListener('load',function(){
-    polygon.start();
+//    polygon.start();
 });

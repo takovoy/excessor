@@ -3,4 +3,4 @@
  */
 
 var canvas;
-canvas = new Drawing(200, 200,function(){return document.body});
+canvas = new Drawing(200, 600,function(){return document.body});

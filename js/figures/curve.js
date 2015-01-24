@@ -1,17 +1,16 @@
 /**
- * Created by Пользователь on 21.01.2015.
+ * Created by takovoy on 22.01.2015.
  */
 
-var Polygon = function(sidesCount,id,drawingObject,parameters){
+var Curve = function(points,id,drawingObject,parameters){
     this.now = parameters || {};
-    if(!parameters.radian){this.now.radian = Math.PI/180*270}
     Object.defineProperties(this,{
-        sidesCount: {
+        points: {
             get: function(){
-                return this.now.sidesCount;
+                return this.now.points;
             },
             set: function(value){
-                this.now.sidesCount = value;
+                this.now.points = value;
             }
         },
         x: {
@@ -35,7 +34,7 @@ var Polygon = function(sidesCount,id,drawingObject,parameters){
     });
     this.x = 0;
     this.y = 0;
-    this.sidesCount = sidesCount;
+    this.points = points;
     this.id = id || '' + Math.random();
     this.start = function(){
         drawingObject.stack.append(this);
@@ -44,25 +43,16 @@ var Polygon = function(sidesCount,id,drawingObject,parameters){
         drawingObject.stack.remove(this.id);
     };
 };
-Polygon.prototype = Object.create(CanvasObject.prototype);
+Curve.prototype = Object.create(CanvasObject.prototype);
 
-Polygon.prototype.animate = function(context){
-    if(this.sidesCount < 3){return false}
+Curve.prototype.animate = function(context){
     context.beginPath();
-    context.moveTo(
-        formula.getPointOnCircle(this.now.radian,this.now.radius,this.x,this.y)[0],
-        formula.getPointOnCircle(this.now.radian,this.now.radius,this.x,this.y)[1]
-    );
-    for(var i = 0;i < this.sidesCount;i++){
-        context.lineTo(
-            formula.getPointOnCircle(Math.PI*2 / this.sidesCount * i + this.now.radian,this.now.radius,this.x,this.y)[0],
-            formula.getPointOnCircle(Math.PI*2 / this.sidesCount * i + this.now.radian,this.now.radius,this.x,this.y)[1]
-        );
+    if(this.points.length < 2) {return}
+    context.moveTo(this.points[0][0],this.points[0][1]);
+    for(var i = 0;i < this.now.shift;i += this.now.step){
+        var coord = formula.getPointOnCurve(i,this.points);
+        context.lineTo(coord[0],coord[1]);
     }
-    context.lineTo(
-        formula.getPointOnCircle(this.now.radian,this.now.radius,this.x,this.y)[0],
-        formula.getPointOnCircle(this.now.radian,this.now.radius,this.x,this.y)[1]
-    );
     if(this.now.fill){
         context.fillStyle = this.now.fill;
         context.fill();
