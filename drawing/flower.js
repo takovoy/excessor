@@ -23,8 +23,40 @@ sun.appendChild(new Curve(
     {step: 1,shift: 1,stroke: 'green'}
 ));
 
+sun.appendChild(new Curve(
+    [
+        [100,250],
+        [150,160],
+        [280,380],
+        [150,140],
+        [170,330],
+        [100,250]
+    ],
+    'sheet_0',
+    canvas,
+    {step: 1,shift: 0,stroke: 'green'}
+));
+
+sun.appendChild(new Curve(
+    [
+        [100,250],
+        [50,160],
+        [-80,380],
+        [50,140],
+        [50,330],
+        [100,250]
+    ],
+    'sheet_1',
+    canvas,
+    {step: 1,shift: 0,stroke: 'green'}
+));
+
 sun.appendChild(new Circle(15,'sunCenter',canvas,{fill: '#FFB151'}));
 sun.animate = function(context){
+    if(this.childrens['flowerStem'].now.shift >= 50 && this.childrens['sheet_0'].now.shift < 100){
+        this.childrens['sheet_0'].now.shift++;
+        this.childrens['sheet_1'].now.shift++;
+    }
     if(this.childrens['flowerStem'].now.shift <= 100){
         this.childrens['flowerStem'].now.shift++
     } else {
