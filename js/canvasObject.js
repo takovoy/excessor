@@ -51,7 +51,6 @@ var CanvasObject = function(id,drawingObject,parameters){
         drawingObject.stack.remove(this.id);
     };
     this.childrens = {};
-    this.animate = function(context){};
 };
 
 CanvasObject.prototype.appendChild = function(canvasObject){

@@ -4,32 +4,36 @@
 
 var Polygon = function(sidesCount,id,drawingObject,parameters){
     this.now = parameters || {};
-    if(!parameters.radian){this.now.radian = Math.PI/180*270}
+    if(!this.now.radian){this.now.radian = Math.PI/180*270}
     Object.defineProperties(this,{
         sidesCount: {
             get: function(){
                 return this.now.sidesCount;
             },
             set: function(value){
-                this.now.sidesCount = value;
+                this.now.sidesCount = +value;
             }
         },
         x: {
             get: function(){
-                if(this.parent){return this.now.x + this.parent.x}
+                if(this.parent){
+                    return this.now.x + this.parent.x;
+                }
                 return this.now.x;
             },
             set: function(value){
-                this.now.x = value;
+                this.now.x = +value;
             }
         },
         y: {
             get: function(){
-                if(this.parent){return this.now.y + this.parent.y}
+                if(this.parent){
+                    return this.now.y + this.parent.y;
+                }
                 return this.now.y;
             },
             set: function(value){
-                this.now.y = value;
+                this.now.y = +value;
             }
         }
     });

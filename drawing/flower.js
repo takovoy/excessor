@@ -2,7 +2,7 @@
  * Created by Пользователь on 21.01.2015.
  */
 
-var sun = new CanvasObject('myFlowerAnimate',canvas,
+var sun = new CanvasObject('myFlowerAnimate',drawingData.drawing,
     {
         shift: 0,
         step: 0.1,
@@ -19,7 +19,7 @@ sun.appendChild(new Curve(
         [100,400]
     ],
     'flowerStem',
-    canvas,
+    drawingData.drawing,
     {step: 1,shift: 1,stroke: 'green'}
 ));
 
@@ -33,7 +33,7 @@ sun.appendChild(new Curve(
         [100,250]
     ],
     'sheet_0',
-    canvas,
+    drawingData.drawing,
     {step: 1,shift: 0,stroke: 'green'}
 ));
 
@@ -47,11 +47,11 @@ sun.appendChild(new Curve(
         [100,250]
     ],
     'sheet_1',
-    canvas,
+    drawingData.drawing,
     {step: 1,shift: 0,stroke: 'green'}
 ));
 
-sun.appendChild(new Circle(15,'sunCenter',canvas,{fill: '#FFB151'}));
+sun.appendChild(new Circle(15,'sunCenter',drawingData.drawing,{fill: '#FFB151'}));
 sun.animate = function(context){
     if(this.childrens['flowerStem'].now.shift >= 50 && this.childrens['sheet_0'].now.shift < 100){
         this.childrens['sheet_0'].now.shift++;
@@ -71,7 +71,7 @@ sun.animate = function(context){
 
     for(var i = 0;i < this.now.petalCount;i++){
         if(!this.childrens['beam_' + i]){
-            this.appendChild(new Polygon(3,'beam_' + i,canvas,{radius: 5, fill: '#FFB151'}));
+            this.appendChild(new Polygon(3,'beam_' + i, null,{radius: 5, fill: '#FFB151'}));
         }
         if(this.childrens['beam_' + i].now.radius < 30){
             this.childrens['beam_' + i].now.radius++;
@@ -86,7 +86,3 @@ sun.animate = function(context){
     }
     this.now.shift += this.now.step;
 };
-
-window.addEventListener('load',function(){
-    sun.start();
-});

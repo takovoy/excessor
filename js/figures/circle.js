@@ -21,7 +21,7 @@ var Circle = function(radius,id,drawingObject,parameters){
                 return this.now.x;
             },
             set: function(value){
-                this.now.x = value;
+                this.now.x = +value;
             }
         },
         y: {
@@ -32,7 +32,7 @@ var Circle = function(radius,id,drawingObject,parameters){
                 return this.now.y;
             },
             set: function(value){
-                this.now.y = value;
+                this.now.y = +value;
             }
         }
     });
@@ -46,18 +46,19 @@ var Circle = function(radius,id,drawingObject,parameters){
     this.stop = function(){
         drawingObject.stack.remove(this.id);
     };
-    this.animate = function(context){
-        context.beginPath();
-        context.arc(this.x,this.y,this.radius,0,Math.PI*2);
-        if(this.now.fill){
-            context.fillStyle = this.now.fill;
-            context.fill();
-        }
-        if(this.now.stroke){
-            context.strokeStyle = this.now.stroke;
-            context.stroke();
-        }
-        context.closePath();
-    }
 };
 Circle.prototype = Object.create(CanvasObject.prototype);
+
+Circle.prototype.animate = function(context){
+    context.beginPath();
+    context.arc(this.x,this.y,this.radius,0,Math.PI*2);
+    if(this.now.fill){
+        context.fillStyle = this.now.fill;
+        context.fill();
+    }
+    if(this.now.stroke){
+        context.strokeStyle = this.now.stroke;
+        context.stroke();
+    }
+    context.closePath();
+};

@@ -2,20 +2,19 @@
  * Created by takovoy on 22.11.2014.
  */
 
-var random = function(min,max){
+function random (min,max){
     return Math.floor(Math.random() * (max - min + 1)) + min;
-};
+}
 
-var getRandomRGB = function(min,max){
+function getRandomRGB (min,max){
     return 'rgb(' + random(min,max) + ',' + random(min,max) + ',' + random(min,max) + ')'
-};
+}
 
-var Drawing = function(width,height,DOMObject){
+var Drawing = function(width,height){
     var self = this;
     this.canvas = document.createElement('canvas');
     this.canvas.width = width || 0;
     this.canvas.height = height || 0;
-    DObjects.push([DOMObject,this.canvas]);
     this.context = this.canvas.getContext('2d');
     this.stack = {
         list: {},
@@ -33,28 +32,26 @@ var Drawing = function(width,height,DOMObject){
         self.context.closePath();
         //moveTo(self.stack.list[key]);
         for(var child in canvasObject.childrens){
-            self.render(canvasObject.childrens[child]);
+            this.render(canvasObject.childrens[child]);
         }
         canvasObject.animate(this.context);
     };
     Object.defineProperty(this,'fps',{
+        get: function(){
+            return this._fps;
+        },
         set: function(value){
             var self = this;
             if(this.core){clearInterval(this.core)}
-            self.core = setInterval(function(){
-                self.context.clearRect(0,0,self.canvas.width,self.canvas.height);
-                for (var key in self.stack.list) {
-                    self.render(self.stack.list[key]);
-                }
-            },1000 / +value)
+            if(value != 0){
+                this.core = setInterval(function(){
+                    self.context.clearRect(0,0,self.canvas.width,self.canvas.height);
+                    for (var key in self.stack.list) {
+                        self.render(self.stack.list[key]);
+                    }
+                },1000 / +value);
+            }
+            this._fps = value
         }
     });
-    this.fps = 25;
 };
-
-var DObjects = [];
-window.addEventListener('load',function(){
-    for(var i in DObjects){
-        DObjects[i][0]().appendChild(DObjects[i][1]);
-    }
-});

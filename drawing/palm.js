@@ -2,7 +2,7 @@
  * Created by takovoy on 29.12.2014.
  */
 
-var palm = new CanvasObject('myLittlePalm',canvas);
+var palm = new CanvasObject('myLittlePalm',drawingData.drawing);
 palm.x = palm.y = 50;
 var palmBranchAnimate = function(context){
     var index = this.now.index;
@@ -37,7 +37,7 @@ var palmBranchAnimate = function(context){
     for(var i = 1;i<5;i++){
         var index = 1;
         if(i > 2){index = -1}
-        var branch = new CanvasObject('branch' + i,canvas,{
+        var branch = new CanvasObject('branch' + i,drawingData.drawing,{
             shiftX: 5 * index,
             shiftY: 5 + (i % 2) * i / 2,
             index: (i % 2) * 10,
@@ -50,11 +50,7 @@ var palmBranchAnimate = function(context){
         palm.appendChild(branch);
     }
 
-    var palmTrunk = new Circle(5,'palmBranch',canvas,{fill: '#994433'});
+    var palmTrunk = new Circle(5,'palmBranch',drawingData.drawing,{fill: '#994433'});
     palmTrunk.y = 3;
     palm.appendChild(palmTrunk);
 })();
-//
-//window.addEventListener('load',function(){
-//    palm.start();
-//});
