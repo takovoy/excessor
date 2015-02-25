@@ -10,21 +10,13 @@ function getRandomRGB (min,max){
     return 'rgb(' + random(min,max) + ',' + random(min,max) + ',' + random(min,max) + ')'
 }
 
-var Drawing = function(width,height){
+function Drawing (width,height){
     var self = this;
     this.canvas = document.createElement('canvas');
     this.canvas.width = width || 0;
     this.canvas.height = height || 0;
     this.context = this.canvas.getContext('2d');
-    this.stack = {
-        list: {},
-        append: function (canvasObject) {
-            this.list[canvasObject.id] = canvasObject;
-        },
-        remove: function (id) {
-            delete this.list[id];
-        }
-    };
+    this.stack = new PropertyListing();
     this.render = function(canvasObject){
         self.context.beginPath();
         self.context.fillStyle = '#000000';
@@ -36,6 +28,8 @@ var Drawing = function(width,height){
         }
         canvasObject.animate(this.context);
     };
+    this._fps = 0;
+    this.core = false;
     Object.defineProperty(this,'fps',{
         get: function(){
             return this._fps;
@@ -54,4 +48,4 @@ var Drawing = function(width,height){
             this._fps = value
         }
     });
-};
+}
