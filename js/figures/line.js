@@ -25,6 +25,7 @@ var Line = function(point,id,drawingObject){
     this.stop = function(){
         drawingObject.stack.remove(this.id);
     };
+    this.constructor = Line;
 };
 Line.prototype = Object.create(CanvasObject.prototype);
 

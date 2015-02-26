@@ -46,6 +46,7 @@ var Circle = function(radius,id,drawingObject,parameters){
     this.stop = function(){
         drawingObject.stack.remove(this.id);
     };
+    this.constructor = Circle;
 };
 Circle.prototype = Object.create(CanvasObject.prototype);
 

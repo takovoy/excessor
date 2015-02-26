@@ -6,7 +6,17 @@ var drawingData = {
     drawing         : new Drawing(200,400),
     _createdObject  : undefined,
     checkedObject   : undefined,
-    objects         : new PropertyListing(),
+    checkedPoint    : undefined,
+    objects         : new PropertyListing(function(self){
+        var data = [];
+        for(var key in self.list){
+            var dataLen = data.length
+            data[dataLen] = {};
+            data[dataLen].description = key;
+            data[dataLen].action = function(){};
+        }
+        toolbarElements.create.inheritance.value = data;
+    }),
     onStart         : new PropertyListing()
 };
 

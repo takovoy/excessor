@@ -47,6 +47,7 @@ var Polygon = function(sidesCount,id,drawingObject,parameters){
     this.stop = function(){
         drawingObject.stack.remove(this.id);
     };
+    this.constructor = Polygon;
 };
 Polygon.prototype = Object.create(CanvasObject.prototype);
 

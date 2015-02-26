@@ -42,6 +42,7 @@ var Curve = function(points,id,drawingObject,parameters){
     this.stop = function(){
         drawingObject.stack.remove(this.id);
     };
+    this.constructor = Curve;
 };
 Curve.prototype = Object.create(CanvasObject.prototype);
 
