@@ -10,10 +10,12 @@ var drawingData = {
     objects         : new PropertyListing(function(self){
         var data = [];
         for(var key in self.list){
-            var dataLen = data.length
+            var dataLen = data.length;
             data[dataLen] = {};
             data[dataLen].description = key;
-            data[dataLen].action = function(){};
+            data[dataLen].action = function(value){
+                drawingData.objects.list[value].appendChild(drawingData.checkedObject);
+            };
         }
         toolbarElements.create.inheritance.value = data;
     }),
