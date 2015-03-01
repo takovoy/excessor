@@ -4,6 +4,8 @@
 
 var Polygon = function(sidesCount,id,drawingObject,parameters){
     this.now = parameters || {};
+    if(drawingObject)this.drawingStack = drawingObject.stack;
+
     if(!this.now.radian){this.now.radian = Math.PI/180*270}
     Object.defineProperties(this,{
         sidesCount: {
@@ -13,40 +15,10 @@ var Polygon = function(sidesCount,id,drawingObject,parameters){
             set: function(value){
                 this.now.sidesCount = +value;
             }
-        },
-        x: {
-            get: function(){
-                if(this.parent){
-                    return this.now.x + this.parent.x;
-                }
-                return this.now.x;
-            },
-            set: function(value){
-                this.now.x = +value;
-            }
-        },
-        y: {
-            get: function(){
-                if(this.parent){
-                    return this.now.y + this.parent.y;
-                }
-                return this.now.y;
-            },
-            set: function(value){
-                this.now.y = +value;
-            }
         }
     });
-    this.x = 0;
-    this.y = 0;
     this.sidesCount = sidesCount;
     this.id = id || '' + Math.random();
-    this.start = function(){
-        drawingObject.stack.append(this);
-    };
-    this.stop = function(){
-        drawingObject.stack.remove(this.id);
-    };
     this.constructor = Polygon;
 };
 Polygon.prototype = Object.create(CanvasObject.prototype);

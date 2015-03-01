@@ -3,6 +3,8 @@
  */
 
 var Line = function(point,id,drawingObject){
+    if(drawingObject)this.drawingStack = drawingObject.stack;
+
     Object.defineProperties(this,{
         point: {
             get: function(){
@@ -19,12 +21,6 @@ var Line = function(point,id,drawingObject){
         this.now.point.push(value);
     };
     this.id = id || '' + Math.random();
-    this.start = function(){
-        drawingObject.stack.append(this);
-    };
-    this.stop = function(){
-        drawingObject.stack.remove(this.id);
-    };
     this.constructor = Line;
 };
 Line.prototype = Object.create(CanvasObject.prototype);

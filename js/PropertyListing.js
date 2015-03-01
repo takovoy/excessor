@@ -10,7 +10,7 @@ function PropertyListing (append,remove){
 
 PropertyListing.prototype.append = function (object) {
     this.list[object.id] = object;
-    this.up(this);
+    this.up(this,object);
 };
 PropertyListing.prototype.remove = function (id) {
     delete this.list[id];

@@ -51,7 +51,8 @@ sun.appendChild(new Curve(
     {step: 1,shift: 0,stroke: 'green'}
 ));
 
-sun.appendChild(new Circle(15,'sunCenter',drawingData.drawing,{fill: '#FFB151'}));
+sun.appendChild(new Circle(15,'sunCenter',drawingData.drawing,{fill: '#FFB151',x:0,y:0}));
+
 sun.animate = function(context){
     if(this.childrens['flowerStem'].now.shift >= 50 && this.childrens['sheet_0'].now.shift < 100){
         this.childrens['sheet_0'].now.shift++;

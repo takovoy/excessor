@@ -4,32 +4,6 @@
 
 var CanvasObject = function(id,drawingObject,parameters){
     this.now = parameters || {};
-    Object.defineProperties(this,{
-        x: {
-            get: function(){
-                if(this.parent){
-                    return this.now.x + this.parent.x;
-                }
-                return this.now.x;
-            },
-            set: function(value){
-                this.now.x = value;
-            }
-        },
-        y: {
-            get: function(){
-                if(this.parent){
-                    return this.now.y + this.parent.y;
-                }
-                return this.now.y;
-            },
-            set: function(value){
-                this.now.y = value;
-            }
-        }
-    });
-    this.x = 0;
-    this.y = 0;
     this.id = id || '' + Math.random();
     this.after = {
         list: {},
@@ -44,13 +18,40 @@ var CanvasObject = function(id,drawingObject,parameters){
             delete this.list[name];
         }
     };
-    this.start = function(){
-        drawingObject.stack.append(this);
-    };
-    this.stop = function(){
-        drawingObject.stack.remove(this.id);
-    };
+    this.drawingStack = drawingObject.stack;
     this.childrens = {};
+};
+
+Object.defineProperties(CanvasObject.prototype,{
+    x: {
+        get: function(){
+            if(this.parent){
+                return +this.now.x + this.parent.x;
+            }
+            return +this.now.x;
+        },
+        set: function(value){
+            this.now.x = +value;
+        }
+    },
+    y: {
+        get: function(){
+            if(this.parent){
+                return +this.now.y + this.parent.y;
+            }
+            return +this.now.y;
+        },
+        set: function(value){
+            this.now.y = +value;
+        }
+    }
+});
+
+CanvasObject.prototype.start = function(){
+    this.drawingStack.append(this);
+};
+CanvasObject.prototype.stop = function(){
+    this.drawingStack.remove(this.id);
 };
 
 CanvasObject.prototype.appendChild = function(canvasObject){

@@ -4,6 +4,8 @@
 
 var Curve = function(points,id,drawingObject,parameters){
     this.now = parameters || {};
+    if(drawingObject)this.drawingStack = drawingObject.stack;
+
     Object.defineProperties(this,{
         points: {
             get: function(){
@@ -12,36 +14,10 @@ var Curve = function(points,id,drawingObject,parameters){
             set: function(value){
                 this.now.points = value;
             }
-        },
-        x: {
-            get: function(){
-                if(this.parent){return this.now.x + this.parent.x}
-                return this.now.x;
-            },
-            set: function(value){
-                this.now.x = value;
-            }
-        },
-        y: {
-            get: function(){
-                if(this.parent){return this.now.y + this.parent.y}
-                return this.now.y;
-            },
-            set: function(value){
-                this.now.y = value;
-            }
         }
     });
-    this.x = 0;
-    this.y = 0;
     this.points = points;
     this.id = id || '' + Math.random();
-    this.start = function(){
-        drawingObject.stack.append(this);
-    };
-    this.stop = function(){
-        drawingObject.stack.remove(this.id);
-    };
     this.constructor = Curve;
 };
 Curve.prototype = Object.create(CanvasObject.prototype);

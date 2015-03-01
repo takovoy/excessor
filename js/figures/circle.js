@@ -4,6 +4,8 @@
 
 var Circle = function(radius,id,drawingObject,parameters){
     this.now = parameters || {};
+    if(drawingObject)this.drawingStack = drawingObject.stack;
+
     Object.defineProperties(this,{
         radius: {
             get: function(){
@@ -12,40 +14,10 @@ var Circle = function(radius,id,drawingObject,parameters){
             set: function(value){
                 this.now.radius = value;
             }
-        },
-        x: {
-            get: function(){
-                if(this.parent){
-                    return this.now.x + this.parent.x;
-                }
-                return this.now.x;
-            },
-            set: function(value){
-                this.now.x = +value;
-            }
-        },
-        y: {
-            get: function(){
-                if(this.parent){
-                    return this.now.y + this.parent.y;
-                }
-                return this.now.y;
-            },
-            set: function(value){
-                this.now.y = +value;
-            }
         }
     });
-    this.x = 0;
-    this.y = 0;
     this.radius = radius;
     this.id = id || '' + Math.random();
-    this.start = function(){
-        drawingObject.stack.append(this);
-    };
-    this.stop = function(){
-        drawingObject.stack.remove(this.id);
-    };
     this.constructor = Circle;
 };
 Circle.prototype = Object.create(CanvasObject.prototype);
