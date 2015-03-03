@@ -18,10 +18,11 @@ var dynamic = {
                     var callback;
 
                     if(after.callback) {
-                        callback = canvasObject.after.append(after.callback);
+                        callback = after.callback;
                     }
 
                     canvasObject.after.remove(key);
+                    canvasObject.after.append(callback);
                 }
 
                 continue;
