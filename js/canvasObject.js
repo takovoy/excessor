@@ -18,7 +18,7 @@ var CanvasObject = function(id,drawingObject,parameters){
             delete this.list[name];
         }
     };
-    this.drawingStack = drawingObject.stack;
+    this.drawingObject = drawingObject;
     this.childrens = {};
 };
 
@@ -48,10 +48,10 @@ Object.defineProperties(CanvasObject.prototype,{
 });
 
 CanvasObject.prototype.start = function(){
-    this.drawingStack.append(this);
+    this.drawingObject.stack.append(this);
 };
 CanvasObject.prototype.stop = function(){
-    this.drawingStack.remove(this.id);
+    this.drawingObject.stack.remove(this.id);
 };
 
 CanvasObject.prototype.appendChild = function(canvasObject){
