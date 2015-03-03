@@ -5,10 +5,10 @@
 var formula = {
 
     getPointOnCircle: function(radian,radius,centerX,centerY){
-        centerX = centerX || 0;
-        centerY = centerY || 0;
-        var y = radius * Math.sin(radian);
-        var x = radius * Math.cos(radian);
+        centerX = +centerX || 0;
+        centerY = +centerY || 0;
+        var y = +radius * Math.sin(+radian);
+        var x = +radius * Math.cos(+radian);
         return [centerX + x,centerY + y];
     },
 
