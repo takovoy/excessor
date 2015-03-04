@@ -4,7 +4,7 @@
 
 var Curve = function(points,id,drawingObject,parameters){
     this.now = parameters || {};
-    if(drawingObject)this.drawingStack = drawingObject.stack;
+    if(drawingObject)this.drawingObject = drawingObject;
 
     Object.defineProperties(this,{
         points: {

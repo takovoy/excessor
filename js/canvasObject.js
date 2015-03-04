@@ -7,12 +7,8 @@ var CanvasObject = function(id,drawingObject,parameters){
     this.id = id || '' + Math.random();
     this.after = {
         list: {},
-        append: function(name,value,time,type){
-            this.list[name] = {
-                value: value,
-                time: time,
-                type: type
-            };
+        append: function(name,data){
+            this.list[name] = data;
         },
         remove: function(name){
             delete this.list[name];

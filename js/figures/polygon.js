@@ -4,7 +4,7 @@
 
 var Polygon = function(sidesCount,id,drawingObject,parameters){
     this.now = parameters || {};
-    if(drawingObject)this.drawingStack = drawingObject.stack;
+    if(drawingObject)this.drawingObject = drawingObject;
 
     if(!this.now.radian){this.now.radian = Math.PI/180*270}
     Object.defineProperties(this,{

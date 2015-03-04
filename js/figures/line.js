@@ -3,7 +3,7 @@
  */
 
 var Line = function(point,id,drawingObject){
-    if(drawingObject)this.drawingStack = drawingObject.stack;
+    if(drawingObject)this.drawingObject = drawingObject;
 
     Object.defineProperties(this,{
         point: {

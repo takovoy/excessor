@@ -22,7 +22,7 @@ var dynamic = {
                     }
 
                     canvasObject.after.remove(key);
-                    canvasObject.after.append(callback);
+                    drawingData.objects.getObject(callback.id).after.append(callback.data);
                 }
 
                 continue;

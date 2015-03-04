@@ -16,3 +16,6 @@ PropertyListing.prototype.remove = function (id) {
     delete this.list[id];
     this.rem(this);
 };
+PropertyListing.prototype.getObject = function (id) {
+    return this.list[id];
+};

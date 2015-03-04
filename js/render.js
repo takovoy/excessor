@@ -17,14 +17,15 @@ function Drawing (width,height){
     this.canvas.height = height || 0;
     this.context = this.canvas.getContext('2d');
     this.stack = new PropertyListing();
-    this.render = function(canvasObject){
+    this.render = function(canvasObject,key){
+        canvasObject.id = key;
         self.context.beginPath();
         self.context.fillStyle = '#000000';
         self.context.strokeStyle = '#000000';
         self.context.closePath();
         //moveTo(self.stack.list[key]);
         for(var child in canvasObject.childrens){
-            this.render(canvasObject.childrens[child]);
+            this.render(canvasObject.childrens[child],child);
         }
         canvasObject.animate(this.context);
     };
@@ -41,7 +42,7 @@ function Drawing (width,height){
                 this.core = setInterval(function(){
                     self.context.clearRect(0,0,self.canvas.width,self.canvas.height);
                     for (var key in self.stack.list) {
-                        self.render(self.stack.list[key]);
+                        self.render(self.stack.list[key],key);
                     }
                 },1000 / +value);
             }
