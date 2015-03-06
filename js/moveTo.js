@@ -12,7 +12,11 @@ var dynamic = {
             if(this.data[key]){
                 this.data[key].prepareData(canvasObject);
 
-                if(after[key].shift >= after[key].endShift){
+                if(after[key].endShift == 'cycle'){
+                    if(after[key].shift >= 100){
+                        after[key].shift = 0;
+                    }
+                } else if(after[key].shift >= after[key].endShift){
                     var callback = false;
 
                     if(after[key].callback) {
@@ -35,6 +39,7 @@ var dynamic = {
     //drawingData.checkedObject.after.append('trajectory',{type:'circle',shift:0,endShift:100,radius:20,center:[100,100]});
 
     data: {
+
         trajectory: {
 
             type        : 'trajectory',
@@ -70,16 +75,17 @@ var dynamic = {
                 },
 
                 line    : function(data){
-
+                    return formula.getPointOnLine(data.shift,data.points);
                 },
 
                 curve   : function(data){
-
+                    return formula.getPointOnCurve(data.shift,data.points);
                 }
 
             }
 
         },
+
         color   : {
 
             type        : 'color',
@@ -93,6 +99,7 @@ var dynamic = {
             }
 
         },
+
         radian  : {
 
             type        : 'radian',
@@ -106,6 +113,7 @@ var dynamic = {
             }
 
         },
+
         radius  : {
 
             type        : 'radius',
