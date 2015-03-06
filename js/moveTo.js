@@ -5,24 +5,25 @@
 var dynamic = {
 
     move: function(canvasObject){
-        var fps         = canvasObject.drawingObject.fps,
-            incidence   = 1000 / fps,
-            after       = canvasObject.after.list;
+        var after       = canvasObject.after.list;
 
         for(var key in after){
 
             if(this.data[key]){
                 this.data[key].prepareData(canvasObject);
 
-                if(after.shift >= after.endShift){
-                    var callback;
+                if(after[key].shift >= after[key].endShift){
+                    var callback = false;
 
-                    if(after.callback) {
-                        callback = after.callback;
+                    if(after[key].callback) {
+                        callback = after[key].callback;
                     }
 
                     canvasObject.after.remove(key);
-                    drawingData.objects.getObject(callback.id).after.append(callback.data);
+
+                    if(callback){
+                        drawingData.objects.getObject(callback.id).after.append(callback.data);
+                    }
                 }
 
                 continue;
@@ -31,25 +32,25 @@ var dynamic = {
         }
 
     },
+    //drawingData.checkedObject.after.append('trajectory',{shift:0,endShift:100,type:'circle',radius:20,center:[100,100]});
 
     data: {
         trajectory: {
 
             type        : 'trajectory',
-
             prepareData : function(canvasObject){
                 var key         = this.type,
                     fps         = canvasObject.drawingObject.fps,
-                    incidence   = 1000 / fps,
+                    incidence   = 1000 / (+fps),
                     after       = canvasObject.after.list;
-
                 if(!after[key].step){
-                    after[key].step =       after[key].time / 100 * (after[key].time / incidence);
+                    after[key].step = (after[key].endShift - after[key].shift) / (after[key].time / incidence);
                 }
 
-                after[key].shift    +=      after[key].step;
-                canvasObject.x      =       this.functions[after[key].type](after[key])[0];
-                canvasObject.y      =       this.functions[after[key].type](after[key])[1];
+                canvasObject.x      = +this.functions[after[key].type](after[key])[0];
+                canvasObject.y      = +this.functions[after[key].type](after[key])[1];
+
+                after[key].shift    += +after[key].step;
             },
 
             functions   : {

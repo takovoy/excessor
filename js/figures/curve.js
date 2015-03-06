@@ -5,6 +5,15 @@
 var Curve = function(points,id,drawingObject,parameters){
     this.now = parameters || {};
     if(drawingObject)this.drawingObject = drawingObject;
+    this.after = {
+        list: {},
+        append: function(name,data){
+            this.list[name] = data;
+        },
+        remove: function(name){
+            delete this.list[name];
+        }
+    };
 
     Object.defineProperties(this,{
         points: {
@@ -42,13 +51,6 @@ Curve.prototype.animate = function(context){
         var coord = formula.getPointOnCurve(i,this.points);
         context.lineTo(coord[0],coord[1]);
     }
-    if(this.now.fill){
-        context.fillStyle = this.now.fill;
-        context.fill();
-    }
-    if(this.now.stroke){
-        context.strokeStyle = this.now.stroke;
-        context.stroke();
-    }
+    changeContext(context,this.now);
     context.closePath();
 };

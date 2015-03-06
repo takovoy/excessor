@@ -4,6 +4,15 @@
 
 var Line = function(point,id,drawingObject){
     if(drawingObject)this.drawingObject = drawingObject;
+    this.after = {
+        list: {},
+        append: function(name,data){
+            this.list[name] = data;
+        },
+        remove: function(name){
+            delete this.list[name];
+        }
+    };
 
     Object.defineProperties(this,{
         point: {

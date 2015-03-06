@@ -5,6 +5,15 @@
 var Polygon = function(sidesCount,id,drawingObject,parameters){
     this.now = parameters || {};
     if(drawingObject)this.drawingObject = drawingObject;
+    this.after = {
+        list: {},
+        append: function(name,data){
+            this.list[name] = data;
+        },
+        remove: function(name){
+            delete this.list[name];
+        }
+    };
 
     if(!this.now.radian){this.now.radian = Math.PI/180*270}
     Object.defineProperties(this,{
@@ -40,13 +49,6 @@ Polygon.prototype.animate = function(context){
         formula.getPointOnCircle(this.now.radian,this.now.radius,this.x,this.y)[0],
         formula.getPointOnCircle(this.now.radian,this.now.radius,this.x,this.y)[1]
     );
-    if(this.now.fill){
-        context.fillStyle = this.now.fill;
-        context.fill();
-    }
-    if(this.now.stroke){
-        context.strokeStyle = this.now.stroke;
-        context.stroke();
-    }
+    changeContext(context,this.now);
     context.closePath();
 };

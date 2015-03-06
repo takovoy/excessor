@@ -23,7 +23,7 @@ function Drawing (width,height){
         self.context.fillStyle = '#000000';
         self.context.strokeStyle = '#000000';
         self.context.closePath();
-        //moveTo(self.stack.list[key]);
+        dynamic.move(canvasObject);
         for(var child in canvasObject.childrens){
             this.render(canvasObject.childrens[child],child);
         }
