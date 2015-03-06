@@ -1,6 +1,6 @@
 /**
  * Created by takovoy on 05.12.2014.
- */
+*/
 
 var dynamic = {
 
@@ -32,7 +32,7 @@ var dynamic = {
         }
 
     },
-    //drawingData.checkedObject.after.append('trajectory',{shift:0,endShift:100,type:'circle',radius:20,center:[100,100]});
+    //drawingData.checkedObject.after.append('trajectory',{type:'circle',shift:0,endShift:100,radius:20,center:[100,100]});
 
     data: {
         trajectory: {
@@ -108,7 +108,7 @@ var dynamic = {
         },
         radius  : {
 
-            type        : 'radian',
+            type        : 'radius',
 
             prepareData : function(canvasObject){
 
