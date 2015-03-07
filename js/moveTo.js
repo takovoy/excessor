@@ -5,32 +5,38 @@
 var dynamic = {
 
     move: function(canvasObject){
-        var after       = canvasObject.after.list;
+        var after       = canvasObject.after.list,
+            fps         = canvasObject.drawingObject.fps,
+            incidence   = 1000 / (+fps);
 
         for(var key in after){
 
+            if(!after[key].step){
+                after[key].step = (after[key].endShift - after[key].shift) / (after[key].time / incidence);
+            }
+
             if(this.data[key]){
                 this.data[key].prepareData(canvasObject);
+            }
 
-                if(after[key].endShift == 'cycle'){
-                    if(after[key].shift >= 100){
-                        after[key].shift = 0;
-                    }
-                } else if(after[key].shift >= after[key].endShift){
-                    var callback = false;
+            after[key].shift    += +after[key].step;
 
-                    if(after[key].callback) {
-                        callback = after[key].callback;
-                    }
+            if(after[key].endShift == 'cycle'){
+                if(after[key].shift >= 100){
+                    after[key].shift = 0;
+                }
+            } else if(after[key].shift >= after[key].endShift){
+                var callback = false;
 
-                    canvasObject.after.remove(key);
-
-                    if(callback){
-                        drawingData.objects.getObject(callback.id).after.append(callback.data);
-                    }
+                if(after[key].callback) {
+                    callback = after[key].callback;
                 }
 
-                continue;
+                canvasObject.after.remove(key);
+
+                if(callback){
+                    drawingData.objects.getObject(callback.id).after.append(callback.data);
+                }
             }
 
         }
@@ -45,17 +51,10 @@ var dynamic = {
             type        : 'trajectory',
             prepareData : function(canvasObject){
                 var key         = this.type,
-                    fps         = canvasObject.drawingObject.fps,
-                    incidence   = 1000 / (+fps),
                     after       = canvasObject.after.list;
-                if(!after[key].step){
-                    after[key].step = (after[key].endShift - after[key].shift) / (after[key].time / incidence);
-                }
 
                 canvasObject.x      = +this.functions[after[key].type](after[key])[0];
                 canvasObject.y      = +this.functions[after[key].type](after[key])[1];
-
-                after[key].shift    += +after[key].step;
             },
 
             functions   : {

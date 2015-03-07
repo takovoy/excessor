@@ -72,7 +72,7 @@ sun.animate = function(context){
 
     for(var i = 0;i < this.now.petalCount;i++){
         if(!this.childrens['beam_' + i]){
-            this.appendChild(new Polygon(3,'beam_' + i, null,{radius: 5, fill: '#FFB151'}));
+            this.appendChild(new Polygon(5,'beam_' + i, drawingData.drawing,{radius: 5, fill: '#FFB151'}));
         }
         if(this.childrens['beam_' + i].now.radius < 30){
             this.childrens['beam_' + i].now.radius++;
