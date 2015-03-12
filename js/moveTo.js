@@ -10,16 +10,17 @@ var dynamic = {
             incidence   = 1000 / (+fps);
 
         for(var key in after){
-
             if(!after[key].step){
                 after[key].step = (after[key].endShift - after[key].shift) / (after[key].time / incidence);
             }
+            after[key].shift    += +after[key].step;
 
             if(this.data[key]){
                 this.data[key].prepareData(canvasObject);
+            } else {
+                canvasObject.now[key] = after[key].start + (after[key].end - after[key].start) / 100 * after[key].shift;
             }
 
-            after[key].shift    += +after[key].step;
 
             if(after[key].endShift == 'cycle'){
                 if(after[key].shift >= 100){
@@ -102,20 +103,6 @@ var dynamic = {
         radian  : {
 
             type        : 'radian',
-
-            prepareData : function(canvasObject){
-
-            },
-
-            functions   : {
-
-            }
-
-        },
-
-        radius  : {
-
-            type        : 'radius',
 
             prepareData : function(canvasObject){
 

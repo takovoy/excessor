@@ -53,26 +53,25 @@ sun.appendChild(new Curve(
 
 sun.appendChild(new Circle(15,'sunCenter',drawingData.drawing,{fill: '#FFB151',x:0,y:0}));
 
+sun.childrens.flowerStem.after.append('shift',{shift:0,endShift:100,start: 0,end: 100,time: 3500});
+sun.childrens.sunCenter.after.append('radius',{shift:0,endShift:100,start: 15,end: 40,time: 1000});
+
 sun.animate = function(context){
-    if(this.childrens['flowerStem'].now.shift >= 50 && this.childrens['sheet_0'].now.shift < 100){
-        this.childrens['sheet_0'].now.shift++;
-        this.childrens['sheet_1'].now.shift++;
-    }
-    if(this.childrens['flowerStem'].now.shift <= 100){
-        this.childrens['flowerStem'].now.shift++
-    } else {
+    if(this.childrens['flowerStem'].now.shift >= 50){
         return;
     }
+    if(Math.round(this.childrens['flowerStem'].now.shift) == 50){
+        this.childrens['sheet_0'].after.append('shift',{shift:0,endShift:100,start: 0,end: 100,time: 3500});
+        this.childrens['sheet_1'].after.append('shift',{shift:0,endShift:100,start: 0,end: 100,time: 3500});
+    }
 
-    if(this.childrens['sunCenter'].radius < 40){
-        this.childrens['sunCenter'].radius++;
-    } else {
+    if(this.childrens['sunCenter'].radius >= 39){
         this.now.step = (this.now.step / 1.5) * 1.4;
     }
 
     for(var i = 0;i < this.now.petalCount;i++){
         if(!this.childrens['beam_' + i]){
-            this.appendChild(new Polygon(5,'beam_' + i, drawingData.drawing,{radius: 5, fill: '#FFB151'}));
+            this.appendChild(new Polygon(3,'beam_' + i, drawingData.drawing,{radius: 5, fill: '#FFB151'}));
         }
         if(this.childrens['beam_' + i].now.radius < 30){
             this.childrens['beam_' + i].now.radius++;

@@ -11,13 +11,17 @@ var changeContext = function(context,value){
 
 var dataContextChanges = {
 
-    fill: function(context,value){
+    fill        : function(context,value){
         context.fillStyle = value;
         context.fill();
     },
 
-    stroke: function(context,value){
+    stroke      : function(context,value){
         context.strokeStyle = value;
         context.stroke();
+    },
+
+    lineWidth   : function(context,value){
+        context.lineWidth = +value;
     }
 };
