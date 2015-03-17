@@ -12,12 +12,14 @@ function getRandomRGB (min,max){
 
 function Drawing (width,height){
     var self = this;
-    this.canvas = document.createElement('canvas');
-    this.canvas.width = width || 0;
-    this.canvas.height = height || 0;
-    this.context = this.canvas.getContext('2d');
-    this.stack = new PropertyListing();
-    this.render = function(canvasObject,key){
+    this.DOMObject          = document.createElement('canvas');
+    this.DOMObject.width    = width || 0;
+    this.DOMObject.height   = height || 0;
+    this.context            = this.DOMObject.getContext('2d');
+    this.stack              = new PropertyListing();
+    this._fps               = 0;
+    this.core               = false;
+    this.render             = function(canvasObject,key){
         canvasObject.id = key;
         self.context.beginPath();
         self.context.fillStyle = '#000000';
@@ -29,8 +31,6 @@ function Drawing (width,height){
         }
         canvasObject.animate(this.context);
     };
-    this._fps = 0;
-    this.core = false;
     Object.defineProperty(this,'fps',{
         get: function(){
             return this._fps;
@@ -40,7 +40,7 @@ function Drawing (width,height){
             if(this.core){clearInterval(this.core)}
             if(value != 0){
                 this.core = setInterval(function(){
-                    self.context.clearRect(0,0,self.canvas.width,self.canvas.height);
+                    self.context.clearRect(0,0,self.DOMObject.width,self.DOMObject.height);
                     for (var key in self.stack.list) {
                         self.render(self.stack.list[key],key);
                     }

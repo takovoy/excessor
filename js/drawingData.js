@@ -17,7 +17,7 @@ var drawingData = {
                 drawingData.objects.list[value].appendChild(drawingData.checkedObject);
             };
         }
-        toolbarData.elements.create.inheritance.value = data;
+        toolbarModel.elements.create.inheritance.data = data;
     }),
     onStart         : new PropertyListing()
 };
