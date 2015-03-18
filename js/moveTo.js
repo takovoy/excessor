@@ -22,11 +22,7 @@ var dynamic = {
             }
 
 
-            if(after[key].endShift == 'cycle'){
-                if(after[key].shift >= 100){
-                    after[key].shift = 0;
-                }
-            } else if(after[key].shift >= after[key].endShift){
+            if(after[key].shift >= after[key].endShift){
                 var callback = false;
 
                 if(after[key].callback) {
