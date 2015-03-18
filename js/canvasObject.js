@@ -3,23 +3,14 @@
  */
 
 var CanvasObject = function(id,drawingObject,parameters){
-    this.now = parameters || {};
-    this.id = id || '' + Math.random();
-    this.after = {
-        list: {},
-        append: function(name,data){
-            this.list[name] = data;
-        },
-        remove: function(name){
-            delete this.list[name];
-        }
-    };
-    this.drawingObject = drawingObject;
-    this.childrens = {};
+    this.now            = parameters || {};
+    this.id             = id || '' + Math.random();
+    this.drawingObject  = drawingObject;
+    this.childrens      = {};
 };
 
 Object.defineProperties(CanvasObject.prototype,{
-    x: {
+    x       : {
         get: function(){
             if(this.parent){
                 return +this.now.x + this.parent.x;
@@ -30,7 +21,7 @@ Object.defineProperties(CanvasObject.prototype,{
             this.now.x = +value;
         }
     },
-    y: {
+    y       : {
         get: function(){
             if(this.parent){
                 return +this.now.y + this.parent.y;
@@ -40,22 +31,38 @@ Object.defineProperties(CanvasObject.prototype,{
         set: function(value){
             this.now.y = +value;
         }
+    },
+    after   : {
+        get: function(){
+            if(!this._after){
+                this._after = {
+                    list    : {},
+                    append  : function(name,data){
+                        this.list[name] = data;
+                    },
+                    remove  : function(name){
+                        delete this.list[name];
+                    }
+                }
+            }
+            return this._after;
+        }
     }
 });
 
-CanvasObject.prototype.start = function(){
+CanvasObject.prototype.start        = function(){
     this.drawingObject.stack.append(this);
 };
-CanvasObject.prototype.stop = function(){
+CanvasObject.prototype.stop         = function(){
     this.drawingObject.stack.remove(this.id);
 };
 
-CanvasObject.prototype.appendChild = function(canvasObject){
+CanvasObject.prototype.appendChild  = function(canvasObject){
     canvasObject.parent = this.now;
     this.childrens[canvasObject.id] = canvasObject;
 };
-CanvasObject.prototype.removeChild = function(id){
+CanvasObject.prototype.removeChild  = function(id){
     delete this.childrens[id];
 };
 
-CanvasObject.prototype.animate = function(){};
+CanvasObject.prototype.animate      = function(){};
