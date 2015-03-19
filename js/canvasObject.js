@@ -7,6 +7,9 @@ var CanvasObject = function(id,drawingObject,parameters){
     this.id             = id || '' + Math.random();
     this.drawingObject  = drawingObject;
     this.childrens      = {};
+    if(drawingObject){
+        this.drawingObject = drawingObject;
+    }
 };
 
 Object.defineProperties(CanvasObject.prototype,{
