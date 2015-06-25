@@ -7,21 +7,26 @@ var dynamic = {
     move: function(canvasObject){
         var after       = canvasObject.after.list,
             fps         = canvasObject.drawingObject.fps,
-            incidence   = 1000 / (+fps);
+            incidence   = 1000 / (+fps);//количество секунд между кадрами
 
         for(var key in after){
+
+            // устанавливаем шаг изменения смещения
             if(!after[key].step){
                 after[key].step = (after[key].endShift - after[key].shift) / (after[key].time / incidence);
             }
+
+            //смещение
             after[key].shift    += +after[key].step;
 
+            //вычисление динамики
             if(this.data[key]){
                 this.data[key].prepareData(canvasObject);
             } else {
                 canvasObject.now[key] = after[key].start + (after[key].end - after[key].start) / 100 * after[key].shift;
             }
 
-
+            //обработка окончания динамики
             if(after[key].shift >= after[key].endShift){
                 var callback = false;
 
@@ -48,10 +53,11 @@ var dynamic = {
             type        : 'trajectory',
             prepareData : function(canvasObject){
                 var key         = this.type,
-                    after       = canvasObject.after.list;
+                    after       = canvasObject.after.list,
+                    coord      = this.functions[after[key].type](after[key]);
 
-                canvasObject.x      = +this.functions[after[key].type](after[key])[0];
-                canvasObject.y      = +this.functions[after[key].type](after[key])[1];
+                canvasObject.x      = coord[0];
+                canvasObject.y      = coord[1];
             },
 
             functions   : {
@@ -85,20 +91,6 @@ var dynamic = {
         color   : {
 
             type        : 'color',
-
-            prepareData : function(canvasObject){
-
-            },
-
-            functions   : {
-
-            }
-
-        },
-
-        radian  : {
-
-            type        : 'radian',
 
             prepareData : function(canvasObject){
 

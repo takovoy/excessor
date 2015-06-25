@@ -2,13 +2,6 @@
  * Created by takovoy on 22.11.2014.
  */
 
-function random (min,max){
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function getRandomRGB (min,max){
-    return 'rgb(' + random(min,max) + ',' + random(min,max) + ',' + random(min,max) + ')'
-}
 
 function Drawing (width,height){
     var self = this;
@@ -19,15 +12,20 @@ function Drawing (width,height){
     this.stack              = new PropertyListing();
     this._fps               = 0;
     this.core               = false;
-    this.render             = function(canvasObject,key){
-        canvasObject.id = key;
+    this.render             = function(canvasObject,id){
+        canvasObject.id = id;
         self.context.beginPath();
         self.context.fillStyle = '#000000';
         self.context.strokeStyle = '#000000';
         self.context.closePath();
+
+        //проверка событий
+        eventer.setProperties(canvasObject);
+        //динамика
         dynamic.move(canvasObject);
-        for(var child in canvasObject.childrens){
-            this.render(canvasObject.childrens[child],child);
+
+        for(var child in canvasObject.childrens.list){
+            this.render(canvasObject.childrens.list[child],child);
         }
         canvasObject.animate(this.context);
     };
