@@ -8,11 +8,11 @@ var eventer = {
 
         var properties = canvasObject.events.list;
 
-        //перебор отслеживаемых свойств
+        //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
         for(var propertyName in properties){
             if(!canvasObject.after.list[propertyName]) continue;
 
-            //обработка начала анимации свойства
+            //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             if(properties[propertyName].onStart){
                 for(var operationIndex = 0; properties[propertyName].onStart[operationIndex]; operationIndex++){
                     var event = properties[propertyName].onStart[operationIndex];
@@ -20,18 +20,18 @@ var eventer = {
                     this.types[event.type](event,canvasObject);
                 }
 
-                //удаление
+                //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 canvasObject.events.remove(propertyName,'onStart');
             }
 
             var property    = canvasObject.after.list[propertyName],
                 shift       = property.shift;
 
-            //перебор событий относящихся к свойству
+            //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             for(var comparisonValue in properties[propertyName]){
                 if (shift < +comparisonValue) continue;
 
-                //перебор операций события
+                //пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 for(
                     var operationIndex = 0;
                     properties[propertyName][comparisonValue][operationIndex];
@@ -40,12 +40,12 @@ var eventer = {
 
                     var operation = properties[propertyName][comparisonValue][operationIndex];
 
-                    //передача операции на выполнение
+                    //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                     this.types[operation.type](operation,canvasObject,propertyName);
 
                 }
 
-                //удаление
+                //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
                 canvasObject.events.remove(propertyName,comparisonValue);
             }
 
@@ -66,7 +66,7 @@ var eventer = {
                 return;
             }
 
-            canvasObject = canvasObject.drawingObject.stack.getObject(operation.id);
+            canvasObject = canvasObject.drawing.stack.getObject(operation.id);
 
             if(!canvasObject) return;
 

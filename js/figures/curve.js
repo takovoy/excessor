@@ -2,14 +2,10 @@
  * Created by takovoy on 22.01.2015.
  */
 
-var Curve = function(points,id,drawingObject,parameters){
-    this.now            = parameters || {};
-    this.now.points     = points;
-    this.id             = id || '' + Math.random();
+var Curve = function(options){
+    CanvasObject.apply(this,arguments);
     this.constructor    = Curve;
-    if(drawingObject){
-        this.drawingObject = drawingObject;
-    }
+    this.now.points     = options.points;
 };
 
 Curve.prototype = Object.create(CanvasObject.prototype);

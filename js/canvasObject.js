@@ -2,12 +2,11 @@
  * Created by takovoy on 22.11.2014.
  */
 
-var CanvasObject = function(id,drawingObject,parameters){
-    this.now            = parameters || {};
-    this.id             = id || '' + Math.random();
-    this.drawingObject  = drawingObject;
-    if(drawingObject){
-        this.drawingObject = drawingObject;
+var CanvasObject = function(options){
+    this.id             = options.id || '' + Math.random();
+    this.now            = options.settings || {};
+    if(options.drawing){
+        this.drawing= options.drawing;
     }
 };
 
@@ -69,10 +68,10 @@ Object.defineProperties(CanvasObject.prototype,{
 });
 
 CanvasObject.prototype.start        = function(){
-    this.drawingObject.stack.append(this);
+    this.drawing.stack.append(this);
 };
 CanvasObject.prototype.stop         = function(){
-    this.drawingObject.stack.remove(this.id);
+    this.drawing.stack.remove(this.id);
 };
 
 CanvasObject.prototype.appendChild  = function(canvasObject){

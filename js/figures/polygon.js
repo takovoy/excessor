@@ -2,15 +2,10 @@
  * Created by Пользователь on 21.01.2015.
  */
 
-var Polygon = function(sidesCount,id,drawingObject,parameters){
-    this.now            = parameters || {};
-    this.now.sidesCount = sidesCount;
-    this.id             = id || '' + Math.random();
+var Polygon = function(options){
+    CanvasObject.apply(this,arguments);
     this.constructor    = Polygon;
-    if(drawingObject){
-        this.drawingObject = drawingObject;
-    }
-
+    this.now.sidesCount = options.sidesCount;
     if(!this.now.radian){this.now.radian = Math.PI/180*270}
 };
 

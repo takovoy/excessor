@@ -2,14 +2,10 @@
  * Created by takovoy on 12.12.2014.
  */
 
-var Line = function(point,id,drawingObject){
-    this.now            = {};
-    this.now.points      = point || [];
-    this.id             = id || '' + Math.random();
+var Line = function(options){
+    CanvasObject.apply(this,arguments);
     this.constructor    = Line;
-    if(drawingObject){
-        this.drawingObject = drawingObject;
-    }
+    this.now.points      = options.points || [];
 };
 
 Line.prototype = Object.create(CanvasObject.prototype);
