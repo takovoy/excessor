@@ -105,3 +105,19 @@ CanvasObject.prototype.moveTo       = function(coord,time){
         }
     )
 };
+CanvasObject.prototype.movePropertyTo   = function(property,value,time){
+    if(!time){
+        this.x = coord[0];
+        this.y = coord[1];
+        return;
+    }
+    this.after.append(property,
+        {
+            shift   : 0     ,
+            endShift: 100   ,
+            start   : this.now[property],
+            end     : value,
+            time    : +time
+        }
+    )
+};

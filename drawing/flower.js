@@ -18,10 +18,10 @@ sun.appendChild(new Curve({
     drawing         : drawingData.drawing,
     settings        : {step: 1,shift: 1,stroke: 'green'},
     points          : [
-        [100,100],
-        [140,200],
-        [60,300],
-        [100,400]
+        [0,0],
+        [40,100],
+        [-40,200],
+        [0,300]
     ]
 }));
 
@@ -30,12 +30,12 @@ sun.appendChild(new Curve({
     drawing         : drawingData.drawing,
     settings        : {step: 1,shift: 0,stroke: 'green'},
     points          : [
-        [100,250],
-        [150,160],
-        [280,380],
-        [150,140],
-        [170,330],
-        [100,250]
+        [0,150],
+        [50,60],
+        [180,280],
+        [50,40],
+        [70,230],
+        [0,150]
     ]
 }));
 
@@ -44,12 +44,12 @@ sun.appendChild(new Curve({
     drawing         : drawingData.drawing,
     settings        : {step: 1,shift: 0,stroke: 'green'},
     points          : [
-        [100,250],
-        [50,160],
-        [-80,380],
-        [50,140],
-        [50,330],
-        [100,250]
+        [0,150],
+        [-50,60],
+        [-180,280],
+        [-50,40],
+        [-50,230],
+        [0,150]
     ]
 }));
 
