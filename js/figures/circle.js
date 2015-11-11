@@ -2,14 +2,10 @@
  * Created by takovoy on 30.11.2014.
  */
 
-var Circle = function(radius,id,drawingObject,parameters){
-    this.now            = parameters || {};
-    this.now.radius     = radius;
-    this.id             = id || '' + Math.random();
+var Circle = function(options){
+    CanvasObject.apply(this,arguments);
     this.constructor    = Circle;
-    if(drawingObject){
-        this.drawingObject = drawingObject;
-    }
+    this.now.radius     = options.radius;
 };
 
 Circle.prototype = Object.create(CanvasObject.prototype);

@@ -2,56 +2,63 @@
  * Created by Пользователь on 21.01.2015.
  */
 
-var sun = new CanvasObject('myFlowerAnimate',drawingData.drawing,
-    {
+var sun = new CanvasObject({
+    id          :'myFlowerAnimate',
+    drawing     : drawingData.drawing,
+    settings        : {
         shift: 0,
         step: 0.1,
         petalCount: 6
     }
-);
+});
 sun.x = sun.y = 100;
 
-sun.appendChild(new Curve(
-    [
-        [100,100],
-        [140,200],
-        [60,300],
-        [100,400]
-    ],
-    'flowerStem',
-    drawingData.drawing,
-    {step: 1,shift: 1,stroke: 'green'}
-));
+sun.appendChild(new Curve({
+    id              : 'flowerStem',
+    drawing         : drawingData.drawing,
+    settings        : {step: 1,shift: 1,stroke: 'green'},
+    points          : [
+        [0,0],
+        [40,100],
+        [-40,200],
+        [0,300]
+    ]
+}));
 
-sun.appendChild(new Curve(
-    [
-        [100,250],
-        [150,160],
-        [280,380],
-        [150,140],
-        [170,330],
-        [100,250]
-    ],
-    'sheet_0',
-    drawingData.drawing,
-    {step: 1,shift: 0,stroke: 'green'}
-));
+sun.appendChild(new Curve({
+    id              : 'sheet_0',
+    drawing         : drawingData.drawing,
+    settings        : {step: 1,shift: 0,stroke: 'green'},
+    points          : [
+        [0,150],
+        [50,60],
+        [180,280],
+        [50,40],
+        [70,230],
+        [0,150]
+    ]
+}));
 
-sun.appendChild(new Curve(
-    [
-        [100,250],
-        [50,160],
-        [-80,380],
-        [50,140],
-        [50,330],
-        [100,250]
-    ],
-    'sheet_1',
-    drawingData.drawing,
-    {step: 1,shift: 0,stroke: 'green'}
-));
+sun.appendChild(new Curve({
+    id              : 'sheet_1',
+    drawing         : drawingData.drawing,
+    settings        : {step: 1,shift: 0,stroke: 'green'},
+    points          : [
+        [0,150],
+        [-50,60],
+        [-180,280],
+        [-50,40],
+        [-50,230],
+        [0,150]
+    ]
+}));
 
-sun.appendChild(new Circle(15,'sunCenter',drawingData.drawing,{fill: '#FFB151',x:0,y:0}));
+sun.appendChild(new Circle({
+    id              :'sunCenter',
+    drawing         : drawingData.drawing,
+    settings        : {fill: '#FFB151',x:0,y:0},
+    radius          : 15
+}));
 
 sun.childrens.list.flowerStem.after.append('shift',{shift:0,endShift:100,start: 0,end: 100,time: 3500});
 sun.childrens.list.sunCenter.after.append('radius',{shift:0,endShift:100,start: 15,end: 40,time: 1000});
@@ -71,7 +78,12 @@ sun.animate = function(context){
 
     for(var i = 0;i < this.now.petalCount;i++){
         if(!this.childrens.list['beam_' + i]){
-            this.appendChild(new Polygon(3,'beam_' + i, drawingData.drawing,{radius: 5, fill: '#FFB151'}));
+            this.appendChild(new Polygon({
+                id              : 'beam_' + i,
+                drawing         : drawingData.drawing,
+                settings        : {radius: 5, fill: '#FFB151'},
+                sidesCount      : 3
+            }));
         }
         if(this.childrens.list['beam_' + i].now.radius < 30){
             this.childrens.list['beam_' + i].now.radius++;

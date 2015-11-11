@@ -6,27 +6,27 @@ var dynamic = {
 
     move: function(canvasObject){
         var after       = canvasObject.after.list,
-            fps         = canvasObject.drawingObject.fps,
-            incidence   = 1000 / (+fps);//количество секунд между кадрами
+            fps         = canvasObject.drawing.fps,
+            incidence   = 1000 / (+fps);//пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
         for(var key in after){
 
-            // устанавливаем шаг изменения смещения
+            // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             if(!after[key].step){
                 after[key].step = (after[key].endShift - after[key].shift) / (after[key].time / incidence);
             }
 
-            //смещение
+            //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             after[key].shift    += +after[key].step;
 
-            //вычисление динамики
+            //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             if(this.data[key]){
                 this.data[key].prepareData(canvasObject);
             } else {
                 canvasObject.now[key] = after[key].start + (after[key].end - after[key].start) / 100 * after[key].shift;
             }
 
-            //обработка окончания динамики
+            //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             if(after[key].shift >= after[key].endShift){
                 var callback = false;
 
