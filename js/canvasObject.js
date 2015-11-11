@@ -5,6 +5,7 @@
 var CanvasObject = function(options){
     this.id             = options.id || '' + Math.random();
     this.now            = options.settings || {};
+    this._transform     = new Listing();
     if(options.drawing){
         this.drawing= options.drawing;
     }
@@ -49,14 +50,6 @@ Object.defineProperties(CanvasObject.prototype,{
             return this._childrens;
         }
     },
-    after   : {
-        get: function(){
-            if(!this._after){
-                this._after = new Listing();
-            }
-            return this._after;
-        }
-    },
     events   : {
         get: function(){
             if(!this._events){
@@ -83,41 +76,38 @@ CanvasObject.prototype.removeChild  = function(id){
 };
 
 CanvasObject.prototype.animate      = function(){};
+CanvasObject.prototype.transform    = function(transform){
+    if(!transform){return this._transform}
+    this._transform.append(transform.id,transform);
+};
 CanvasObject.prototype.moveTo       = function(coord,time){
     if(!time){
         this.x = coord[0];
         this.y = coord[1];
         return;
     }
-    this.after.append('trajectory',
-        {
-            type    : 'line',
-            shift   : 0     ,
-            endShift: 100   ,
-            points  : [
-                [
-                    this.x,
-                    this.y
-                ],
-                coord
+    this.transform(new Transform({
+        property: 'trajectory',
+        type    : 'line',
+        points  : [
+            [
+                this.x,
+                this.y
             ],
-            time    : time
-        }
-    )
+            coord
+        ],
+        time    : time
+    }));
 };
 CanvasObject.prototype.movePropertyTo   = function(property,value,time){
     if(!time){
-        this.x = coord[0];
-        this.y = coord[1];
+        this.now[property] = value;
         return;
     }
-    this.after.append(property,
-        {
-            shift   : 0     ,
-            endShift: 100   ,
-            start   : this.now[property],
-            end     : value,
-            time    : +time
-        }
-    )
+    this.transform(new Transform({
+        property:property,
+        start   : this.now[property],
+        end     : value,
+        time    : time
+    }))
 };

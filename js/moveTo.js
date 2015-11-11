@@ -5,40 +5,39 @@
 var dynamic = {
 
     move: function(canvasObject){
-        var after       = canvasObject.after.list,
+        var transform       = canvasObject.transform().list,
             fps         = canvasObject.drawing.fps,
-            incidence   = 1000 / (+fps);//���������� ������ ����� �������
+            incidence   = 1000 / (+fps);
 
-        for(var key in after){
-
-            // ������������� ��� ��������� ��������
-            if(!after[key].step){
-                after[key].step = (after[key].endShift - after[key].shift) / (after[key].time / incidence);
+        for(var key in transform){
+            var options = transform[key].options;
+            if(!options.step){
+                options.step = (options.endShift - options.shift) / (options.time / incidence);
             }
 
             //��������
-            after[key].shift    += +after[key].step;
+            options.shift    += +options.step;
 
             //���������� ��������
             if(this.data[key]){
                 this.data[key].prepareData(canvasObject);
             } else {
-                canvasObject.now[key] = after[key].start + (after[key].end - after[key].start) / 100 * after[key].shift;
+                canvasObject.now[key] = options.start + (options.end - options.start) / 100 * options.shift;
             }
 
             //��������� ��������� ��������
-            if(after[key].shift >= after[key].endShift){
-                var callback = false;
+            if(options.shift >= options.endShift){
+                //var callback = false;
+                //
+                //if(after[key].callback) {
+                //    callback = after[key].callback;
+                //}
 
-                if(after[key].callback) {
-                    callback = after[key].callback;
-                }
+                canvasObject.transform().remove(key);
 
-                canvasObject.after.remove(key);
-
-                if(callback){
-                    drawingData.objects.getObject(callback.id).after.append(callback.data);
-                }
+                //if(callback){
+                //    drawingData.objects.getObject(callback.id).after.append(callback.data);
+                //}
             }
 
         }
@@ -53,8 +52,8 @@ var dynamic = {
             type        : 'trajectory',
             prepareData : function(canvasObject){
                 var key         = this.type,
-                    after       = canvasObject.after.list,
-                    coord      = this.functions[after[key].type](after[key]);
+                    transform   = canvasObject.transform().list[key],
+                    coord       = this.functions[transform.options.type](transform.options);
 
                 canvasObject.x      = coord[0];
                 canvasObject.y      = coord[1];
