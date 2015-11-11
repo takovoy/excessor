@@ -62,7 +62,6 @@ sun.appendChild(new Circle({
 
 sun.childrens.list.flowerStem.transform(new Transform({
     property :'shift',
-    start: 0,
     end: 100,
     time: 3500
 }));

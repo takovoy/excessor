@@ -16,7 +16,7 @@ var dynamic = {
             }
 
             //��������
-            options.shift    += +options.step;
+            options.shift    += +options.step * options.rate;
 
             //���������� ��������
             if(this.data[key]){

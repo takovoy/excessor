@@ -79,6 +79,7 @@ CanvasObject.prototype.animate      = function(){};
 CanvasObject.prototype.transform    = function(transform){
     if(!transform){return this._transform}
     this._transform.append(transform.id,transform);
+    transform.play();
 };
 CanvasObject.prototype.moveTo       = function(coord,time){
     if(!time){
