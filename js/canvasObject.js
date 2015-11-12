@@ -50,14 +50,6 @@ Object.defineProperties(CanvasObject.prototype,{
             return this._childrens;
         }
     },
-    after   : {
-        get: function(){
-            if(!this._after){
-                this._after = new Listing();
-            }
-            return this._after;
-        }
-    },
     events   : {
         get: function(){
             if(!this._events){
@@ -100,8 +92,6 @@ CanvasObject.prototype.moveTo       = function(coord,time){
     this.transform(new Transform({
         property: 'trajectory',
         type    : 'line',
-        shift   : 0     ,
-        endShift: 100   ,
         points  : [
             [
                 this.x,
@@ -113,12 +103,14 @@ CanvasObject.prototype.moveTo       = function(coord,time){
     }));
 };
 CanvasObject.prototype.movePropertyTo   = function(property,value,time){
+    if(!time){
+        this.now[property] = value;
+        return;
+    }
     this.transform(new Transform({
-        property: property,
-        shift   : 0     ,
-        endShift: 100   ,
+        property:property,
         start   : this.now[property],
         end     : value,
-        time    : +time
+        time    : time
     }))
 };

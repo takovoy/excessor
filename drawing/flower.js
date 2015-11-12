@@ -60,16 +60,33 @@ sun.appendChild(new Circle({
     radius          : 15
 }));
 
-sun.childrens.list.flowerStem.after.append('shift',{shift:0,endShift:100,start: 0,end: 100,time: 3500});
-sun.childrens.list.sunCenter.after.append('radius',{shift:0,endShift:100,start: 15,end: 40,time: 1000});
+sun.childrens.list.flowerStem.transform(new Transform({
+    property :'shift',
+    end: 100,
+    time: 3500
+}));
+sun.childrens.list.sunCenter.transform(new Transform({
+    property:'radius',
+    start: 15,
+    end: 40,
+    time: 1000
+}));
 
 sun.animate = function(context){
     if(this.childrens.list['flowerStem'].now.shift >= 50){
         return;
     }
     if(Math.round(this.childrens.list['flowerStem'].now.shift) == 50){
-        this.childrens.list['sheet_0'].after.append('shift',{shift:0,endShift:100,start: 0,end: 100,time: 3500});
-        this.childrens.list['sheet_1'].after.append('shift',{shift:0,endShift:100,start: 0,end: 100,time: 3500});
+        this.childrens.list['sheet_0'].transform(new Transform({
+            property:'shift',
+            end: 100,
+            time: 3500
+        }));
+        this.childrens.list['sheet_1'].transform(new Transform({
+            property:'shift',
+            end: 100,
+            time: 3500
+        }));
     }
 
     if(this.childrens.list['sunCenter'].radius >= 39){

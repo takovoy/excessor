@@ -5,20 +5,18 @@
 var dynamic = {
 
     move: function(canvasObject){
-        var after       = canvasObject.transform().list,
+        var transform       = canvasObject.transform().list,
             fps         = canvasObject.drawing.fps,
-            incidence   = 1000 / (+fps);//���������� ������ ����� �������
+            incidence   = 1000 / (+fps);
 
-        for(var key in after){
-
-            // ������������� ��� ��������� ��������
-            var options = after[key].options;
+        for(var key in transform){
+            var options = transform[key].options;
             if(!options.step){
-                options.step = (options.endShift - options.shift) / (options.time / incidence) * options.rate;
+                options.step = (options.endShift - options.shift) / (options.time / incidence);
             }
 
             //��������
-            options.shift    += +options.step;
+            options.shift    += +options.step * options.rate;
 
             //���������� ��������
             if(this.data[key]){
@@ -30,12 +28,12 @@ var dynamic = {
             //��������� ��������� ��������
             if(options.shift >= options.endShift){
                 //var callback = false;
-
-                //if(options.callback) {
-                //    callback = options.callback;
+                //
+                //if(after[key].callback) {
+                //    callback = after[key].callback;
                 //}
 
-                canvasObject.after.remove(key);
+                canvasObject.transform().remove(key);
 
                 //if(callback){
                 //    drawingData.objects.getObject(callback.id).after.append(callback.data);
@@ -54,8 +52,8 @@ var dynamic = {
             type        : 'trajectory',
             prepareData : function(canvasObject){
                 var key         = this.type,
-                    after       = canvasObject.transform().list,
-                    coord      = this.functions[after[key].type](after[key]);
+                    transform   = canvasObject.transform().list[key],
+                    coord       = this.functions[transform.options.type](transform.options);
 
                 canvasObject.x      = coord[0];
                 canvasObject.y      = coord[1];
