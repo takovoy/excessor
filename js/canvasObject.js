@@ -5,9 +5,19 @@
 var CanvasObject = function(options){
     this.id             = options.id || '' + Math.random();
     this.now            = options.settings || {};
-    this._transform = new Listing();
+    this.childrens      = new PropertyListing(
+        function(self,object){          //append callback
+            object.parent = self.now;
+        },
+        function(self){                 //remove callback
+
+        },
+        this
+    );
+    this.events         = new EventsListing();
+    this._transform     = new Listing();
     if(options.drawing){
-        this.drawing= options.drawing;
+        this.drawing = options.drawing;
     }
 };
 
@@ -32,30 +42,6 @@ Object.defineProperties(CanvasObject.prototype,{
         },
         set: function(value){
             this.now.y = +value;
-        }
-    },
-    childrens: {
-        get: function(){
-            if(!this._childrens){
-                this._childrens = new PropertyListing(
-                    function(self,object){
-                        object.parent = self.now;
-                    },
-                    function(self){
-
-                    },
-                    this
-                )
-            }
-            return this._childrens;
-        }
-    },
-    events   : {
-        get: function(){
-            if(!this._events){
-                this._events = new EventsListing();
-            }
-            return this._events;
         }
     }
 });
