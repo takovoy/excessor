@@ -15,35 +15,21 @@ var dynamic = {
                 options.step = (options.endShift - options.shift) / (options.time / incidence);
             }
 
-            //��������
             options.shift    += +options.step * options.rate;
 
-            //���������� ��������
             if(this.data[key]){
                 this.data[key].prepareData(canvasObject);
             } else {
                 canvasObject.now[key] = options.start + (options.end - options.start) / 100 * options.shift;
             }
 
-            //��������� ��������� ��������
             if(options.shift >= options.endShift){
-                //var callback = false;
-                //
-                //if(after[key].callback) {
-                //    callback = after[key].callback;
-                //}
-
                 canvasObject.transform().remove(key);
-
-                //if(callback){
-                //    drawingData.objects.getObject(callback.id).after.append(callback.data);
-                //}
             }
 
         }
 
     },
-    //drawingData.checkedObject.after.append('trajectory',{type:'circle',shift:0,endShift:100,radius:20,center:[100,100]});
 
     data: {
 

@@ -6,6 +6,16 @@ var CanvasObject = function(options){
     this.id             = options.id || '' + Math.random();
     this.now            = options.settings || {};
     this._transform     = new Listing();
+    this.childrens = new PropertyListing(
+        function(self,object){
+            object.parent = self.now;
+        },
+        function(self){
+
+        },
+        this
+    );
+    this.events = new EventsListing();
     if(options.drawing){
         this.drawing= options.drawing;
     }
@@ -33,30 +43,6 @@ Object.defineProperties(CanvasObject.prototype,{
         set: function(value){
             this.now.y = +value;
         }
-    },
-    childrens: {
-        get: function(){
-            if(!this._childrens){
-                this._childrens = new PropertyListing(
-                    function(self,object){
-                        object.parent = self.now;
-                    },
-                    function(self){
-
-                    },
-                    this
-                )
-            }
-            return this._childrens;
-        }
-    },
-    events   : {
-        get: function(){
-            if(!this._events){
-                this._events = new EventsListing();
-            }
-            return this._events;
-        }
     }
 });
 
@@ -66,22 +52,13 @@ CanvasObject.prototype.start        = function(){
 CanvasObject.prototype.stop         = function(){
     this.drawing.stack.remove(this.id);
 };
-
-CanvasObject.prototype.appendChild  = function(canvasObject){
-    canvasObject.parent = this.now;
-    this.childrens.list[canvasObject.id] = canvasObject;
-};
-CanvasObject.prototype.removeChild  = function(id){
-    delete this.childrens.list[id];
-};
-
 CanvasObject.prototype.animate      = function(){};
 CanvasObject.prototype.transform    = function(transform){
     if(!transform){return this._transform}
     this._transform.append(transform.id,transform);
     transform.play();
 };
-CanvasObject.prototype.moveTo       = function(coord,time){
+CanvasObject.prototype.move       = function(coord,time){
     if(!time){
         this.x = coord[0];
         this.y = coord[1];
