@@ -42,5 +42,29 @@ var formula = {
             (points[1][0] - points[0][0]) * (shift / 100) + points[0][0],
             (points[1][1] - points[0][1]) * (shift / 100) + points[0][1]
         ];
+    },
+
+    /**
+     * @return {Array}
+     */
+    HEXtoRGB    : function(color){
+        if(color.length != 7){return false}
+        var rgb = [];
+        rgb[0] = parseInt(color.substring(1,3),16);
+        rgb[1] = parseInt(color.substring(3,5),16);
+        rgb[2] = parseInt(color.substring(5),16);
+        return rgb;
+    },
+
+    changeColor : function(start,end,shift){
+        var result      = [];
+
+        if(start[0] == '#'){start = formula.HEXtoRGB(start)}
+        if(end[0] == '#'){end = formula.HEXtoRGB(end)}
+
+        for(var i = 0;i<3;i++){
+            result[i] = Math.round(start[i] + (end[i] - start[i]) / 100 * shift);
+        }
+        return 'rgb(' + result[0] + ',' + result[1] + ',' + result[2] + ')';
     }
 };

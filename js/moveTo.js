@@ -73,16 +73,34 @@ var dynamic = {
 
         },
 
-        color   : {
+        fill   : {
 
-            type        : 'color',
+            type        : 'fill',
 
             prepareData : function(canvasObject){
+                var key         = this.type,
+                    transform   = canvasObject.transform().list[key],
+                    start       = transform.options.start,
+                    end         = transform.options.end,
+                    shift         = transform.options.shift;
 
-            },
+                canvasObject.now.fill = formula.changeColor(start,end,shift);
+            }
 
-            functions   : {
+        },
 
+        stroke   : {
+
+            type        : 'stroke',
+
+            prepareData : function(canvasObject){
+                var key         = this.type,
+                    transform   = canvasObject.transform().list[key],
+                    start       = transform.options.start,
+                    end         = transform.options.end,
+                    shift         = transform.options.shift;
+
+                canvasObject.now.stroke = formula.changeColor(start,end,shift);
             }
 
         }

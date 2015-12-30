@@ -89,7 +89,7 @@ CanvasObject.prototype.move       = function(coord,time){
         time    : time
     }));
 };
-CanvasObject.prototype.movePropertyTo   = function(property,value,time){
+CanvasObject.prototype.moveProperty   = function(property,value,time){
     if(!time){
         this.now[property] = value;
         return;

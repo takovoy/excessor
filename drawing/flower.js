@@ -70,6 +70,8 @@ sun.childrens.list.sunCenter.transform(new Transform({
     end     : 40,
     time    : 1000
 }));
+console.log(sun.childrens.list.sunCenter.now.fill);
+sun.childrens.list.sunCenter.moveProperty('fill','#ff5555',1000);
 
 sun.animate = function(context){
     if(this.childrens.list['flowerStem'].now.shift >= 50){
