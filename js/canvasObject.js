@@ -16,6 +16,16 @@ var CanvasObject = function(options){
     );
     this.events         = new EventsListing();
     this._transform     = new Listing();
+    this.childrens = new PropertyListing(
+        function(self,object){
+            object.parent = self.now;
+        },
+        function(self){
+
+        },
+        this
+    );
+    this.events = new EventsListing();
     if(options.drawing){
         this.drawing = options.drawing;
     }
@@ -52,15 +62,6 @@ CanvasObject.prototype.start        = function(){
 CanvasObject.prototype.stop         = function(){
     this.drawing.stack.remove(this.id);
 };
-
-CanvasObject.prototype.appendChild  = function(canvasObject){
-    canvasObject.parent = this.now;
-    this.childrens.list[canvasObject.id] = canvasObject;
-};
-CanvasObject.prototype.removeChild  = function(id){
-    delete this.childrens.list[id];
-};
-
 CanvasObject.prototype.animate      = function(){};
 CanvasObject.prototype.transform = function(transform){
     if(!this._transform){
@@ -69,7 +70,7 @@ CanvasObject.prototype.transform = function(transform){
     if (!transform) {return this._transform;}
     this._transform.append(transform.id,transform);
 };
-CanvasObject.prototype.moveTo       = function(coord,time){
+CanvasObject.prototype.move       = function(coord,time){
     if(!time){
         this.x = coord[0];
         this.y = coord[1];

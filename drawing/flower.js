@@ -13,7 +13,7 @@ var sun = new CanvasObject({
 });
 sun.x = sun.y = 100;
 
-sun.appendChild(new Curve({
+sun.childrens.append(new Curve({
     id              : 'flowerStem',
     drawing         : drawingData.drawing,
     settings        : {step: 1,shift: 1,stroke: 'green'},
@@ -25,7 +25,7 @@ sun.appendChild(new Curve({
     ]
 }));
 
-sun.appendChild(new Curve({
+sun.childrens.append(new Curve({
     id              : 'sheet_0',
     drawing         : drawingData.drawing,
     settings        : {step: 1,shift: 0,stroke: 'green'},
@@ -39,7 +39,7 @@ sun.appendChild(new Curve({
     ]
 }));
 
-sun.appendChild(new Curve({
+sun.childrens.append(new Curve({
     id              : 'sheet_1',
     drawing         : drawingData.drawing,
     settings        : {step: 1,shift: 0,stroke: 'green'},
@@ -53,7 +53,7 @@ sun.appendChild(new Curve({
     ]
 }));
 
-sun.appendChild(new Circle({
+sun.childrens.append(new Circle({
     id              :'sunCenter',
     drawing         : drawingData.drawing,
     settings        : {fill: '#FFB151',x:0,y:0},
@@ -61,15 +61,14 @@ sun.appendChild(new Circle({
 }));
 
 sun.childrens.list.flowerStem.transform(new Transform({
-    property :'shift',
-    end: 100,
-    time: 3500
+    property:'shift',
+    end     : 100,
+    time    : 3500
 }));
 sun.childrens.list.sunCenter.transform(new Transform({
     property:'radius',
-    start: 15,
-    end: 40,
-    time: 1000
+    end     : 40,
+    time    : 1000
 }));
 
 sun.animate = function(context){
@@ -95,7 +94,7 @@ sun.animate = function(context){
 
     for(var i = 0;i < this.now.petalCount;i++){
         if(!this.childrens.list['beam_' + i]){
-            this.appendChild(new Polygon({
+            this.childrens.append(new Polygon({
                 id              : 'beam_' + i,
                 drawing         : drawingData.drawing,
                 settings        : {radius: 5, fill: '#FFB151'},
