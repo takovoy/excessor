@@ -19,9 +19,7 @@ function Drawing (width,height){
         self.context.strokeStyle = '#000000';
         self.context.closePath();
 
-        //проверка событий
-        eventer.setProperties(canvasObject);
-        //динамика
+        //РґРёРЅР°РјРёРєР°
         dynamic.move(canvasObject);
 
         for(var child in canvasObject.childrens.list){

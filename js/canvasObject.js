@@ -19,6 +19,7 @@ var CanvasObject = function(options){
     this.childrens = new PropertyListing(
         function(self,object){
             object.parent = self.now;
+            return object;
         },
         function(self){
 
@@ -58,9 +59,11 @@ Object.defineProperties(CanvasObject.prototype,{
 
 CanvasObject.prototype.start        = function(){
     this.drawing.stack.append(this);
+    return this;
 };
 CanvasObject.prototype.stop         = function(){
     this.drawing.stack.remove(this.id);
+    return this;
 };
 CanvasObject.prototype.animate      = function(){};
 CanvasObject.prototype.transform = function(transform){
@@ -69,6 +72,7 @@ CanvasObject.prototype.transform = function(transform){
     }
     if (!transform) {return this._transform;}
     this._transform.append(transform.id,transform);
+    return transform;
 };
 CanvasObject.prototype.move       = function(coord,time){
     if(!time){

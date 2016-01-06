@@ -5,30 +5,75 @@
 var dynamic = {
 
     move: function(canvasObject){
-        var transform       = canvasObject.transform().list,
+        var transforms       = canvasObject.transform().list,
             fps         = canvasObject.drawing.fps,
             incidence   = 1000 / (+fps);
 
-        for(var key in transform){
-            var options = transform[key].options;
+        for(var key in transforms){
+            var transform   = transforms[key];
+                options     = transform.options;
+
+            if(transform.event('start')){
+                transform.events.list['start'](transform.event('start'),transform,canvasObject);
+            }
             if(!options.step){
-                options.step = (options.endShift - options.shift) / (options.time / incidence);
+                options.step = (options.endShift - options.startShift) / (options.time / incidence);
             }
 
-            options.shift    += +options.step * options.rate;
+            //the increase in displacement
+            if(!transform.reverse){
+                options.shift    += +options.step * options.rate;
+            } else {
+                options.shift    -= +options.step * options.rate;
+            }
 
+            //processing frame
             if(this.data[key]){
                 this.data[key].prepareData(canvasObject);
             } else {
                 canvasObject.now[key] = options.start + (options.end - options.start) / 100 * options.shift;
             }
 
-            if(options.shift >= options.endShift){
-                canvasObject.transform().remove(key);
+            //initiate events
+            for(var event in transform.events.list){
+                if(isNaN(+event)){continue}
+
+                if(!transform.reverse){
+                    if(+event > options.shift){break}
+                } else {
+                    if(+event < options.shift){break}
+                }
+
+                transform.events.list[event](transform.event(event),transform,canvasObject);
+                transform.events.remove(event);
             }
 
-        }
+            //checked end of animation
+            if(!transform.reverse){
+                if(options.shift < options.endShift){
+                    continue
+                }
+            } else {
+                if(options.shift > options.startShift){
+                    continue
+                }
+            }
 
+            //recourse or callback
+            canvasObject.transform().remove(key);
+            if(transform.options.recourse){
+                if(!transform.reverse){
+                    transform.options.shift  = transform.options.startShift;
+                } else {
+                    transform.options.shift  = transform.options.endShift;
+                }
+                canvasObject.transform(transform);
+            }
+            if(transform.event('callback')){
+                transform.event('callback')(transform.event('callback'),transform,canvasObject);
+                transform.events.remove('callback');
+            }
+        }
     },
 
     data: {

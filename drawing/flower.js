@@ -11,19 +11,8 @@ var sun = new CanvasObject({
         petalCount: 6
     }
 });
-sun.x = sun.y = 100;
 
-sun.childrens.append(new Curve({
-    id              : 'flowerStem',
-    drawing         : drawingData.drawing,
-    settings        : {step: 1,shift: 1,stroke: 'green'},
-    points          : [
-        [0,0],
-        [40,100],
-        [-40,200],
-        [0,300]
-    ]
-}));
+sun.x = sun.y = 100;
 
 sun.childrens.append(new Curve({
     id              : 'sheet_0',
@@ -53,43 +42,55 @@ sun.childrens.append(new Curve({
     ]
 }));
 
+sun.childrens.append(new Curve({
+    id              : 'flowerStem',
+    drawing         : drawingData.drawing,
+    settings        : {step: 1,shift: 1,stroke: 'green'},
+    points          : [
+        [0,0],
+        [40,100],
+        [-40,200],
+        [0,300]
+    ]
+})).transform(new Transform({
+    property:'shift',
+    end     : 100,
+    time    : 3500
+})).event(50,function(event,transform,canvasObject){
+
+    sun.childrens.list['sheet_0'].transform(new Transform({
+        property:'shift',
+        end     : 100,
+        time    : 3500,
+        recourse: true
+    })).event(100,function(event,transform,canvasObject){
+        transform.reverse = true;
+    });
+
+    sun.childrens.list['sheet_1'].transform(new Transform({
+        property:'shift',
+        end     : 100,
+        time    : 3500
+    }));
+
+    sun.animate = function(){};
+});
+
 sun.childrens.append(new Circle({
     id              :'sunCenter',
     drawing         : drawingData.drawing,
     settings        : {fill: '#FFB151',x:0,y:0},
     radius          : 15
-}));
-
-sun.childrens.list.flowerStem.transform(new Transform({
-    property:'shift',
-    end     : 100,
-    time    : 3500
-}));
-sun.childrens.list.sunCenter.transform(new Transform({
+})).transform(new Transform({
     property:'radius',
     end     : 40,
     time    : 1000
 }));
+
 console.log(sun.childrens.list.sunCenter.now.fill);
 sun.childrens.list.sunCenter.moveProperty('fill','#ff5555',1000);
 
 sun.animate = function(context){
-    if(this.childrens.list['flowerStem'].now.shift >= 50){
-        return;
-    }
-    if(Math.round(this.childrens.list['flowerStem'].now.shift) == 50){
-        this.childrens.list['sheet_0'].transform(new Transform({
-            property:'shift',
-            end: 100,
-            time: 3500
-        }));
-        this.childrens.list['sheet_1'].transform(new Transform({
-            property:'shift',
-            end: 100,
-            time: 3500
-        }));
-    }
-
     if(this.childrens.list['sunCenter'].radius >= 39){
         this.now.step = (this.now.step / 1.5) * 1.4;
     }

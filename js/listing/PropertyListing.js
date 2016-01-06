@@ -11,7 +11,7 @@ function PropertyListing (append,remove,parent){
 
 PropertyListing.prototype.append = function (object) {
     this.list[object.id] = object;
-    this.up(this.parent,object);
+    return this.up(this.parent,object);
 };
 PropertyListing.prototype.remove = function (id) {
     delete this.list[id];
