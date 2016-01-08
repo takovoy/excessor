@@ -80,7 +80,7 @@ CanvasObject.prototype.move       = function(coord,time){
         this.y = coord[1];
         return;
     }
-    this.transform(new Transform({
+    return this.transform(new Transform({
         property: 'trajectory',
         type    : 'line',
         points  : [
@@ -98,7 +98,7 @@ CanvasObject.prototype.moveProperty   = function(property,value,time){
         this.now[property] = value;
         return;
     }
-    this.transform(new Transform({
+    return this.transform(new Transform({
         property:property,
         start   : this.now[property],
         end     : value,
