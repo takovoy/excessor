@@ -1,0 +1,119 @@
+.scenario-drawing {
+    margin-left: 71px;
+    margin-right: 102px;
+    background: #ffffff;
+    display: block;
+}
+.scenario-instruments {
+    position: absolute;
+    text-align: center;
+    top: 22px;
+    width: 70px;
+    bottom: 52px;
+    overflow-y: scroll;
+    background: #ffffff;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.scenario-instruments > button {
+    width: 50px;
+    height: 50px;
+}
+.scenario-objectManager {
+    position: absolute;
+    right: 0;
+    top: 22px;
+    bottom: 52px;
+    background: #ffffff;
+    width: 100px;
+}
+
+.scenario-objectManager > div {
+    position: relative;
+    border-bottom: solid 1px #f0f0f0;
+}
+
+.scenario-objectManager button.collapse {
+    height: 100%;
+}
+
+.scenario-objectManager > .topMenu {
+
+}
+.scenario-sceneManager {
+    height: 50px;
+    margin-top: 2px;
+    background: #ffffff;
+}
+.scenario-topMenu {
+    background: #ffffff;
+    height: 20px;
+    padding-left: 2px;
+    margin-bottom: 2px;
+}
+
+.scenario-topMenu > input {
+    border: 0;
+    border-right: solid 1px #f0f0f0;
+    padding-left: 5px;
+    width: 50px;
+    height: 18px;
+    background: transparent;
+    outline: none;
+}
+
+.scenario-topMenu > button {
+    position: absolute;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    border: none;
+    border-left: solid 1px #f0f0f0;
+    background: transparent;
+    outline: none;
+}
+
+.scenario-topMenu > button:hover {
+    background: #8ba7f0;
+    color: #f0f0f0;
+}
+
+.scenario-topMenu > button:active {
+    background: #6d8ac8;
+}
+.scenario-wrap {
+    font-family: arial, serif;
+    font-size: x-small;
+    color: #555555;
+    position: relative;
+    display: inline-block;
+    background: #cacaca;
+    border: solid 2px #cacaca;
+}
+
+.scenario-wrap button {
+    text-align: center;
+    outline: none;
+    border: none;
+    background: #f3f3f3;
+}
+
+.scenario-wrap button:hover {
+    background: #eeeeee;
+    cursor: pointer;
+}
+
+.scenario-wrap button.collapse {
+    position: absolute;
+    right: 0;
+}
+
+.scenario-wrap button.collapse:hover {
+    background: #8ba7f0;
+    color: #f0f0f0;
+}
+
+.scenario-wrap button.collapse:active {
+    background: #6d8ac8;
+}

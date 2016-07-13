@@ -5,16 +5,6 @@
 var CanvasObject = function(options){
     this.id             = options.id || '' + Math.random();
     this.now            = options.settings || {};
-    this.childrens      = new PropertyListing(
-        function(self,object){          //append callback
-            object.parent = self.now;
-        },
-        function(self){                 //remove callback
-
-        },
-        this
-    );
-    this.events         = new EventsListing();
     this._transform     = new Listing();
     this.childrens = new PropertyListing(
         function(self,object){
@@ -26,7 +16,6 @@ var CanvasObject = function(options){
         },
         this
     );
-    this.events = new EventsListing();
     if(options.drawing){
         this.drawing = options.drawing;
     }
@@ -146,6 +135,18 @@ var formula = {
         var y   = radius * Math.sin(+radian);
         var x   = radius * Math.cos(+radian);
         return [centerX + x,centerY + y];
+    },
+
+    getPointOnEllipse: function(semiAxisX,semiAxisY,shift,tilt,centerX,centerY){
+        tilt = tilt || 0;
+        tilt *= -1;
+
+        var x1  = semiAxisX*Math.cos(+shift),
+            y1  = semiAxisY*Math.sin(+shift),
+            x2 = x1 * Math.cos(tilt) + y1 * Math.sin(tilt),
+            y2 = -x1 * Math.sin(tilt) + y1 * Math.cos(tilt);
+
+        return [x2 + centerX,y2 + centerY];
     },
 
     getPointsFromPolygon: function(sidesCount,radian,radius,centerX,centerY){
@@ -361,7 +362,6 @@ var dynamic = {
 
 
 function Drawing (width,height){
-    var self = this;
     this.DOMObject          = document.createElement('canvas');
     this.DOMObject.width    = width || 0;
     this.DOMObject.height   = height || 0;
@@ -369,40 +369,57 @@ function Drawing (width,height){
     this.stack              = new PropertyListing();
     this._fps               = 0;
     this.core               = false;
-    this.render             = function(canvasObject,id){
-        canvasObject.id = id;
-        self.context.beginPath();
-        self.context.fillStyle = '#000000';
-        self.context.strokeStyle = '#000000';
-        self.context.closePath();
-
-        //динамика
-        dynamic.move(canvasObject);
-
-        for(var child in canvasObject.childrens.list){
-            this.render(canvasObject.childrens.list[child],child);
-        }
-        canvasObject.animate(this.context);
-    };
-    Object.defineProperty(this,'fps',{
-        get: function(){
-            return this._fps;
-        },
-        set: function(value){
-            var self = this;
-            if(this.core){clearInterval(this.core)}
-            if(value != 0){
-                this.core = setInterval(function(){
-                    self.context.clearRect(0,0,self.DOMObject.width,self.DOMObject.height);
-                    for (var key in self.stack.list) {
-                        self.render(self.stack.list[key],key);
-                    }
-                },1000 / +value);
-            }
-            this._fps = value
-        }
-    });
 }
+
+Drawing.prototype.render = function(canvasObject,id){
+    canvasObject.id = id;
+    this.context.beginPath();
+    this.context.fillStyle = '#000000';
+    this.context.strokeStyle = '#000000';
+    this.context.closePath();
+
+    //динамика
+    dynamic.move(canvasObject);
+
+    for(var child in canvasObject.childrens.list){
+        this.render(canvasObject.childrens.list[child],child);
+    }
+    canvasObject.animate(this.context);
+};
+
+Drawing.prototype.pause = function(){
+    this.fps = 0;
+};
+
+Drawing.prototype.play = function(){
+    var self = this;
+    if(this.core){clearInterval(this.core)}
+    this.core = setInterval(function(){
+        self.context.clearRect(0,0,self.DOMObject.width,self.DOMObject.height);
+        for (var key in self.stack.list) {
+            self.render(self.stack.list[key],key);
+        }
+    },1000 / +self.fps);
+};
+
+Object.defineProperty(Drawing.prototype,'fps',{
+    get: function(){
+        return this._fps;
+    },
+    set: function(value){
+        var self = this;
+        if(this.core){clearInterval(this.core)}
+        if(value != 0){
+            this.core = setInterval(function(){
+                self.context.clearRect(0,0,self.DOMObject.width,self.DOMObject.height);
+                for (var key in self.stack.list) {
+                    self.render(self.stack.list[key],key);
+                }
+            },1000 / +value);
+        }
+        this._fps = value
+    }
+});
 /**
  * Created by 1 on 11.11.2015.
  */
@@ -454,39 +471,6 @@ Transform.prototype.event = function(shift,action){
     this.events.append(shift,action);
     return this;
 };
-/**
- * Created by Пользователь on 25.02.2015.
- */
-
-var drawingData = {
-    drawing         : new Drawing(200,400),
-    _createdObject  : undefined,
-    checkedObject   : undefined,
-    checkedPoint    : undefined,
-    objects         : new PropertyListing(function(self){
-        var data = [];
-        for(var key in self.list){
-            var dataLen = data.length;
-            data[dataLen] = {};
-            data[dataLen].description = key;
-            data[dataLen].action = function(value){
-                drawingData.objects.list[value].appendChild(drawingData.checkedObject);
-            };
-        }
-        toolbarModel.elements.create.inheritance.data = data;
-    }),
-    onStart         : new PropertyListing()
-};
-
-Object.defineProperties(drawingData,{
-    createdObject: {
-        get: function(){return this._createdObject},
-        set: function(value){
-            this._createdObject = value;
-            this.checkedObject  = this._createdObject;
-        }
-    }
-});
 /**
  * Created by takovoySuper on 11.04.2015.
  */
@@ -555,6 +539,39 @@ Curve.prototype.animate = function(context){
         var coord = formula.getPointOnCurve(i,this.now.points);
         context.lineTo(coord[0] + this.parent.x,coord[1] + this.parent.y);
     }
+
+    changeContext(context,this.now);
+
+    context.closePath();
+};
+/**
+ * Created by takovoySuper on 25.06.2015.
+ */
+
+var Ellipse = function(id,drawingObject,options){
+    this.now            = options || {};
+    this.id             = id || '' + Math.random();
+    this.constructor    = Ellipse;
+    if(drawingObject){
+        this.drawingObject = drawingObject;
+    }
+
+    this.now.step = this.now.step || 0.1;
+};
+
+Ellipse.prototype = Object.create(CanvasObject.prototype);
+
+Ellipse.prototype.animate = function(context){
+    context.beginPath();
+    var shift = 0;
+    var coord = formula.getPointOnEllipse(this.now.semiAxisX,this.now.semiAxisY,shift,this.now.tilt,this.x,this.y);
+    context.moveTo(coord[0],coord[1]);
+
+    for(;shift <= Math.PI*2;shift += this.now.step){
+        var coordinate = formula.getPointOnEllipse(this.now.semiAxisX,this.now.semiAxisY,shift,this.now.tilt,this.x,this.y);
+        context.lineTo(coordinate[0],coordinate[1]);
+    }
+    context.lineTo(coord[0],coord[1]);
 
     changeContext(context,this.now);
 

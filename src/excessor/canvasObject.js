@@ -5,16 +5,6 @@
 var CanvasObject = function(options){
     this.id             = options.id || '' + Math.random();
     this.now            = options.settings || {};
-    this.childrens      = new PropertyListing(
-        function(self,object){          //append callback
-            object.parent = self.now;
-        },
-        function(self){                 //remove callback
-
-        },
-        this
-    );
-    this.events         = new EventsListing();
     this._transform     = new Listing();
     this.childrens = new PropertyListing(
         function(self,object){
@@ -26,7 +16,6 @@ var CanvasObject = function(options){
         },
         this
     );
-    this.events = new EventsListing();
     if(options.drawing){
         this.drawing = options.drawing;
     }

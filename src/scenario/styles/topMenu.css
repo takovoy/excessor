@@ -1,0 +1,36 @@
+.scenario-topMenu {
+    background: #ffffff;
+    height: 20px;
+    padding-left: 2px;
+    margin-bottom: 2px;
+}
+
+.scenario-topMenu > input {
+    border: 0;
+    border-right: solid 1px #f0f0f0;
+    padding-left: 5px;
+    width: 50px;
+    height: 18px;
+    background: transparent;
+    outline: none;
+}
+
+.scenario-topMenu > button {
+    position: absolute;
+    right: 0;
+    width: 20px;
+    height: 20px;
+    border: none;
+    border-left: solid 1px #f0f0f0;
+    background: transparent;
+    outline: none;
+}
+
+.scenario-topMenu > button:hover {
+    background: #8ba7f0;
+    color: #f0f0f0;
+}
+
+.scenario-topMenu > button:active {
+    background: #6d8ac8;
+}

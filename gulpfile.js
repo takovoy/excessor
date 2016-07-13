@@ -6,11 +6,27 @@ var gulp        = require('gulp')               ,
     uglify      = require('gulp-uglify')        ;
 
 gulp.task('core',function(){
-    gulp.src(['js/*.js','js/*/*.js'])
+    gulp.src(['src/excessor/*.js','src/excessor/*/*.js'])
         .pipe(concat('excessor.js'))
         //.pipe(uglify())
         .pipe(gulp.dest('excessor/'))
         .pipe(notify('core reload'));
+});
+
+gulp.task('scenario',function(){
+    gulp.src(['src/scenario/*.js','src/scenario/*/*.js'])
+        .pipe(concat('scenario.js'))
+        //.pipe(uglify())
+        .pipe(gulp.dest('excessor/'))
+        .pipe(notify('scenario reload'));
+});
+
+gulp.task('scenarioStyles',function(){
+    gulp.src(['src/scenario/*.css','src/scenario/*/*.css'])
+        .pipe(concat('scenario.css'))
+        //.pipe(uglify())
+        .pipe(gulp.dest('excessor/'))
+        .pipe(notify('scenario styles reload'));
 });
 
 gulp.task('drawings',function(){
@@ -22,8 +38,10 @@ gulp.task('drawings',function(){
 });
 
 gulp.task('watch',function(){
-    gulp.watch(['js/*.js','js/*/*.js'],['core']);
+    gulp.watch(['src/excessor/*.js','src/excessor/*/*.js'],['core']);
+    gulp.watch(['src/scenario/*.js','src/scenario/*/*.js'],['scenario']);
+    gulp.watch(['src/scenario/*.css','src/scenario/*/*.css'],['scenarioStyles']);
     gulp.watch('drawing/*.js',['drawings']);
 });
 
-gulp.task('default',['core','drawings','watch']);
+gulp.task('default',['core','scenario','scenarioStyles','drawings','watch']);

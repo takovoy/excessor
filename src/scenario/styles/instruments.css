@@ -1,0 +1,16 @@
+.scenario-instruments {
+    position: absolute;
+    text-align: center;
+    top: 22px;
+    width: 70px;
+    bottom: 52px;
+    overflow-y: scroll;
+    background: #ffffff;
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
+
+.scenario-instruments > button {
+    width: 50px;
+    height: 50px;
+}

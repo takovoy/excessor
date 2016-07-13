@@ -4,7 +4,7 @@
 
 var sun = new CanvasObject({
     id          :'myFlowerAnimate',
-    drawing     : drawingData.drawing,
+    drawing     : scene,
     settings        : {
         shift: 0,
         step: 0.1,
@@ -16,7 +16,7 @@ sun.x = sun.y = 100;
 
 sun.childrens.append(new Curve({
     id              : 'sheet_0',
-    drawing         : drawingData.drawing,
+    drawing         : scene,
     settings        : {step: 1,shift: 0,stroke: 'green'},
     points          : [
         [0,150],
@@ -30,7 +30,7 @@ sun.childrens.append(new Curve({
 
 sun.childrens.append(new Curve({
     id              : 'sheet_1',
-    drawing         : drawingData.drawing,
+    drawing         : scene,
     settings        : {step: 1,shift: 0,stroke: 'green'},
     points          : [
         [0,150],
@@ -44,7 +44,7 @@ sun.childrens.append(new Curve({
 
 sun.childrens.append(new Curve({
     id              : 'flowerStem',
-    drawing         : drawingData.drawing,
+    drawing         : scene,
     settings        : {step: 1,shift: 1,stroke: 'green'},
     points          : [
         [0,0],
@@ -62,7 +62,7 @@ sun.childrens.append(new Curve({
         property:'shift',
         end     : 100,
         time    : 3500,
-        recourse: true
+        recourse: false
     })).event(100,function(event,transform,canvasObject){
         transform.reverse = true;
     });
@@ -78,7 +78,7 @@ sun.childrens.append(new Curve({
 
 sun.childrens.append(new Circle({
     id              :'sunCenter',
-    drawing         : drawingData.drawing,
+    drawing         : scene,
     settings        : {fill: '#FFB151',x:0,y:0},
     radius          : 15
 })).transform(new Transform({
@@ -99,7 +99,7 @@ sun.animate = function(context){
         if(!this.childrens.list['beam_' + i]){
             this.childrens.append(new Polygon({
                 id              : 'beam_' + i,
-                drawing         : drawingData.drawing,
+                drawing         : scene,
                 settings        : {radius: 5, fill: '#FFB151'},
                 sidesCount      : 3
             }));

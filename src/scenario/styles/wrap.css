@@ -1,0 +1,35 @@
+.scenario-wrap {
+    font-family: arial, serif;
+    font-size: x-small;
+    color: #555555;
+    position: relative;
+    display: inline-block;
+    background: #cacaca;
+    border: solid 2px #cacaca;
+}
+
+.scenario-wrap button {
+    text-align: center;
+    outline: none;
+    border: none;
+    background: #f3f3f3;
+}
+
+.scenario-wrap button:hover {
+    background: #eeeeee;
+    cursor: pointer;
+}
+
+.scenario-wrap button.collapse {
+    position: absolute;
+    right: 0;
+}
+
+.scenario-wrap button.collapse:hover {
+    background: #8ba7f0;
+    color: #f0f0f0;
+}
+
+.scenario-wrap button.collapse:active {
+    background: #6d8ac8;
+}

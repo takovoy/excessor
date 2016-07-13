@@ -1,0 +1,21 @@
+.scenario-objectManager {
+    position: absolute;
+    right: 0;
+    top: 22px;
+    bottom: 52px;
+    background: #ffffff;
+    width: 100px;
+}
+
+.scenario-objectManager > div {
+    position: relative;
+    border-bottom: solid 1px #f0f0f0;
+}
+
+.scenario-objectManager button.collapse {
+    height: 100%;
+}
+
+.scenario-objectManager > .topMenu {
+
+}
