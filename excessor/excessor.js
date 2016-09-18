@@ -472,6 +472,49 @@ Transform.prototype.event = function(shift,action){
     return this;
 };
 /**
+ * Created by takovoy on 31.07.2016.
+ */
+
+// отмечает контрольные точки на холсте кружочками в 4 пикселя
+function markControlPoints ( points, context, corrective){
+    corrective = corrective || {};
+
+    context.moveTo(
+        +corrective.x,
+        +corrective.y
+    );
+    context.arc(
+        +corrective.x,
+        +corrective.y,
+        2,
+        0,
+        Math.PI*2
+    );
+
+    for(var point = 0;points[point];point++){
+        if(typeof points[point][0] === 'object'){
+            markControlPoints(
+                points[point],
+                context,
+                corrective
+            );
+            continue;
+        }
+
+        context.moveTo(
+            points[point][0] + +corrective.x,
+            points[point][1] + +corrective.y
+        );
+        context.arc(
+            points[point][0] + +corrective.x,
+            points[point][1] + +corrective.y,
+            2,
+            0,
+            Math.PI*2
+        );
+    }
+}
+/**
  * Created by takovoySuper on 11.04.2015.
  */
 
@@ -482,6 +525,56 @@ function random (min,max){
 function getRandomRGB (min,max){
     return 'rgb(' + random(min,max) + ',' + random(min,max) + ',' + random(min,max) + ')'
 }
+/**
+ * Created by takovoy on 31.07.2016.
+ */
+
+function toIdentifyTheLine ( points, context, corrective, moveTo){
+    corrective = corrective || {};
+
+    if(moveTo){
+        context.moveTo(
+            points[0][0] + +corrective.x,
+            points[0][1] + +corrective.y
+        );
+    }
+
+    for(var point = 0;points[point];point++){
+        if(typeof points[point][0] === 'object'){
+            toIdentifyTheLine(
+                points[point],
+                context,
+                corrective
+            );
+            continue;
+        }
+
+        context.lineTo(
+            points[point][0] + +corrective.x,
+            points[point][1] + +corrective.y
+        );
+    }
+}
+
+function toIdentifyTheCurve ( points, context, corrective, moveTo){
+    corrective = corrective || {};
+
+    if(moveTo){
+        context.moveTo(
+            points[0][0] + +corrective.x,
+            points[0][1] + +corrective.y
+        );
+    }
+
+    for(var point = 0;points[point];point++){
+        var coord = formula.getPointOnCurve(i,this.now.points);
+        context.lineTo(
+            coord[0] + this.parent.x,
+            coord[1] + this.parent.y
+        );
+    }
+}
+
 /**
  * Created by takovoy on 30.11.2014.
  */
@@ -513,23 +606,26 @@ var Curve = function(options){
 Curve.prototype = Object.create(CanvasObject.prototype);
 
 Curve.prototype.animate = function(context){
-    context.beginPath();
 
     if(this.now.points.length < 2) {
         return
     }
 
+    //отобразить контрольные точки на холсте
     if(this.now.showBreakpoints){
-        for(var j = 0;this.now.points[j];j++){
-            context.moveTo(this.now.points[j][0] + this.parent.x,this.now.points[j][1] + this.parent.y);
-            context.arc(this.now.points[j][0] + this.parent.x,this.now.points[j][1] + this.parent.y,2,0,Math.PI*2);
-        }
+        context.beginPath();
+
+        markControlPoints( this.now.points, context, this);
+
         context.fill();
         context.closePath();
-        context.beginPath();
     }
 
-    context.moveTo(this.now.points[0][0] + this.parent.x,this.now.points[0][1] + this.parent.y);
+    context.beginPath();
+    context.moveTo(
+        this.now.points[0][0] + this.x,
+        this.now.points[0][1] + this.y
+    );
 
     if(this.now.shift > 101){
         this.now.shift = 101;
@@ -600,6 +696,13 @@ Line.prototype.animate = function(context){
     context.closePath();
 };
 /**
+ * Created by takovoy on 17.09.2016.
+ */
+
+function Point (coordinates){
+
+}
+/**
  * Created by РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ on 21.01.2015.
  */
 
@@ -635,6 +738,55 @@ Polygon.prototype.animate = function(context){
         formula.getPointOnCircle(this.now.radian,this.now.radius,this.x,this.y)[0],
         formula.getPointOnCircle(this.now.radian,this.now.radius,this.x,this.y)[1]
     );
+
+    changeContext(context,this.now);
+
+    context.closePath();
+};
+/**
+ * Created by takovoy on 31.07.2016.
+ */
+
+function Polyline (options){
+    CanvasObject.apply(this,arguments);
+    this.constructor    = Polyline;
+    this.now.points     = options.points;
+}
+
+Polyline.prototype = Object.create(CanvasObject.prototype);
+
+Polyline.prototype.animate = function(context){
+
+    //если массив не пустой то продолжить
+    if(this.now.points.length < 2) {
+        return
+    }
+
+    //отобразить контрольные точки на холсте
+    if(this.now.showBreakpoints){
+        context.beginPath();
+
+        markControlPoints( this.now.points, context, this);
+
+        context.fill();
+        context.closePath();
+    }
+
+    context.beginPath();
+    //переход к началу отрисовки объекта
+    context.moveTo(
+        this.now.points[0][0] + this.x,
+        this.now.points[0][1] + this.y
+    );
+
+    if(this.now.shift > 101){
+        this.now.shift = 101;
+    }
+
+    for(var i = 0;i <= this.now.shift;i += this.now.step){
+        var coord = formula.getPointOnCurve(i,this.now.points);
+        context.lineTo(coord[0] + this.parent.x,coord[1] + this.parent.y);
+    }
 
     changeContext(context,this.now);
 

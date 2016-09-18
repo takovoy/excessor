@@ -1,17 +1,18 @@
 /**
- * Created by takovoy on 22.01.2015.
+ * Created by takovoy on 31.07.2016.
  */
 
-var Curve = function(options){
+function Polyline (options){
     CanvasObject.apply(this,arguments);
-    this.constructor    = Curve;
+    this.constructor    = Polyline;
     this.now.points     = options.points;
-};
+}
 
-Curve.prototype = Object.create(CanvasObject.prototype);
+Polyline.prototype = Object.create(CanvasObject.prototype);
 
-Curve.prototype.animate = function(context){
+Polyline.prototype.animate = function(context){
 
+    //если массив не пустой то продолжить
     if(this.now.points.length < 2) {
         return
     }
@@ -27,6 +28,7 @@ Curve.prototype.animate = function(context){
     }
 
     context.beginPath();
+    //переход к началу отрисовки объекта
     context.moveTo(
         this.now.points[0][0] + this.x,
         this.now.points[0][1] + this.y

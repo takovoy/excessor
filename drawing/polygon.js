@@ -5,7 +5,7 @@
 
 var polygon = new Polygon({
     id          :'myLittlePolygon',
-    drawing     :drawingData.drawing,
+    drawing     : scene,
     settings    :{
         radius  : 30,
         fill    :   getRandomRGB(100,250)

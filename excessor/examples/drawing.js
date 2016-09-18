@@ -1,11 +1,8 @@
 /**
- * Created by takovoy on 28.07.2016.
- */
-
-var eys = new Curve();
-/**
  * Created by Пользователь on 21.01.2015.
  */
+
+var scene = new Drawing(400,400);
 
 var sun = new CanvasObject({
     id          :'myFlowerAnimate',
@@ -47,52 +44,42 @@ sun.childrens.append(new Curve({
     ]
 }));
 
-sun.childrens.append(new Curve({
-    id              : 'flowerStem',
-    drawing         : scene,
-    settings        : {step: 1,shift: 1,stroke: 'green'},
-    points          : [
-        [0,0],
-        [40,100],
-        [-40,200],
-        [0,300]
-    ]
-})).transform(new Transform({
-    property:'shift',
-    end     : 100,
-    time    : 3500
-})).event(50,function(event,transform,canvasObject){
+sun.childrens
+    .append(new Curve({
+        id              : 'flowerStem',
+        drawing         : scene,
+        settings        : {step: 1,shift: 1,stroke: 'green'},
+        points          : [
+            [0,0],
+            [40,100],
+            [-40,200],
+            [0,300]
+        ]
+    }))
+    .moveProperty('shift',100,3500)
+    .event(50,function(event,transform,canvasObject){
+        transform.pause();
+        sun.childrens.list['sheet_0'].transform(new Transform({
+            property:'shift',
+            end     : 100,
+            time    : 3500,
+            recourse: false
+        })).event(100,function(event,transform,canvasObject){
+            transform.reverse = true;
+        });
 
-    sun.childrens.list['sheet_0'].transform(new Transform({
-        property:'shift',
-        end     : 100,
-        time    : 3500,
-        recourse: false
-    })).event(100,function(event,transform,canvasObject){
-        transform.reverse = true;
+        sun.childrens.list['sheet_1'].moveProperty('shift',100,3500);
+
+        sun.animate = function(){};
     });
-
-    sun.childrens.list['sheet_1'].transform(new Transform({
-        property:'shift',
-        end     : 100,
-        time    : 3500
-    }));
-
-    sun.animate = function(){};
-});
 
 sun.childrens.append(new Circle({
     id              :'sunCenter',
     drawing         : scene,
     settings        : {fill: '#FFB151',x:0,y:0},
     radius          : 15
-})).transform(new Transform({
-    property:'radius',
-    end     : 40,
-    time    : 1000
-}));
+})).moveProperty('radius',40,1000);
 
-console.log(sun.childrens.list.sunCenter.now.fill);
 sun.childrens.list.sunCenter.moveProperty('fill','#ff5555',1000);
 
 sun.animate = function(context){
@@ -129,7 +116,7 @@ sun.animate = function(context){
 
 var polygon = new Polygon({
     id          :'myLittlePolygon',
-    drawing     :drawingData.drawing,
+    drawing     : scene,
     settings    :{
         radius  : 30,
         fill    :   getRandomRGB(100,250)
