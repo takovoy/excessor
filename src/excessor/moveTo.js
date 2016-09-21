@@ -38,14 +38,13 @@ var dynamic = {
             for(var event in transform.events.list){
                 if(isNaN(+event)){continue}
 
-                if(!transform.reverse){
-                    if(+event > options.shift){break}
+                if(transform.reverse){
+                    if(+event > options.shift || +event < options.shift - options.step){continue}
                 } else {
-                    if(+event < options.shift){break}
+                    if(+event < options.shift || +event > options.shift + options.step){continue}
                 }
 
                 transform.events.list[event](transform.event(event),transform,canvasObject);
-                transform.events.remove(event);
             }
 
             //checked end of animation
@@ -148,6 +147,41 @@ var dynamic = {
                 canvasObject.now.stroke = formula.changeColor(start,end,shift);
             }
 
+        },
+
+        points  : {
+            type        : 'points',
+            prepareData : function(canvasObject){
+                var key         = this.type,
+                    transform   = canvasObject.transform().list[key],
+                    start       = transform.options.start,
+                    end         = transform.options.end,
+                    shift       = transform.options.shift;
+
+                canvasObject.now.points = this.functions.pointsRecourse(start,end,shift);
+            },
+
+            functions   : {
+                pointsRecourse  : function(start,end,shift){
+                    var result = [];
+                    for(var i = 0;i < start.length || i < end.length;i++) {
+                        if(typeof start[i] != typeof end[i] || !start[i]){
+                            result[i] = start[i];
+                            continue;
+                        }
+
+                        if(typeof start[i] === 'object'){
+                            result[i] = this.pointsRecourse(start[i],end[i],shift);
+                            continue;
+                        }
+
+                        result = formula.getPointOnLine(shift,[start,end]);
+                        break;
+                    }
+
+                    return result;
+                }
+            }
         }
     }
 };

@@ -5,6 +5,8 @@
 var CanvasObject = function(options){
     this.id             = options.id || '' + Math.random();
     this.now            = options.settings || {};
+    this.now.x          = this.now.x || 0;
+    this.now.y          = this.now.y || 0;
     this._transform     = new Listing();
     this.childrens = new PropertyListing(
         function(self,object){
@@ -243,14 +245,13 @@ var dynamic = {
             for(var event in transform.events.list){
                 if(isNaN(+event)){continue}
 
-                if(!transform.reverse){
-                    if(+event > options.shift){break}
+                if(transform.reverse){
+                    if(+event > options.shift || +event < options.shift - options.step){continue}
                 } else {
-                    if(+event < options.shift){break}
+                    if(+event < options.shift || +event > options.shift + options.step){continue}
                 }
 
                 transform.events.list[event](transform.event(event),transform,canvasObject);
-                transform.events.remove(event);
             }
 
             //checked end of animation
@@ -353,6 +354,41 @@ var dynamic = {
                 canvasObject.now.stroke = formula.changeColor(start,end,shift);
             }
 
+        },
+
+        points  : {
+            type        : 'points',
+            prepareData : function(canvasObject){
+                var key         = this.type,
+                    transform   = canvasObject.transform().list[key],
+                    start       = transform.options.start,
+                    end         = transform.options.end,
+                    shift       = transform.options.shift;
+
+                canvasObject.now.points = this.functions.pointsRecourse(start,end,shift);
+            },
+
+            functions   : {
+                pointsRecourse  : function(start,end,shift){
+                    var result = [];
+                    for(var i = 0;i < start.length || i < end.length;i++) {
+                        if(typeof start[i] != typeof end[i] || !start[i]){
+                            result[i] = start[i];
+                            continue;
+                        }
+
+                        if(typeof start[i] === 'object'){
+                            result[i] = this.pointsRecourse(start[i],end[i],shift);
+                            continue;
+                        }
+
+                        result = formula.getPointOnLine(shift,[start,end]);
+                        break;
+                    }
+
+                    return result;
+                }
+            }
         }
     }
 };
@@ -380,11 +416,11 @@ Drawing.prototype.render = function(canvasObject,id){
 
     //динамика
     dynamic.move(canvasObject);
+    canvasObject.animate(this.context);
 
     for(var child in canvasObject.childrens.list){
         this.render(canvasObject.childrens.list[child],child);
     }
-    canvasObject.animate(this.context);
 };
 
 Drawing.prototype.pause = function(){
@@ -633,7 +669,7 @@ Curve.prototype.animate = function(context){
 
     for(var i = 0;i <= this.now.shift;i += this.now.step){
         var coord = formula.getPointOnCurve(i,this.now.points);
-        context.lineTo(coord[0] + this.parent.x,coord[1] + this.parent.y);
+        context.lineTo(coord[0] + this.x,coord[1] + this.y);
     }
 
     changeContext(context,this.now);

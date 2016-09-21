@@ -5,6 +5,8 @@
 var CanvasObject = function(options){
     this.id             = options.id || '' + Math.random();
     this.now            = options.settings || {};
+    this.now.x          = this.now.x || 0;
+    this.now.y          = this.now.y || 0;
     this._transform     = new Listing();
     this.childrens = new PropertyListing(
         function(self,object){

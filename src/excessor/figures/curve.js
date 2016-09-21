@@ -38,7 +38,7 @@ Curve.prototype.animate = function(context){
 
     for(var i = 0;i <= this.now.shift;i += this.now.step){
         var coord = formula.getPointOnCurve(i,this.now.points);
-        context.lineTo(coord[0] + this.parent.x,coord[1] + this.parent.y);
+        context.lineTo(coord[0] + this.x,coord[1] + this.y);
     }
 
     changeContext(context,this.now);

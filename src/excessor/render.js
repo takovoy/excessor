@@ -22,11 +22,11 @@ Drawing.prototype.render = function(canvasObject,id){
 
     //динамика
     dynamic.move(canvasObject);
+    canvasObject.animate(this.context);
 
     for(var child in canvasObject.childrens.list){
         this.render(canvasObject.childrens.list[child],child);
     }
-    canvasObject.animate(this.context);
 };
 
 Drawing.prototype.pause = function(){
