@@ -2,7 +2,7 @@
  * Created by Пользователь on 21.01.2015.
  */
 
-var scene = new Drawing(400,400);
+var scene = new Drawing(1000,450);
 
 var sun = new CanvasObject({
     id          :'myFlowerAnimate',
@@ -56,7 +56,9 @@ sun.childrens
             [0,300]
         ]
     }))
+    .operationContext
     .moveProperty('shift',100,3500)
+    .operationContext
     .event(50,function(event,transform,canvasObject){
         transform.pause();
         sun.childrens.list['sheet_0'].transform(new Transform({
@@ -64,9 +66,11 @@ sun.childrens
             end     : 100,
             time    : 3500,
             recourse: false
-        })).event(100,function(event,transform,canvasObject){
-            transform.reverse = true;
-        });
+        }))
+            .operationContext
+            .event(100,function(event,transform,canvasObject){
+                transform.reverse = true;
+            });
 
         sun.childrens.list['sheet_1'].moveProperty('shift',100,3500);
 
@@ -78,7 +82,9 @@ sun.childrens.append(new Circle({
     drawing         : scene,
     settings        : {fill: '#FFB151',x:0,y:0},
     radius          : 15
-})).moveProperty('radius',40,1000);
+}))
+    .operationContext
+    .moveProperty('radius',40,1000);
 
 sun.childrens.list.sunCenter.moveProperty('fill','#ff5555',1000);
 

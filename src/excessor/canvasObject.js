@@ -5,13 +5,14 @@
 var CanvasObject = function(options){
     this.id             = options.id || '' + Math.random();
     this.now            = options.settings || {};
-    this.now.x          = this.now.x || 0;
-    this.now.y          = this.now.y || 0;
+    this.now.x          = this.now.x || options.x || 0;
+    this.now.y          = this.now.y || options.y || 0;
     this._transform     = new Listing();
     this.childrens = new PropertyListing(
         function(self,object){
-            object.parent = self.now;
-            return object;
+            object.parent = self;
+            self.operationContext = object;
+            return self;
         },
         function(self){
 
@@ -63,7 +64,8 @@ CanvasObject.prototype.transform = function(transform){
     }
     if (!transform) {return this._transform;}
     this._transform.append(transform.id,transform);
-    return transform;
+    this.operationContext = transform;
+    return this;
 };
 CanvasObject.prototype.move       = function(coord,time){
     if(!time){
