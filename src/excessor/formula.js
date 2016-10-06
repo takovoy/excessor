@@ -3,7 +3,6 @@
  */
 
 var formula = {
-
     getPointOnCircle: function(radian,radius,centerX,centerY){
         radius  = +radius;
         radian  = +radian;
@@ -11,17 +10,17 @@ var formula = {
         centerY = +centerY || 0;
         var y   = radius * Math.sin(+radian);
         var x   = radius * Math.cos(+radian);
-        return [centerX + x,centerY + y];
+        return  [centerX + x,centerY + y];
     },
 
     getPointOnEllipse: function(semiAxisX,semiAxisY,shift,tilt,centerX,centerY){
-        tilt = tilt || 0;
-        tilt *= -1;
+        tilt    = tilt || 0;
+        tilt    *= -1;
 
         var x1  = semiAxisX*Math.cos(+shift),
             y1  = semiAxisY*Math.sin(+shift),
-            x2 = x1 * Math.cos(tilt) + y1 * Math.sin(tilt),
-            y2 = -x1 * Math.sin(tilt) + y1 * Math.cos(tilt);
+            x2  = x1 * Math.cos(tilt) + y1 * Math.sin(tilt),
+            y2  = -x1 * Math.sin(tilt) + y1 * Math.cos(tilt);
 
         return [x2 + centerX,y2 + centerY];
     },
@@ -35,25 +34,26 @@ var formula = {
         return coord;
     },
 
-    getPointOnCurve: function(shift,points){
+    getPointOnCurve: function(shift,points,tilt){
         if(points.length == 2){
-            return this.getPointOnLine(shift,points);
+            return this.getPointOnLine(shift,points,tilt);
         }
         var pointsPP = [];
         for(var i = 1;i < points.length;i++){
             pointsPP.push(this.getPointOnLine(shift,[
                 points[i - 1],
                 points[i]
-            ]));
+            ],tilt));
         }
-        return this.getPointOnCurve(shift,pointsPP);
+        return this.getPointOnCurve(shift,pointsPP,tilt);
     },
 
-    getPointOnLine: function(shift,points){
-        return [
-            (points[1][0] - points[0][0]) * (shift / 100) + points[0][0],
-            (points[1][1] - points[0][1]) * (shift / 100) + points[0][1]
-        ];
+    getPointOnLine: function(shift,points,tilt){
+        var x   = (points[1][0] - points[0][0]) * (shift / 100) + points[0][0],
+            y   = (points[1][1] - points[0][1]) * (shift / 100) + points[0][1],
+            x2  = x * Math.cos(tilt) + y * Math.sin(tilt),
+            y2  = -x * Math.sin(tilt) + y * Math.cos(tilt);
+        return [x2,y2];
     },
 
     /**

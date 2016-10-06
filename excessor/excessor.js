@@ -130,7 +130,6 @@ var dataContextChanges = {
  */
 
 var formula = {
-
     getPointOnCircle: function(radian,radius,centerX,centerY){
         radius  = +radius;
         radian  = +radian;
@@ -138,17 +137,17 @@ var formula = {
         centerY = +centerY || 0;
         var y   = radius * Math.sin(+radian);
         var x   = radius * Math.cos(+radian);
-        return [centerX + x,centerY + y];
+        return  [centerX + x,centerY + y];
     },
 
     getPointOnEllipse: function(semiAxisX,semiAxisY,shift,tilt,centerX,centerY){
-        tilt = tilt || 0;
-        tilt *= -1;
+        tilt    = tilt || 0;
+        tilt    *= -1;
 
         var x1  = semiAxisX*Math.cos(+shift),
             y1  = semiAxisY*Math.sin(+shift),
-            x2 = x1 * Math.cos(tilt) + y1 * Math.sin(tilt),
-            y2 = -x1 * Math.sin(tilt) + y1 * Math.cos(tilt);
+            x2  = x1 * Math.cos(tilt) + y1 * Math.sin(tilt),
+            y2  = -x1 * Math.sin(tilt) + y1 * Math.cos(tilt);
 
         return [x2 + centerX,y2 + centerY];
     },
@@ -162,25 +161,26 @@ var formula = {
         return coord;
     },
 
-    getPointOnCurve: function(shift,points){
+    getPointOnCurve: function(shift,points,tilt){
         if(points.length == 2){
-            return this.getPointOnLine(shift,points);
+            return this.getPointOnLine(shift,points,tilt);
         }
         var pointsPP = [];
         for(var i = 1;i < points.length;i++){
             pointsPP.push(this.getPointOnLine(shift,[
                 points[i - 1],
                 points[i]
-            ]));
+            ],tilt));
         }
-        return this.getPointOnCurve(shift,pointsPP);
+        return this.getPointOnCurve(shift,pointsPP,tilt);
     },
 
-    getPointOnLine: function(shift,points){
-        return [
-            (points[1][0] - points[0][0]) * (shift / 100) + points[0][0],
-            (points[1][1] - points[0][1]) * (shift / 100) + points[0][1]
-        ];
+    getPointOnLine: function(shift,points,tilt){
+        var x   = (points[1][0] - points[0][0]) * (shift / 100) + points[0][0],
+            y   = (points[1][1] - points[0][1]) * (shift / 100) + points[0][1],
+            x2  = x * Math.cos(tilt) + y * Math.sin(tilt),
+            y2  = -x * Math.sin(tilt) + y * Math.cos(tilt);
+        return [x2,y2];
     },
 
     /**
@@ -670,7 +670,7 @@ Curve.prototype.animate = function(context){
     }
 
     for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnCurve(i,this.now.points);
+        var coord = formula.getPointOnCurve(i,this.now.points,this.now.radian);
         context.lineTo(coord[0] + this.x,coord[1] + this.y);
     }
 
@@ -698,11 +698,11 @@ Ellipse.prototype = Object.create(CanvasObject.prototype);
 Ellipse.prototype.animate = function(context){
     context.beginPath();
     var shift = 0;
-    var coord = formula.getPointOnEllipse(this.now.semiAxisX,this.now.semiAxisY,shift,this.now.tilt,this.x,this.y);
+    var coord = formula.getPointOnEllipse(this.now.semiAxisX,this.now.semiAxisY,shift,this.now.radian,this.x,this.y);
     context.moveTo(coord[0],coord[1]);
 
     for(;shift <= Math.PI*2;shift += this.now.step){
-        var coordinate = formula.getPointOnEllipse(this.now.semiAxisX,this.now.semiAxisY,shift,this.now.tilt,this.x,this.y);
+        var coordinate = formula.getPointOnEllipse(this.now.semiAxisX,this.now.semiAxisY,shift,this.now.radian,this.x,this.y);
         context.lineTo(coordinate[0],coordinate[1]);
     }
     context.lineTo(coord[0],coord[1]);
