@@ -8,7 +8,7 @@ var CanvasObject = function(options){
     this.now.x          = this.now.x || options.x || 0;
     this.now.y          = this.now.y || options.y || 0;
     this._transform     = new Listing();
-    this.childrens = new PropertyListing(
+    this.childrens      = new PropertyListing(
         function(self,object){
             object.parent = self;
             self.operationContext = object;
@@ -19,9 +19,7 @@ var CanvasObject = function(options){
         },
         this
     );
-    if(options.drawing){
-        this.drawing = options.drawing;
-    }
+    this.drawing = options.drawing || this.parent.drawing || undefined;
 };
 
 Object.defineProperties(CanvasObject.prototype,{

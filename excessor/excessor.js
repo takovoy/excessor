@@ -187,6 +187,15 @@ var formula = {
      * @return {Array}
      */
     HEXtoRGB    : function(color){
+        if(color[0] != "#"){return false}
+        var rgb = [];
+        rgb[0] = parseInt(color.substring(1,3),16);
+        rgb[1] = parseInt(color.substring(3,5),16);
+        rgb[2] = parseInt(color.substring(5),16);
+        return rgb;
+    },
+
+    RGBtoRGBA    : function(color){
         if(color.length != 7){return false}
         var rgb = [];
         rgb[0] = parseInt(color.substring(1,3),16);
