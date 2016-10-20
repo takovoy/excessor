@@ -23,6 +23,7 @@ var CanvasObject = function(options){
 };
 
 Object.defineProperties(CanvasObject.prototype,{
+
     x       : {
         get: function(){
             if(this.parent){
