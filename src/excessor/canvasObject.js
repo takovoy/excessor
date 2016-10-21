@@ -7,6 +7,7 @@ var CanvasObject = function(options){
     this.now            = options.settings || {};
     this.now.x          = this.now.x || options.x || 0;
     this.now.y          = this.now.y || options.y || 0;
+    this.now.radian     = this.now.radian || options.radian || 0;
     this._transform     = new Listing();
     this.childrens      = new PropertyListing(
         function(self,object){
@@ -27,7 +28,12 @@ Object.defineProperties(CanvasObject.prototype,{
     x       : {
         get: function(){
             if(this.parent){
-                return +this.now.x + this.parent.x;
+                return formula.getPointOnCircle(
+                    this.parent.now.radian,
+                    formula.getCenterToPointDistance([this.now.x,this.now.y]),
+                    this.parent.x,
+                    this.parent.y
+                )[0];
             }
             return +this.now.x;
         },
@@ -35,10 +41,16 @@ Object.defineProperties(CanvasObject.prototype,{
             this.now.x = +value;
         }
     },
+
     y       : {
         get: function(){
             if(this.parent){
-                return +this.now.y + this.parent.y;
+                return formula.getPointOnCircle(
+                    this.parent.now.radian,
+                    formula.getCenterToPointDistance([this.now.x,this.now.y]),
+                    this.parent.x,
+                    this.parent.y
+                )[1];
             }
             return +this.now.y;
         },
@@ -46,6 +58,7 @@ Object.defineProperties(CanvasObject.prototype,{
             this.now.y = +value;
         }
     }
+
 });
 
 CanvasObject.prototype.start        = function(){

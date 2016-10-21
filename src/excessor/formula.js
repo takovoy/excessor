@@ -4,12 +4,10 @@
 
 var formula = {
     getPointOnCircle: function(radian,radius,centerX,centerY){
-        radius  = +radius;
-        radian  = +radian;
         centerX = +centerX || 0;
         centerY = +centerY || 0;
-        var y   = radius * Math.sin(+radian);
-        var x   = radius * Math.cos(+radian);
+        var y   = +radius * Math.sin(+radian);
+        var x   = +radius * Math.cos(+radian);
         return  [centerX + x,centerY + y];
     },
 
@@ -54,6 +52,10 @@ var formula = {
             x2  = x * Math.cos(tilt) + y * Math.sin(tilt),
             y2  = -x * Math.sin(tilt) + y * Math.cos(tilt);
         return [x2,y2];
+    },
+
+    getCenterToPointDistance : function(coordinates){
+        return Math.sqrt(Math.pow(coordinates[0],2) + Math.pow(coordinates[1],2));
     },
 
     /**

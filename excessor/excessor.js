@@ -7,8 +7,9 @@ var CanvasObject = function(options){
     this.now            = options.settings || {};
     this.now.x          = this.now.x || options.x || 0;
     this.now.y          = this.now.y || options.y || 0;
+    this.now.radian     = this.now.radian || options.radian || 0;
     this._transform     = new Listing();
-    this.childrens = new PropertyListing(
+    this.childrens      = new PropertyListing(
         function(self,object){
             object.parent = self;
             self.operationContext = object;
@@ -19,16 +20,20 @@ var CanvasObject = function(options){
         },
         this
     );
-    if(options.drawing){
-        this.drawing = options.drawing;
-    }
+    this.drawing = options.drawing || this.parent.drawing || undefined;
 };
 
 Object.defineProperties(CanvasObject.prototype,{
+
     x       : {
         get: function(){
             if(this.parent){
-                return +this.now.x + this.parent.x;
+                return formula.getPointOnCircle(
+                    this.parent.now.radian,
+                    formula.getCenterToPointDistance([this.now.x,this.now.y]),
+                    this.parent.x,
+                    this.parent.y
+                )[0];
             }
             return +this.now.x;
         },
@@ -36,10 +41,16 @@ Object.defineProperties(CanvasObject.prototype,{
             this.now.x = +value;
         }
     },
+
     y       : {
         get: function(){
             if(this.parent){
-                return +this.now.y + this.parent.y;
+                return formula.getPointOnCircle(
+                    this.parent.now.radian,
+                    formula.getCenterToPointDistance([this.now.x,this.now.y]),
+                    this.parent.x,
+                    this.parent.y
+                )[1];
             }
             return +this.now.y;
         },
@@ -47,6 +58,7 @@ Object.defineProperties(CanvasObject.prototype,{
             this.now.y = +value;
         }
     }
+
 });
 
 CanvasObject.prototype.start        = function(){
@@ -126,17 +138,89 @@ var dataContextChanges = {
     }
 };
 /**
+ * Created by yeIAmCrasyProgrammer on 10.10.2016.
+ */
+
+function Cluster (count,correlation){
+    CanvasObject.apply(this,[{}]);
+    this.correlation    = correlation || {};
+    this.count          = count;
+    this.iteration      = 0;
+    this.constructor    = Cluster;
+    this.parameters     = {
+        list        : {},
+        iteration   : false
+    }
+}
+
+Curve.prototype = Object.create(CanvasObject.prototype);
+
+Cluster.prototype.transform = function(){
+    if(!this._transform){
+        this._transform = new Listing();
+    }
+    return this._transform;
+};
+
+Cluster.prototype.animate = function(){
+    if(this.iteration >= this.count){
+        this.iteration = 0;
+        return;
+    }
+    this.parent.animate(this.drawing.context);
+    this.iteration++;
+    this.animate();
+};
+
+Object.defineProperties(CanvasObject.prototype,{
+    now     : {
+        get : function(){
+            if(this.parameters.iteration !== this.iteration) {
+                for(var key in this.parent.now){
+                    this.parameters.list[key] = this.parent.now[key] +
+                        (this.correlation[key] * this.iteration);
+                }
+            }
+            return this.parameters.list;
+        },
+
+        set : function(value){
+            return this.parameters.list;
+        }
+    },
+    x       : {
+        get : function(){
+            if(this.parent.parent){
+                return +this.now.x + this.parent.parent.x;
+            }
+            return +this.now.x;
+        },
+        set : function(value){
+            this.now.x = +value;
+        }
+    },
+    y       : {
+        get : function(){
+            if(this.parent.parent){
+                return +this.now.y + this.parent.parent.y;
+            }
+            return +this.now.y;
+        },
+        set : function(value){
+            this.now.y = +value;
+        }
+    }
+});
+/**
  * Created by takovoy on 14.09.2014.
  */
 
 var formula = {
     getPointOnCircle: function(radian,radius,centerX,centerY){
-        radius  = +radius;
-        radian  = +radian;
         centerX = +centerX || 0;
         centerY = +centerY || 0;
-        var y   = radius * Math.sin(+radian);
-        var x   = radius * Math.cos(+radian);
+        var y   = +radius * Math.sin(+radian);
+        var x   = +radius * Math.cos(+radian);
         return  [centerX + x,centerY + y];
     },
 
@@ -183,6 +267,10 @@ var formula = {
         return [x2,y2];
     },
 
+    getCenterToPointDistance : function(coordinates){
+        return Math.sqrt(Math.pow(coordinates[0],2) + Math.pow(coordinates[1],2));
+    },
+
     /**
      * @return {Array}
      */
@@ -196,7 +284,7 @@ var formula = {
     },
 
     RGBtoRGBA    : function(color){
-        if(color.length != 7){return false}
+        if(color.substring(1,3) != 7){return false}
         var rgb = [];
         rgb[0] = parseInt(color.substring(1,3),16);
         rgb[1] = parseInt(color.substring(3,5),16);
