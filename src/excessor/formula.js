@@ -32,26 +32,24 @@ var formula = {
         return coord;
     },
 
-    getPointOnCurve: function(shift,points,tilt){
+    getPointOnCurve: function(shift,points){
         if(points.length == 2){
-            return this.getPointOnLine(shift,points,tilt);
+            return this.getPointOnLine(shift,points);
         }
         var pointsPP = [];
         for(var i = 1;i < points.length;i++){
             pointsPP.push(this.getPointOnLine(shift,[
                 points[i - 1],
                 points[i]
-            ],tilt));
+            ]));
         }
-        return this.getPointOnCurve(shift,pointsPP,tilt);
+        return this.getPointOnCurve(shift,pointsPP);
     },
 
-    getPointOnLine: function(shift,points,tilt){
+    getPointOnLine: function(shift,points){
         var x   = (points[1][0] - points[0][0]) * (shift / 100) + points[0][0],
-            y   = (points[1][1] - points[0][1]) * (shift / 100) + points[0][1],
-            x2  = x * Math.cos(tilt) + y * Math.sin(tilt),
-            y2  = -x * Math.sin(tilt) + y * Math.cos(tilt);
-        return [x2,y2];
+            y   = (points[1][1] - points[0][1]) * (shift / 100) + points[0][1];
+        return [x,y];
     },
 
     getCenterToPointDistance : function(coordinates){

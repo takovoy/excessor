@@ -6,7 +6,7 @@ function Cluster (count,correlation){
     CanvasObject.apply(this,[{}]);
     this.correlation    = correlation || {};
     this.count          = count;
-    this.iteration      = 0;
+    this.iteration      = 1;
     this.constructor    = Cluster;
     this.parameters     = {
         list        : {},
@@ -14,7 +14,7 @@ function Cluster (count,correlation){
     }
 }
 
-Curve.prototype = Object.create(CanvasObject.prototype);
+Cluster.prototype = Object.create(CanvasObject.prototype);
 
 Cluster.prototype.transform = function(){
     if(!this._transform){
@@ -24,8 +24,8 @@ Cluster.prototype.transform = function(){
 };
 
 Cluster.prototype.animate = function(){
-    if(this.iteration >= this.count){
-        this.iteration = 0;
+    if(this.iteration > this.count){
+        this.iteration = 1;
         return;
     }
     this.parent.animate(this.drawing.context);
@@ -33,14 +33,19 @@ Cluster.prototype.animate = function(){
     this.animate();
 };
 
-Object.defineProperties(CanvasObject.prototype,{
+Object.defineProperties(Cluster.prototype,{
     now     : {
         get : function(){
             if(this.parameters.iteration !== this.iteration) {
                 for(var key in this.parent.now){
+                    var correlation = +this.correlation[key];
+                    if(typeof this.correlation[key] == "function"){
+                        correlation = +this.correlation[key](this.iteration);
+                    }
                     this.parameters.list[key] = this.parent.now[key] +
-                        (this.correlation[key] * this.iteration);
+                        (correlation * this.iteration);
                 }
+                this.parameters.iteration = +this.iteration;
             }
             return this.parameters.list;
         },

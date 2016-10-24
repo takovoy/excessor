@@ -2,7 +2,7 @@
  * Created by Пользователь on 21.01.2015.
  */
 
-var scene = new Drawing(1000,450);
+var scene = new Drawing(1000,500);
 
 var sun = new CanvasObject({
     id          :'myFlowerAnimate',
@@ -60,7 +60,7 @@ sun.childrens
     .moveProperty('shift',100,3500)
     .operationContext
     .event(50,function(event,transform,canvasObject){
-        transform.pause();
+        //transform.pause();
         sun.childrens.list['sheet_0'].transform(new Transform({
             property:'shift',
             end     : 100,
@@ -77,41 +77,53 @@ sun.childrens
         sun.animate = function(){};
     });
 
-sun.childrens.append(new Circle({
+var center = sun.childrens.append(new Circle({
     id              :'sunCenter',
     drawing         : scene,
     settings        : {fill: '#FFB151',x:0,y:0},
     radius          : 15
 }))
     .operationContext
-    .moveProperty('radius',40,1000);
+    .moveProperty('radius',40,1000)
+    .moveProperty('radian',3,1000);
 
+
+for(var i = 0;i < sun.now.petalCount;i++){
+    if(!center.childrens.list['beam_' + i]){
+        center.childrens.append(new Polygon({
+            id              : 'beam_' + i,
+            drawing         : scene,
+            settings        : {
+                radius  : 5,
+                radian  : (Math.PI*2/sun.now.petalCount)*i,
+                fill    : '#FFB151'
+            },
+            sidesCount      : 3,
+            x               : formula.getPointOnCircle(
+                (Math.PI*2/sun.now.petalCount)*i,
+                70,
+                0,
+                0
+            )[0],
+            y               : formula.getPointOnCircle(
+                (Math.PI*2/sun.now.petalCount)*i,
+                70,
+                0,
+                0
+            )[1]
+        }));
+    }
+}
 sun.childrens.list.sunCenter.moveProperty('fill','#ff5555',1000);
 
 sun.animate = function(context){
-    if(this.childrens.list['sunCenter'].radius >= 39){
+    if(center.radius >= 39){
         this.now.step = (this.now.step / 1.5) * 1.4;
     }
 
     for(var i = 0;i < this.now.petalCount;i++){
-        if(!this.childrens.list['beam_' + i]){
-            this.childrens.append(new Polygon({
-                id              : 'beam_' + i,
-                drawing         : scene,
-                settings        : {radius: 5, fill: '#FFB151'},
-                sidesCount      : 3
-            }));
+        if(center.childrens.list['beam_' + i].now.radius < 30){
+            center.childrens.list['beam_' + i].now.radius++;
         }
-        if(this.childrens.list['beam_' + i].now.radius < 30){
-            this.childrens.list['beam_' + i].now.radius++;
-        }
-        this.childrens.list['beam_' + i].now.radian = (Math.PI*2/this.now.petalCount)*i + this.now.shift;
-        this.childrens.list['beam_' + i].x = formula.getPointOnCircle((Math.PI*2/this.now.petalCount)*i + this.now.shift,70,0,0)[0];
-        this.childrens.list['beam_' + i].y = formula.getPointOnCircle((Math.PI*2/this.now.petalCount)*i + this.now.shift,70,0,0)[1];
     }
-
-    if(this.now.shift > Math.PI*2){
-        this.now.shift = 0;
-    }
-    this.now.shift += this.now.step;
 };

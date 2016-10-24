@@ -24,16 +24,15 @@ var CanvasObject = function(options){
 };
 
 Object.defineProperties(CanvasObject.prototype,{
-
     x       : {
         get: function(){
             if(this.parent){
-                return formula.getPointOnCircle(
-                    this.parent.now.radian,
-                    formula.getCenterToPointDistance([this.now.x,this.now.y]),
-                    this.parent.x,
-                    this.parent.y
-                )[0];
+                //корректирует положение и наклон объекта относительно родителя
+                return (
+                    this.now.x * Math.cos(this.parent.radian) -
+                    this.now.y * Math.sin(this.parent.radian) +
+                    this.parent.x
+                );
             }
             return +this.now.x;
         },
@@ -45,20 +44,30 @@ Object.defineProperties(CanvasObject.prototype,{
     y       : {
         get: function(){
             if(this.parent){
-                return formula.getPointOnCircle(
-                    this.parent.now.radian,
-                    formula.getCenterToPointDistance([this.now.x,this.now.y]),
-                    this.parent.x,
+                return (
+                    this.now.x * Math.sin(this.parent.radian) +
+                    this.now.y * Math.cos(this.parent.radian) +
                     this.parent.y
-                )[1];
+                );
             }
             return +this.now.y;
         },
         set: function(value){
             this.now.y = +value;
         }
-    }
+    },
 
+    radian  : {
+        get: function(){
+            if(this.parent){
+                return +this.parent.radian + +this.now.radian;
+            }
+            return +this.now.radian;
+        },
+        set: function(value){
+            this.now.radian = +value;
+        }
+    }
 });
 
 CanvasObject.prototype.start        = function(){

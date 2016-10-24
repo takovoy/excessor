@@ -24,16 +24,15 @@ var CanvasObject = function(options){
 };
 
 Object.defineProperties(CanvasObject.prototype,{
-
     x       : {
         get: function(){
             if(this.parent){
-                return formula.getPointOnCircle(
-                    this.parent.now.radian,
-                    formula.getCenterToPointDistance([this.now.x,this.now.y]),
-                    this.parent.x,
-                    this.parent.y
-                )[0];
+                //корректирует положение и наклон объекта относительно родителя
+                return (
+                    this.now.x * Math.cos(this.parent.radian) -
+                    this.now.y * Math.sin(this.parent.radian) +
+                    this.parent.x
+                );
             }
             return +this.now.x;
         },
@@ -45,20 +44,30 @@ Object.defineProperties(CanvasObject.prototype,{
     y       : {
         get: function(){
             if(this.parent){
-                return formula.getPointOnCircle(
-                    this.parent.now.radian,
-                    formula.getCenterToPointDistance([this.now.x,this.now.y]),
-                    this.parent.x,
+                return (
+                    this.now.x * Math.sin(this.parent.radian) +
+                    this.now.y * Math.cos(this.parent.radian) +
                     this.parent.y
-                )[1];
+                );
             }
             return +this.now.y;
         },
         set: function(value){
             this.now.y = +value;
         }
-    }
+    },
 
+    radian  : {
+        get: function(){
+            if(this.parent){
+                return +this.parent.radian + +this.now.radian;
+            }
+            return +this.now.radian;
+        },
+        set: function(value){
+            this.now.radian = +value;
+        }
+    }
 });
 
 CanvasObject.prototype.start        = function(){
@@ -145,7 +154,7 @@ function Cluster (count,correlation){
     CanvasObject.apply(this,[{}]);
     this.correlation    = correlation || {};
     this.count          = count;
-    this.iteration      = 0;
+    this.iteration      = 1;
     this.constructor    = Cluster;
     this.parameters     = {
         list        : {},
@@ -153,7 +162,7 @@ function Cluster (count,correlation){
     }
 }
 
-Curve.prototype = Object.create(CanvasObject.prototype);
+Cluster.prototype = Object.create(CanvasObject.prototype);
 
 Cluster.prototype.transform = function(){
     if(!this._transform){
@@ -163,8 +172,8 @@ Cluster.prototype.transform = function(){
 };
 
 Cluster.prototype.animate = function(){
-    if(this.iteration >= this.count){
-        this.iteration = 0;
+    if(this.iteration > this.count){
+        this.iteration = 1;
         return;
     }
     this.parent.animate(this.drawing.context);
@@ -172,14 +181,19 @@ Cluster.prototype.animate = function(){
     this.animate();
 };
 
-Object.defineProperties(CanvasObject.prototype,{
+Object.defineProperties(Cluster.prototype,{
     now     : {
         get : function(){
             if(this.parameters.iteration !== this.iteration) {
                 for(var key in this.parent.now){
+                    var correlation = +this.correlation[key];
+                    if(typeof this.correlation[key] == "function"){
+                        correlation = +this.correlation[key](this.iteration);
+                    }
                     this.parameters.list[key] = this.parent.now[key] +
-                        (this.correlation[key] * this.iteration);
+                        (correlation * this.iteration);
                 }
+                this.parameters.iteration = +this.iteration;
             }
             return this.parameters.list;
         },
@@ -245,26 +259,24 @@ var formula = {
         return coord;
     },
 
-    getPointOnCurve: function(shift,points,tilt){
+    getPointOnCurve: function(shift,points){
         if(points.length == 2){
-            return this.getPointOnLine(shift,points,tilt);
+            return this.getPointOnLine(shift,points);
         }
         var pointsPP = [];
         for(var i = 1;i < points.length;i++){
             pointsPP.push(this.getPointOnLine(shift,[
                 points[i - 1],
                 points[i]
-            ],tilt));
+            ]));
         }
-        return this.getPointOnCurve(shift,pointsPP,tilt);
+        return this.getPointOnCurve(shift,pointsPP);
     },
 
-    getPointOnLine: function(shift,points,tilt){
+    getPointOnLine: function(shift,points){
         var x   = (points[1][0] - points[0][0]) * (shift / 100) + points[0][0],
-            y   = (points[1][1] - points[0][1]) * (shift / 100) + points[0][1],
-            x2  = x * Math.cos(tilt) + y * Math.sin(tilt),
-            y2  = -x * Math.sin(tilt) + y * Math.cos(tilt);
-        return [x2,y2];
+            y   = (points[1][1] - points[0][1]) * (shift / 100) + points[0][1];
+        return [x,y];
     },
 
     getCenterToPointDistance : function(coordinates){
@@ -767,7 +779,7 @@ Curve.prototype.animate = function(context){
     }
 
     for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnCurve(i,this.now.points,this.now.radian);
+        var coord = formula.getPointOnCurve(i,this.now.points);
         context.lineTo(coord[0] + this.x,coord[1] + this.y);
     }
 
@@ -843,14 +855,14 @@ function Point (coordinates){
 
 var Polygon = function(options){
     CanvasObject.apply(this,arguments);
-    this.constructor    = Polygon;
-    this.now.sidesCount = options.sidesCount;
+    this.constructor        = Polygon;
+    this.now.sidesCount     = options.sidesCount;
     if(!this.now.radian){this.now.radian = Math.PI/180*270}
 };
 
-Polygon.prototype = Object.create(CanvasObject.prototype);
+Polygon.prototype           = Object.create(CanvasObject.prototype);
 
-Polygon.prototype.animate = function(context){
+Polygon.prototype.animate   = function(context){
     if(this.now.sidesCount < 3){
         return false
     }
@@ -858,20 +870,20 @@ Polygon.prototype.animate = function(context){
     context.beginPath();
 
     context.moveTo(
-        formula.getPointOnCircle(this.now.radian,this.now.radius,this.x,this.y)[0],
-        formula.getPointOnCircle(this.now.radian,this.now.radius,this.x,this.y)[1]
+        formula.getPointOnCircle(this.radian,this.now.radius,this.x,this.y)[0],
+        formula.getPointOnCircle(this.radian,this.now.radius,this.x,this.y)[1]
     );
 
     for(var i = 0;i < this.now.sidesCount;i++){
         context.lineTo(
-            formula.getPointOnCircle(Math.PI*2 / this.now.sidesCount * i + this.now.radian,this.now.radius,this.x,this.y)[0],
-            formula.getPointOnCircle(Math.PI*2 / this.now.sidesCount * i + this.now.radian,this.now.radius,this.x,this.y)[1]
+            formula.getPointOnCircle(Math.PI*2 / this.now.sidesCount * i + this.radian,this.now.radius,this.x,this.y)[0],
+            formula.getPointOnCircle(Math.PI*2 / this.now.sidesCount * i + this.radian,this.now.radius,this.x,this.y)[1]
         );
     }
 
     context.lineTo(
-        formula.getPointOnCircle(this.now.radian,this.now.radius,this.x,this.y)[0],
-        formula.getPointOnCircle(this.now.radian,this.now.radius,this.x,this.y)[1]
+        formula.getPointOnCircle(this.radian,this.now.radius,this.x,this.y)[0],
+        formula.getPointOnCircle(this.radian,this.now.radius,this.x,this.y)[1]
     );
 
     changeContext(context,this.now);
