@@ -114,6 +114,27 @@ for(var i = 0;i < sun.now.petalCount;i++){
         }));
     }
 }
+
+var beamsCluster = new Cluster(5,{
+    radian  : Math.PI*2 / 6,
+    x       : function(iteration){
+        return formula.getPointOnCircle(
+            (Math.PI*2/6)*iteration,
+            70,
+            0,
+            0
+        )[0]
+    },
+    y       : function(iteration){
+        return formula.getPointOnCircle(
+            (Math.PI*2/6)*iteration,
+            70,
+            0,
+            0
+        )[1]
+    }
+});
+
 sun.childrens.list.sunCenter.moveProperty('fill','#ff5555',1000);
 
 sun.animate = function(context){
