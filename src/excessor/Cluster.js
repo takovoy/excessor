@@ -3,15 +3,15 @@
  */
 
 function Cluster (count,correlation){
+    this.parameters     = {
+        list        : {},
+        iteration   : false
+    };
     CanvasObject.apply(this,[{}]);
     this.correlation    = correlation || {};
     this.count          = count;
     this.iteration      = 1;
     this.constructor    = Cluster;
-    this.parameters     = {
-        list        : {},
-        iteration   : false
-    }
 }
 
 Cluster.prototype = Object.create(CanvasObject.prototype);
@@ -28,7 +28,8 @@ Cluster.prototype.animate = function(){
         this.iteration = 1;
         return;
     }
-    this.parent.animate(this.drawing.context);
+    this._animate = this.parent.animate;
+    this._animate(this.drawing.context);
     this.iteration++;
     this.animate();
 };
@@ -36,11 +37,15 @@ Cluster.prototype.animate = function(){
 Object.defineProperties(Cluster.prototype,{
     now     : {
         get : function(){
-            if(this.parameters.iteration !== this.iteration) {
+            if(this.parameters.iteration !== this.iteration && this.parent) {
                 for(var key in this.parent.now){
+                    if (!this.correlation[key]) {
+                        this.parameters.list[key] = this.parent.now[key];
+                        continue;
+                    }
                     var correlation = +this.correlation[key];
                     if(typeof this.correlation[key] == "function"){
-                        correlation = +this.correlation[key](this.iteration);
+                        correlation = +this.correlation[key](this.iteration,this);
                     }
                     this.parameters.list[key] = this.parent.now[key] +
                         (correlation * this.iteration);
@@ -57,7 +62,11 @@ Object.defineProperties(Cluster.prototype,{
     x       : {
         get : function(){
             if(this.parent.parent){
-                return +this.now.x + this.parent.parent.x;
+                return (
+                    this.now.x * Math.cos(this.parent.parent.radian) -
+                    this.now.y * Math.sin(this.parent.parent.radian) +
+                    this.parent.parent.x
+                );
             }
             return +this.now.x;
         },
@@ -68,7 +77,11 @@ Object.defineProperties(Cluster.prototype,{
     y       : {
         get : function(){
             if(this.parent.parent){
-                return +this.now.y + this.parent.parent.y;
+                return (
+                    this.now.x * Math.cos(this.parent.parent.radian) -
+                    this.now.y * Math.sin(this.parent.parent.radian) +
+                    this.parent.parent.y
+                );
             }
             return +this.now.y;
         },

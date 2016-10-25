@@ -11,8 +11,9 @@ var CanvasObject = function(options){
     this._transform     = new Listing();
     this.childrens      = new PropertyListing(
         function(self,object){
-            object.parent = self;
-            self.operationContext = object;
+            object.parent           = self;
+            object.drawing          = self.drawing;
+            self.operationContext   = object;
             return self;
         },
         function(self){
@@ -20,14 +21,14 @@ var CanvasObject = function(options){
         },
         this
     );
-    this.drawing = options.drawing || this.parent.drawing || undefined;
+    this.drawing = options.drawing || undefined;
 };
 
 Object.defineProperties(CanvasObject.prototype,{
     x       : {
         get: function(){
             if(this.parent){
-                //корректирует положение и наклон объекта относительно родителя
+                //корректирует координаты и наклон объекта относительно наклона родителя
                 return (
                     this.now.x * Math.cos(this.parent.radian) -
                     this.now.y * Math.sin(this.parent.radian) +

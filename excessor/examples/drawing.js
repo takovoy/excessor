@@ -77,6 +77,12 @@ sun.childrens
         sun.animate = function(){};
     });
 
+var beamsCluster = new Cluster(5,{
+    radian  : Math.PI*2 / 6,
+    x       : 20,
+    y       : 20
+});
+
 var center = sun.childrens.append(new Circle({
     id              :'sunCenter',
     drawing         : scene,
@@ -85,67 +91,43 @@ var center = sun.childrens.append(new Circle({
 }))
     .operationContext
     .moveProperty('radius',40,1000)
-    .moveProperty('radian',3,1000);
+    .moveProperty('radian',3,1000)
+    .moveProperty('fill','#ff5555',1000);
 
-
-for(var i = 0;i < sun.now.petalCount;i++){
-    if(!center.childrens.list['beam_' + i]){
-        center.childrens.append(new Polygon({
-            id              : 'beam_' + i,
-            drawing         : scene,
-            settings        : {
-                radius  : 5,
-                radian  : (Math.PI*2/sun.now.petalCount)*i,
-                fill    : '#FFB151'
-            },
-            sidesCount      : 3,
-            x               : formula.getPointOnCircle(
-                (Math.PI*2/sun.now.petalCount)*i,
-                70,
-                0,
-                0
-            )[0],
-            y               : formula.getPointOnCircle(
-                (Math.PI*2/sun.now.petalCount)*i,
-                70,
-                0,
-                0
-            )[1]
-        }));
-    }
-}
-
-var beamsCluster = new Cluster(5,{
-    radian  : Math.PI*2 / 6,
-    x       : function(iteration){
-        return formula.getPointOnCircle(
-            (Math.PI*2/6)*iteration,
+center.childrens
+    .append(new Polygon({
+        id              : 'beam_',
+        settings        : {
+            radius      : 5,
+            radian      : (Math.PI*2/sun.now.petalCount),
+            fill        : '#FFB151'
+        },
+        sidesCount      : 3,
+        x               : formula.getPointOnCircle(
+            (Math.PI*2/sun.now.petalCount),
             70,
             0,
             0
-        )[0]
-    },
-    y       : function(iteration){
-        return formula.getPointOnCircle(
-            (Math.PI*2/6)*iteration,
+        )[0],
+        y               : formula.getPointOnCircle(
+            (Math.PI*2/sun.now.petalCount),
             70,
             0,
             0
         )[1]
-    }
-});
+    }))
+    .operationContext
+    .moveProperty('radius',30,1000)
+    .childrens
+    .append(beamsCluster);
+
+console.log(beamsCluster);
 
 sun.childrens.list.sunCenter.moveProperty('fill','#ff5555',1000);
 
 sun.animate = function(context){
     if(center.radius >= 39){
         this.now.step = (this.now.step / 1.5) * 1.4;
-    }
-
-    for(var i = 0;i < this.now.petalCount;i++){
-        if(center.childrens.list['beam_' + i].now.radius < 30){
-            center.childrens.list['beam_' + i].now.radius++;
-        }
     }
 };
 /**
