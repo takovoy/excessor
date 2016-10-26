@@ -69,7 +69,7 @@ sun.childrens
         }))
             .operationContext
             .event(100,function(event,transform,canvasObject){
-                transform.reverse = true;
+                //transform.reverse = true;
             });
 
         sun.childrens.list['sheet_1'].moveProperty('shift',100,3500);
@@ -79,8 +79,22 @@ sun.childrens
 
 var beamsCluster = new Cluster(5,{
     radian  : Math.PI*2 / 6,
-    x       : 20,
-    y       : 20
+    x       : function(iteration,cluster){
+        return formula.getPointOnCircle(
+            (Math.PI*2/6) * (iteration + 1),
+            70,
+            -cluster.parent.now.x,
+            -cluster.parent.now.y
+        )[0] / iteration
+    },
+    y       : function(iteration,cluster){
+        return formula.getPointOnCircle(
+            (Math.PI*2/6) * (iteration + 1),
+            70,
+            -cluster.parent.now.x,
+            -cluster.parent.now.y
+        )[1] / iteration
+    }
 });
 
 var center = sun.childrens.append(new Circle({
@@ -99,18 +113,18 @@ center.childrens
         id              : 'beam_',
         settings        : {
             radius      : 5,
-            radian      : (Math.PI*2/sun.now.petalCount),
+            radian      : (Math.PI*2/6),
             fill        : '#FFB151'
         },
         sidesCount      : 3,
         x               : formula.getPointOnCircle(
-            (Math.PI*2/sun.now.petalCount),
+            (Math.PI*2/6),
             70,
             0,
             0
         )[0],
         y               : formula.getPointOnCircle(
-            (Math.PI*2/sun.now.petalCount),
+            (Math.PI*2/6),
             70,
             0,
             0

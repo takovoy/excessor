@@ -78,8 +78,8 @@ Object.defineProperties(Cluster.prototype,{
         get : function(){
             if(this.parent.parent){
                 return (
-                    this.now.x * Math.cos(this.parent.parent.radian) -
-                    this.now.y * Math.sin(this.parent.parent.radian) +
+                    this.now.x * Math.sin(this.parent.parent.radian) +
+                    this.now.y * Math.cos(this.parent.parent.radian) +
                     this.parent.parent.y
                 );
             }

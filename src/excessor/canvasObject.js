@@ -80,7 +80,7 @@ CanvasObject.prototype.stop         = function(){
     return this;
 };
 CanvasObject.prototype.animate      = function(){};
-CanvasObject.prototype.transform = function(transform){
+CanvasObject.prototype.transform    = function(transform){
     if(!this._transform){
         this._transform = new Listing();
     }
@@ -89,7 +89,7 @@ CanvasObject.prototype.transform = function(transform){
     this.operationContext = transform;
     return this;
 };
-CanvasObject.prototype.move       = function(coord,time){
+CanvasObject.prototype.move         = function(coord,time){
     if(!time){
         this.x = coord[0];
         this.y = coord[1];
