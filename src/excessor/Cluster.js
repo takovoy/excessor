@@ -74,6 +74,7 @@ Object.defineProperties(Cluster.prototype,{
             this.now.x = +value;
         }
     },
+
     y       : {
         get : function(){
             if(this.parent.parent){
@@ -87,6 +88,18 @@ Object.defineProperties(Cluster.prototype,{
         },
         set : function(value){
             this.now.y = +value;
+        }
+    },
+
+    radian  : {
+        get: function(){
+            if(this.parent){
+                return +this.parent.parent.radian + +this.now.radian;
+            }
+            return +this.now.radian;
+        },
+        set: function(value){
+            this.now.radian = +value;
         }
     }
 });
