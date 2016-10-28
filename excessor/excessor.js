@@ -646,6 +646,110 @@ Transform.prototype.event = function(shift,action){
     return this;
 };
 /**
+ * Created by takovoy on 31.07.2016.
+ */
+
+// отмечает контрольные точки на холсте кружочками в 4 пикселя
+function markControlPoints ( points, context, corrective){
+    corrective = corrective || {};
+
+    context.moveTo(
+        +corrective.x,
+        +corrective.y
+    );
+    context.arc(
+        +corrective.x,
+        +corrective.y,
+        2,
+        0,
+        Math.PI*2
+    );
+
+    for(var point = 0;points[point];point++){
+        if(typeof points[point][0] === 'object'){
+            markControlPoints(
+                points[point],
+                context,
+                corrective
+            );
+            continue;
+        }
+
+        context.moveTo(
+            points[point][0] + +corrective.x,
+            points[point][1] + +corrective.y
+        );
+        context.arc(
+            points[point][0] + +corrective.x,
+            points[point][1] + +corrective.y,
+            2,
+            0,
+            Math.PI*2
+        );
+    }
+}
+/**
+ * Created by takovoySuper on 11.04.2015.
+ */
+
+function random (min,max){
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function getRandomRGB (min,max){
+    return 'rgb(' + random(min,max) + ',' + random(min,max) + ',' + random(min,max) + ')'
+}
+/**
+ * Created by takovoy on 31.07.2016.
+ */
+
+function toIdentifyTheLine ( points, context, corrective, moveTo){
+    corrective = corrective || {};
+
+    if(moveTo){
+        context.moveTo(
+            points[0][0] + +corrective.x,
+            points[0][1] + +corrective.y
+        );
+    }
+
+    for(var point = 0;points[point];point++){
+        if(typeof points[point][0] === 'object'){
+            toIdentifyTheLine(
+                points[point],
+                context,
+                corrective
+            );
+            continue;
+        }
+
+        context.lineTo(
+            points[point][0] + +corrective.x,
+            points[point][1] + +corrective.y
+        );
+    }
+}
+
+function toIdentifyTheCurve ( points, context, corrective, moveTo){
+    corrective = corrective || {};
+
+    if(moveTo){
+        context.moveTo(
+            points[0][0] + +corrective.x,
+            points[0][1] + +corrective.y
+        );
+    }
+
+    for(var point = 0;points[point];point++){
+        var coord = formula.getPointOnCurve(i,this.now.points);
+        context.lineTo(
+            coord[0] + this.parent.x,
+            coord[1] + this.parent.y
+        );
+    }
+}
+
+/**
  * Created by takovoy on 30.11.2014.
  */
 
@@ -941,106 +1045,3 @@ PropertyListing.prototype.getObjectsMap = function(){
     }
     return map;
 };
-/**
- * Created by takovoy on 31.07.2016.
- */
-
-// отмечает контрольные точки на холсте кружочками в 4 пикселя
-function markControlPoints ( points, context, corrective){
-    corrective = corrective || {};
-
-    context.moveTo(
-        +corrective.x,
-        +corrective.y
-    );
-    context.arc(
-        +corrective.x,
-        +corrective.y,
-        2,
-        0,
-        Math.PI*2
-    );
-
-    for(var point = 0;points[point];point++){
-        if(typeof points[point][0] === 'object'){
-            markControlPoints(
-                points[point],
-                context,
-                corrective
-            );
-            continue;
-        }
-
-        context.moveTo(
-            points[point][0] + +corrective.x,
-            points[point][1] + +corrective.y
-        );
-        context.arc(
-            points[point][0] + +corrective.x,
-            points[point][1] + +corrective.y,
-            2,
-            0,
-            Math.PI*2
-        );
-    }
-}
-/**
- * Created by takovoySuper on 11.04.2015.
- */
-
-function random (min,max){
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-function getRandomRGB (min,max){
-    return 'rgb(' + random(min,max) + ',' + random(min,max) + ',' + random(min,max) + ')'
-}
-/**
- * Created by takovoy on 31.07.2016.
- */
-
-function toIdentifyTheLine ( points, context, corrective, moveTo){
-    corrective = corrective || {};
-
-    if(moveTo){
-        context.moveTo(
-            points[0][0] + +corrective.x,
-            points[0][1] + +corrective.y
-        );
-    }
-
-    for(var point = 0;points[point];point++){
-        if(typeof points[point][0] === 'object'){
-            toIdentifyTheLine(
-                points[point],
-                context,
-                corrective
-            );
-            continue;
-        }
-
-        context.lineTo(
-            points[point][0] + +corrective.x,
-            points[point][1] + +corrective.y
-        );
-    }
-}
-
-function toIdentifyTheCurve ( points, context, corrective, moveTo){
-    corrective = corrective || {};
-
-    if(moveTo){
-        context.moveTo(
-            points[0][0] + +corrective.x,
-            points[0][1] + +corrective.y
-        );
-    }
-
-    for(var point = 0;points[point];point++){
-        var coord = formula.getPointOnCurve(i,this.now.points);
-        context.lineTo(
-            coord[0] + this.parent.x,
-            coord[1] + this.parent.y
-        );
-    }
-}
