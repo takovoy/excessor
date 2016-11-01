@@ -2,13 +2,15 @@
  * Created by yeIAmCrasyProgrammer on 28.10.2016.
  */
 
-var scene   = new Drawing(1000,500);
+var scene   = new Drawing(1000,1000);
 
-var beamsCluster = new Cluster(5,{
-    radian  : Math.PI*2 / 6,
+var beamsCluster = new Cluster(8,{
+    radian  : function (iterator,cluster) {
+        return Math.PI*2 / (cluster.count + 1);
+    },
     x       : function(iteration,cluster){
         return formula.getPointOnCircle(
-                (Math.PI*2/6) * (iteration + 1),
+                (Math.PI*2/(cluster.count + 1)) * (iteration + 1),
                 70,
                 -cluster.parent.now.x,
                 -cluster.parent.now.y
@@ -16,7 +18,7 @@ var beamsCluster = new Cluster(5,{
     },
     y       : function(iteration,cluster){
         return formula.getPointOnCircle(
-                (Math.PI*2/6) * (iteration + 1),
+                (Math.PI*2/(cluster.count + 1)) * (iteration + 1),
                 70,
                 -cluster.parent.now.x,
                 -cluster.parent.now.y
@@ -27,7 +29,7 @@ var beamsCluster = new Cluster(5,{
 var center  = new Circle({
     id              :'sunCenter',
     drawing         : scene,
-    settings        : {fill: '#FFB151',x:250,y:250},
+    settings        : {fill: '#FFB151',x:500,y:350},
     radius          : 15
 })
     .moveProperty('radius',40,1000)
@@ -35,41 +37,64 @@ var center  = new Circle({
     .start();
 
 center
-    .moveProperty('radian',Math.PI*2,10000)
+    .moveProperty('radian',Math.PI*2,50000)
     .operationContext
     .options.recourse = true;
 
-center.childrens
+center
+    .childrens
     .append(new Curve({
         id              : 'light',
         settings        : {
-            stroke      : '#FFB151',
+            fill        : '#FFB151',
             shift       : 100,
-            step        : 1
+            step        : 1,
+            radian      : 0
         },
         x               : formula.getPointOnCircle(
-            (Math.PI*2/6),
+            (Math.PI*2/beamsCluster.count),
             70,
             0,
             0
         )[0],
         y               : formula.getPointOnCircle(
-            (Math.PI*2/6),
+            (Math.PI*2/beamsCluster.count),
             70,
             0,
             0
         )[1],
         points          : [
             [0,0],
+            [20,0],
             [50,50],
-            [0,100],
-            [-50,150],
-            [0,200]
+            [-60,10],
+            [0,150],
+            [60,10],
+            [-50,50],
+            [-20,0],
+            [0,0]
         ]
     }))
     .operationContext
-    .moveProperty('radius',30,1000)
     .childrens
-    .append(beamsCluster);
+    .append(beamsCluster)
+    .moveProperty('points',[
+        [0,0],
+        [20,0],
+        [45,50],
+        [-50,10],
+        [0,120],
+        [50,10],
+        [-45,50],
+        [-20,0],
+        [0,0]
+    ],300)
+    .operationContext
+    .event(45,function(event,transform){
+        transform.reverse = true;
+    })
+    .event(0,function(event,transform){
+        transform.reverse = false;
+    });
 
 center.moveProperty('fill','#ff5555',1000);

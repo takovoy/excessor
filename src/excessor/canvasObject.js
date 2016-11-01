@@ -8,6 +8,7 @@ var CanvasObject = function(options){
     this.now.x          = this.now.x || options.x || 0;
     this.now.y          = this.now.y || options.y || 0;
     this.now.radian     = this.now.radian || options.radian || 0;
+    this.services       = {};
     this._transform     = new Listing();
     this.childrens      = new PropertyListing(
         function(self,object){
@@ -28,7 +29,6 @@ Object.defineProperties(CanvasObject.prototype,{
     x       : {
         get: function(){
             if(this.parent){
-                //корректирует координаты и наклон объекта относительно наклона родителя
                 return (
                     this.now.x * Math.cos(this.parent.radian) -
                     this.now.y * Math.sin(this.parent.radian) +
