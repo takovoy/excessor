@@ -62,7 +62,7 @@ now     | object (настройки для отрисовки)
 x       | number
 y       | number
 radian  | number
-drawing | number
+drawing | Drawing Object
 
 Список параметров объекта `now`
 
