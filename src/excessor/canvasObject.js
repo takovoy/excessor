@@ -120,3 +120,6 @@ CanvasObject.prototype.moveProperty   = function(property,value,time){
         time    : time
     }))
 };
+CanvasObject.prototype.append   = function(object){
+    return this.childrens.append(object);
+};

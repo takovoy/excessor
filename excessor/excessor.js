@@ -120,6 +120,9 @@ CanvasObject.prototype.moveProperty   = function(property,value,time){
         time    : time
     }))
 };
+CanvasObject.prototype.append   = function(object){
+    return this.childrens.append(object);
+};
 /**
  * Created by Пользователь on 06.03.2015.
  */
@@ -334,11 +337,17 @@ var formula = {
     changeColor : function(start,end,shift){
         var result      = [];
 
-        if(start[0] == '#'){start = formula.HEXtoRGB(start)}
-        if(end[0] == '#'){end = formula.HEXtoRGB(end)}
+        if(start[0] === '#'){start = formula.HEXtoRGB(start)}
+        else if ( start.substring(0,4) === "rgb(" ) {
+            start = start.match(/\d+/g);
+        }
+        if(end[0] === '#'){end = formula.HEXtoRGB(end)}
+        else if ( end.substring(0,4) === "rgb(" ) {
+            end = end.match(/\d+/g);
+        }
 
         for(var i = 0;i<3;i++){
-            result[i] = Math.round(start[i] + (end[i] - start[i]) / 100 * shift);
+            result[i] = Math.round(+start[i] + (+end[i] - +start[i]) / 100 * shift);
         }
         return 'rgb(' + result[0] + ',' + result[1] + ',' + result[2] + ')';
     }
@@ -788,12 +797,13 @@ Object.defineProperties(CanvasObject.prototype,{
                 if(!this.services.points){
                     this.services.points = [];
                 }
+                var radian = this.radian - (Math.PI/4);
                 for(var key in this.now.points){
                     this.services.points[key] = [
-                        this.now.points[key][0] * Math.cos(this.radian) -
-                        this.now.points[key][1] * Math.sin(this.radian),
-                        this.now.points[key][0] * Math.sin(this.radian) +
-                        this.now.points[key][1] * Math.cos(this.radian)
+                        this.now.points[key][0] * Math.cos(radian) -
+                        this.now.points[key][1] * Math.sin(radian),
+                        this.now.points[key][0] * Math.sin(radian) +
+                        this.now.points[key][1] * Math.cos(radian)
                     ]
                 }
                 this.services.radian = this.radian;

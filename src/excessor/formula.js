@@ -80,11 +80,17 @@ var formula = {
     changeColor : function(start,end,shift){
         var result      = [];
 
-        if(start[0] == '#'){start = formula.HEXtoRGB(start)}
-        if(end[0] == '#'){end = formula.HEXtoRGB(end)}
+        if(start[0] === '#'){start = formula.HEXtoRGB(start)}
+        else if ( start.substring(0,4) === "rgb(" ) {
+            start = start.match(/\d+/g);
+        }
+        if(end[0] === '#'){end = formula.HEXtoRGB(end)}
+        else if ( end.substring(0,4) === "rgb(" ) {
+            end = end.match(/\d+/g);
+        }
 
         for(var i = 0;i<3;i++){
-            result[i] = Math.round(start[i] + (end[i] - start[i]) / 100 * shift);
+            result[i] = Math.round(+start[i] + (+end[i] - +start[i]) / 100 * shift);
         }
         return 'rgb(' + result[0] + ',' + result[1] + ',' + result[2] + ')';
     }

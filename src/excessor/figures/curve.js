@@ -19,12 +19,13 @@ Object.defineProperties(CanvasObject.prototype,{
                 if(!this.services.points){
                     this.services.points = [];
                 }
+                var radian = this.radian - (Math.PI/4);
                 for(var key in this.now.points){
                     this.services.points[key] = [
-                        this.now.points[key][0] * Math.cos(this.radian) -
-                        this.now.points[key][1] * Math.sin(this.radian),
-                        this.now.points[key][0] * Math.sin(this.radian) +
-                        this.now.points[key][1] * Math.cos(this.radian)
+                        this.now.points[key][0] * Math.cos(radian) -
+                        this.now.points[key][1] * Math.sin(radian),
+                        this.now.points[key][0] * Math.sin(radian) +
+                        this.now.points[key][1] * Math.cos(radian)
                     ]
                 }
                 this.services.radian = this.radian;
