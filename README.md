@@ -13,7 +13,7 @@ var myDrawing = new Drawing(width,height);
 document.body.appendChild(myDrawing.DOMObject);
 ```
 
-Для того чтобы нарисовать кружок создаём экземпляр класса круга (Circle)
+Для того чтобы нарисовать кружок создаём экземпляр класса круга (`Circle`)
 
 ```js
 var circle = new Circle({
@@ -41,7 +41,7 @@ circle.start();
 
 ___
 
---> new CanvasObject(options)
+`new CanvasObject(options)`
 
 Базовый графический класс  
 может использоваться как родительский объект, в этом случае наследники
@@ -53,7 +53,7 @@ ___
 По сути это - всего лишь управляющая прослойка, со всеми необходимыми
 методами для работы с параметрами объекта.
 
-Список всех свойств класса
+Список параметров объекта `options`
 
 name    | default value
 --------|-----------
@@ -64,9 +64,27 @@ y       | number
 radian  | number
 drawing | number
 
+Список параметров объекта `now`
+
+name        | type                  | used classes
+------------|-----------------------|----------------
+fill        | HEX or RGB            | all
+stroke      | HEX or RGB            | all
+strokeWidth | number                | all
+x           | number                | all
+y           | number                | all
+radian      | number                | all
+radius      | number                | Circle, Polygon
+sidesCount  | number                | Polygon
+points      | object                | Curve, Line
+shift       | number from 0 to 100  | Curve
+step        | number from 0 to 1    | Curve, Ellipse
+semiAxisX   | number                | Ellipse
+semiAxisY   | number                | Ellipse
+
 ___
 
---> new Curve(options)
+`new Curve(options)`
 
 Класс графического объекта "кривая"
 
