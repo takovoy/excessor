@@ -2,7 +2,9 @@ Wooops... It is too secret.
 
 Создаём холст:
 
+```js
 var myDrawing = new Drawing(width,height);
+```
 
 Для того чтобы нарисовать кружок создаём экземпляр сласса круга (Circle)
 
@@ -22,13 +24,15 @@ var circle = new Circle({
 
 Хорошо, круг создали, теперь запустим рендеринг холста и отрисуем наш кружок
 
+```js
 // запусаем рендер  
 myDrawing.fps = 30;
 
 // этот метод добавляет наш круг к списку объектов, которые будет отрисовывать холст  
 circle.start();
+```
 
-_____________________________
+___
 
 --> new CanvasObject(options)
 
@@ -41,21 +45,23 @@ _____________________________
 
 По сути это - всего лишь управляющая прослойка, со всеми необходимыми
 методами для работы с параметрами объекта.
+```js
+options =  
+    {  
+        id      : string or numeric,  
+        drawing : new Drawing(width,height),  
+        now     : {properties},  
+        ...  
+    };
+```
 
-options:  
-{  
-id      : string or numeric,  
-drawing : new Drawing(width,height),  
-now     : {...properties...},  
-...  
-}
-
-_____________________________
+___
 
 --> new Curve(options)
 
 Класс графического объекта "кривая"
 
+```js
 var curve = new Curve({  
     id: "my wonder curve",  
     now: {  
@@ -64,3 +70,4 @@ var curve = new Curve({
         ...  
     }  
 })
+```
