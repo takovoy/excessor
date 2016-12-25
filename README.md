@@ -1,10 +1,16 @@
 *Excessor - canvas library*
 ===========================
 
-Создаём холст:
+Создаём холст
 
 ```js
 var myDrawing = new Drawing(width,height);
+```
+
+Добавляем DOM елемент холста в документ
+
+```js
+document.body.appendChild(myDrawing.DOMObject);
 ```
 
 Для того чтобы нарисовать кружок создаём экземпляр класса круга (Circle)
