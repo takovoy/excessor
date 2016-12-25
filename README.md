@@ -6,7 +6,7 @@ Wooops... It is too secret.
 var myDrawing = new Drawing(width,height);
 ```
 
-* Для того чтобы нарисовать кружок создаём экземпляр сласса круга (Circle)
+* Для того чтобы нарисовать кружок создаём экземпляр класса круга (Circle)
 
 ```js
 var circle = new Circle({
