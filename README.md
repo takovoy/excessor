@@ -18,7 +18,7 @@ document.body.appendChild(myDrawing.DOMObject);
 ```js
 var circle = new Circle({
     // необязательное поле, но для удобства дальнейшей работы следует указать
-    id      : "my wonderful circle",
+    id      : "my wonderfull circle",
     // объект холста на котором необходимо отрисовать круг
     drawing : myDrawing,
     // объект свойств для отрисовки
@@ -95,17 +95,17 @@ stop()                              |
 transform(transform)                | Transform Object
 move(coord,time)                    | numeric array ([x,y]), number (1000)
 moveProperty(property,value,time)   | string ('fill'), void ('#ff0000'), number (1000)
-append(object)                      | CanvasObject (идентично методу childrens.append() см. ниже)
+append(object)                      | CanvasObject (идентично методу `childrens.append()` см. ниже)
 
     *properties*
 
-Свойствами объекта CanvasObject являются свойства перечисленные выше для массива options который передаётся в качестве аргумента конструктору объекта. Помимо этого CanvasObject имеет свойство childrens для работы с дочерними элементами:
+Свойствами объекта `CanvasObject` являются свойства перечисленные выше для массива `options` который передаётся в качестве аргумента конструктору объекта. Помимо этого `CanvasObject` имеет свойство `childrens` для работы с дочерними элементами:
 
 name                            | description
 --------------------------------|------------
 childrens                       |  
 childrens.list                  | список объектов
-childrens.append(CanvasObject)  | добавление дочернего элемента (идентично методу append() см. выше)
+childrens.append(CanvasObject)  | добавление дочернего элемента (идентично методу `append()` см. выше)
 childrens.remove(id)            | удаление, необходим идентификатор
 
 ___
