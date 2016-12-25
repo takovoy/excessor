@@ -5,7 +5,7 @@
 var Line = function(options){
     CanvasObject.apply(this,arguments);
     this.constructor    = Line;
-    this.now.points      = options.points || [];
+    this.now.points     = options.points || [];
 };
 
 Line.prototype = Object.create(CanvasObject.prototype);
@@ -17,6 +17,6 @@ Line.prototype.animate = function(context){
     for(var i = 1;this.now.points[i];i++){
         context.lineTo(this.now.points[i][0],this.now.points[i][1]);
     }
-    context.stroke();
+    changeContext(context,this.now);
     context.closePath();
 };
