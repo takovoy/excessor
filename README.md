@@ -55,8 +55,8 @@ ___
 
 Список параметров объекта `options`
 
-name    | default value
---------|-----------
+name    | type
+--------|---------------------------------
 id      | random number from 0 to 1
 now     | object (настройки для отрисовки)
 x       | number
