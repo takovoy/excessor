@@ -52,15 +52,17 @@ ___
 
 По сути это - всего лишь управляющая прослойка, со всеми необходимыми
 методами для работы с параметрами объекта.
-```js
-options =
-    {
-        id      : string or numeric,
-        drawing : new Drawing(width,height),
-        now     : {properties},
-        ...
-    };
-```
+
+Список всех свойств класса
+
+name    | default value
+--------|-----------
+id      | random number from 0 to 1
+now     | object (настройки для отрисовки)
+x       | number
+y       | number
+radian  | number
+drawing | number
 
 ___
 
