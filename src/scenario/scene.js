@@ -11,3 +11,5 @@ function Scene (width,height){
     scenarioTemplates.drawing.dom.appendChild(this.DOMObject);
     this.wrap.className = 'scenario-wrap';
 }
+
+Scene.prototype = Object.create(Drawing.prototype);

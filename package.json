@@ -1,26 +1,27 @@
 {
-  "name": "myVectorEditor",
-  "version": "0.1.0",
-  "description": "vector editor",
-  "main": "index.js",
-  "scripts": {
-    "test": "what"
+  "name"        : "excessor",
+  "version"     : "0.1.0",
+  "description" : "javascript canvas library",
+  "main"        : "index.js",
+  "scripts"     : {
+    "test"      : "what"
   },
-  "repository": {
-    "type": "git",
-    "url": "git://github.com/takovoy/myVectorEditor.git"
+  "repository"  : {
+    "type"      : "git",
+    "url"       : "git://github.com/takovoy/excessor.git"
   },
-  "author": "takovoy",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/takovoy/myVectorEditor/issues"
+  "author"      : "takovoy",
+  "license"     : "ISC",
+  "bugs"        : {
+    "url"       : "https://github.com/takovoy/excessor"
   },
-  "homepage": "https://github.com/takovoy/myVectorEditor",
-  "devDependencies": {
-    "gulp-concat": "^2.4.3",
-    "gulp-connect": "^2.2.0",
-    "gulp-minify": "0.0.14",
-    "gulp-notify": "^2.2.0",
-    "gulp-uglify": "^1.1.0"
+  "homepage"    : "https://github.com/takovoy/excessor",
+  "dependencies": {
+    "gulp"        : "latest",
+    "gulp-concat" : "latest",
+    "gulp-connect": "latest",
+    "gulp-minify" : "latest",
+    "gulp-notify" : "latest",
+    "gulp-uglify" : "latest"
   }
 }

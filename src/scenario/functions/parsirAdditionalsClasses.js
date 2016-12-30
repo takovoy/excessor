@@ -2,28 +2,24 @@
  * Created by takovoy on 07.07.2016.
  */
 
-function ParsirText (text,props){
-    this.type = 'span';
-    this.properties = props || {};
-    this.properties.innerHTML = text;
+function ParsirText (options){
+    this.type                   = 'span';
+    this.properties             = options.props || {};
+    this.properties.innerHTML   = options.text || '';
 }
 
-function ParsirInput (value,placeholder,props,events){
-    this.type = 'input';
-    this.properties = props || {};
-    this.properties.value = value;
-    this.properties.placeholder = placeholder;
-
-    this.events = events || {};
+function ParsirInput (options){
+    this.type                   = 'input';
+    this.properties             = options.props || {};
+    this.properties.value       = options.value || '';
+    this.properties.placeholder = options.placeholder || '';
+    this.events                 = options.events || {};
 }
 
-function ParsirButton (value,click,props){
-    this.type = 'button';
-    this.properties = props || {};
-
-    this.events = {
-        click : click
-    };
-
-    this.childs = [value];
+function ParsirButton (options,click){
+    this.type           = 'button';
+    this.properties     = options.props || {};
+    this.childs         = options.childs;
+    this.events         = options.events || {};
+    this.events.click   = click || this.events.click || function(){};
 }

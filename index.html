@@ -5,19 +5,14 @@
     <title>test</title>
     <script src="excessor/excessor.js"></script>
 
-    <script src="drawing/sun.js"></script>
 </head>
 <body>
 
     <script>
+        var scene   = new Drawing(300,300);
         document.body.appendChild(scene.DOMObject);
         scene.fps = 60;
-//        var radius = new Transform({
-//            property: 'radius',
-//            end     : 50,
-//            time    : 2000
-//        });
-//        sun.start();
     </script>
+    <script src="drawing/sun.js"></script>
 </body>
 </html>

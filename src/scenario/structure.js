@@ -9,19 +9,25 @@ var scenarioTemplates = {
             'className': 'scenario-topMenu'
         },
         childs: {
-            fpsInput : new ParsirInput('', 'fps', {type: 'number'}, {
-                change : function(){
-                    if(+this.value < 0){
-                        this.value = 0
+            fpsInput : new ParsirInput({
+                placeholder:'fps',
+                props:{type: 'number'},
+                events: {
+                    change : function(){
+                        if(+this.value < 0){
+                            this.value = 0
+                        }
                     }
                 }
             }),
             collapseInterfaceButton : new ParsirButton(
-                new ParsirText('-'),
+                {
+                    innerHTML   : '-',
+                    props       : {className: 'collapse'}
+                },
                 function(){
                     console.log('collapse')
-                },
-                {className: 'collapse'}
+                }
             )
         }
     },
@@ -31,37 +37,53 @@ var scenarioTemplates = {
             'className': 'scenario-instruments'
         },
         childs: {
-            arrow : new ParsirButton('arr',function(){
+            arrow : new ParsirButton({
+                props       : {className   : 'button arrow'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'}),
+            }),
 
-            checkpoints : new ParsirButton('points',function(){
+            checkpoints : new ParsirButton({
+                props       : {className   : 'button points'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'}),
+            }),
 
-            arc : new ParsirButton('arc',function(){
+            arc : new ParsirButton({
+                props       : {className   : 'button arc'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'}),
+            }),
 
-            circle : new ParsirButton('crcl',function(){
+            circle : new ParsirButton({
+                props       : {className   : 'button circle'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'}),
+            }),
 
-            line : new ParsirButton('line',function(){
+            line : new ParsirButton({
+                props       : {className   : 'button line'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'}),
+            }),
 
-            curve : new ParsirButton('crv',function(){
+            curve : new ParsirButton({
+                props       : {className   : 'button curve'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'}),
+            }),
 
-            fill : new ParsirButton('fill',function(){
+            fill : new ParsirButton({
+                props       : {className   : 'button fill'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'}),
+            }),
 
-            stroke : new ParsirButton('strk',function(){
+            stroke : new ParsirButton({
+                props       : {className   : 'button stroke'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'})
+            })
         }
     },
 
@@ -81,13 +103,14 @@ var scenarioTemplates = {
                     className : 'topMenu'
                 },
                 childs : {
-                    text : new ParsirText('objects list'),
-                    collapseButton : new ParsirButton(
-                        new ParsirText('-'),
+                    text : new ParsirText({text:'objects list'}),
+                    collapseButton : new ParsirButton({
+                            innerHTML   : '-',
+                            props       : {className: 'collapse'}
+                        },
                         function(){
                             console.log('collapse')
-                        },
-                        {className: 'collapse'}
+                        }
                     )
                 }
             },

@@ -14,7 +14,7 @@ gulp.task('core',function(){
 });
 
 gulp.task('scenario',function(){
-    gulp.src(['src/scenario/*.js','src/scenario/*/*.js'])
+    gulp.src(['src/scenario/*.js','src/scenario/**/*.js'])
         .pipe(concat('scenario.js'))
         .pipe(minify())
         .pipe(gulp.dest('excessor/'))
@@ -39,7 +39,7 @@ gulp.task('drawings',function(){
 
 gulp.task('watch',function(){
     gulp.watch(['src/excessor/*.js','src/excessor/*/*.js'],['core']);
-    gulp.watch(['src/scenario/*.js','src/scenario/*/*.js'],['scenario']);
+    gulp.watch(['src/scenario/*.js','src/scenario/**/*.js'],['scenario']);
     gulp.watch(['src/scenario/*.css','src/scenario/*/*.css'],['scenarioStyles']);
     gulp.watch('drawing/*.js',['drawings']);
 });

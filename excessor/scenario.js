@@ -48,6 +48,8 @@ function Scene (width,height){
     scenarioTemplates.drawing.dom.appendChild(this.DOMObject);
     this.wrap.className = 'scenario-wrap';
 }
+
+Scene.prototype = Object.create(Drawing.prototype);
 /**
  * Created by takovoy on 07.07.2016.
  */
@@ -59,19 +61,25 @@ var scenarioTemplates = {
             'className': 'scenario-topMenu'
         },
         childs: {
-            fpsInput : new ParsirInput('', 'fps', {type: 'number'}, {
-                change : function(){
-                    if(+this.value < 0){
-                        this.value = 0
+            fpsInput : new ParsirInput({
+                placeholder:'fps',
+                props:{type: 'number'},
+                events: {
+                    change : function(){
+                        if(+this.value < 0){
+                            this.value = 0
+                        }
                     }
                 }
             }),
             collapseInterfaceButton : new ParsirButton(
-                new ParsirText('-'),
+                {
+                    innerHTML   : '-',
+                    props       : {className: 'collapse'}
+                },
                 function(){
                     console.log('collapse')
-                },
-                {className: 'collapse'}
+                }
             )
         }
     },
@@ -81,37 +89,53 @@ var scenarioTemplates = {
             'className': 'scenario-instruments'
         },
         childs: {
-            arrow : new ParsirButton('arr',function(){
+            arrow : new ParsirButton({
+                props       : {className   : 'button arrow'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'}),
+            }),
 
-            checkpoints : new ParsirButton('points',function(){
+            checkpoints : new ParsirButton({
+                props       : {className   : 'button points'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'}),
+            }),
 
-            arc : new ParsirButton('arc',function(){
+            arc : new ParsirButton({
+                props       : {className   : 'button arc'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'}),
+            }),
 
-            circle : new ParsirButton('crcl',function(){
+            circle : new ParsirButton({
+                props       : {className   : 'button circle'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'}),
+            }),
 
-            line : new ParsirButton('line',function(){
+            line : new ParsirButton({
+                props       : {className   : 'button line'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'}),
+            }),
 
-            curve : new ParsirButton('crv',function(){
+            curve : new ParsirButton({
+                props       : {className   : 'button curve'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'}),
+            }),
 
-            fill : new ParsirButton('fill',function(){
+            fill : new ParsirButton({
+                props       : {className   : 'button fill'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'}),
+            }),
 
-            stroke : new ParsirButton('strk',function(){
+            stroke : new ParsirButton({
+                props       : {className   : 'button stroke'}
+            },function(){
                 console.log('instruments button');
-            },{className : 'button'})
+            })
         }
     },
 
@@ -131,13 +155,14 @@ var scenarioTemplates = {
                     className : 'topMenu'
                 },
                 childs : {
-                    text : new ParsirText('objects list'),
-                    collapseButton : new ParsirButton(
-                        new ParsirText('-'),
+                    text : new ParsirText({text:'objects list'}),
+                    collapseButton : new ParsirButton({
+                            innerHTML   : '-',
+                            props       : {className: 'collapse'}
+                        },
                         function(){
                             console.log('collapse')
-                        },
-                        {className: 'collapse'}
+                        }
                     )
                 }
             },
@@ -183,28 +208,24 @@ function rDragHor (event,object){
  * Created by takovoy on 07.07.2016.
  */
 
-function ParsirText (text,props){
-    this.type = 'span';
-    this.properties = props || {};
-    this.properties.innerHTML = text;
+function ParsirText (options){
+    this.type                   = 'span';
+    this.properties             = options.props || {};
+    this.properties.innerHTML   = options.text || '';
 }
 
-function ParsirInput (value,placeholder,props,events){
-    this.type = 'input';
-    this.properties = props || {};
-    this.properties.value = value;
-    this.properties.placeholder = placeholder;
-
-    this.events = events || {};
+function ParsirInput (options){
+    this.type                   = 'input';
+    this.properties             = options.props || {};
+    this.properties.value       = options.value || '';
+    this.properties.placeholder = options.placeholder || '';
+    this.events                 = options.events || {};
 }
 
-function ParsirButton (value,click,props){
-    this.type = 'button';
-    this.properties = props || {};
-
-    this.events = {
-        click : click
-    };
-
-    this.childs = [value];
+function ParsirButton (options,click){
+    this.type           = 'button';
+    this.properties     = options.props || {};
+    this.childs         = options.childs;
+    this.events         = options.events || {};
+    this.events.click   = click || this.events.click || function(){};
 }
