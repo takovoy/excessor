@@ -305,7 +305,7 @@ polygon.x = polygon.y = 100;
  * Created by yeIAmCrasyProgrammer on 28.10.2016.
  */
 
-var scene   = new Drawing(300,300);
+//var scene   = new Drawing(300,300);
 
 var beamsCluster = new Cluster(8,{
     radian  : function (iterator,cluster) {
@@ -443,9 +443,6 @@ scene.DOMObject.onmouseout = function () {
     center
         .moveProperty('fill','#FFB151',1000)
         .transform().list.radian.reverse = false;
-
-
-
 
     center.childrens.list[1]
         .moveProperty('fill','#ff8951',1000);
