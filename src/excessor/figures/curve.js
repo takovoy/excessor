@@ -11,7 +11,7 @@ var Curve = function(options){
 
 Curve.prototype = Object.create(CanvasObject.prototype);
 
-Object.defineProperties(Curve.prototype,{
+Object.defineProperties(CanvasObject.prototype,{
     points : {
         get: function(){
             if(this.radian != this.services.radian){

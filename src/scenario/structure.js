@@ -37,49 +37,58 @@ var scenarioTemplates = {
             'className': 'scenario-instruments'
         },
         childs: {
-            arrow : new ParsirButton({
+            arrow           : new ParsirButton({
                 props       : {className   : 'button arrow'}
             },function(){
                 console.log('instruments button');
             }),
 
-            checkpoints : new ParsirButton({
+            checkpoints     : new ParsirButton({
                 props       : {className   : 'button points'}
             },function(){
                 console.log('instruments button');
             }),
 
-            arc : new ParsirButton({
-                props       : {className   : 'button arc'}
+            polygon         : new ParsirButton({
+                props       : {className   : 'button polygon'}
             },function(){
-                console.log('instruments button');
+                //this.scene = {};
+                console.log('instruments polygon');
+                this.scene.editorContext.checkedObject  = new Polygon({});
+                this.scene.editorContext.mode           = sceneModes.pastObject;
             }),
 
-            circle : new ParsirButton({
+            circle          : new ParsirButton({
                 props       : {className   : 'button circle'}
             },function(){
-                console.log('instruments button');
+                console.log('instruments circle');
+                this.scene.editorContext.checkedObject = new Circle({});
+                this.scene.editorContext.mode           = sceneModes.pastObject;
             }),
 
-            line : new ParsirButton({
+            line            : new ParsirButton({
                 props       : {className   : 'button line'}
             },function(){
-                console.log('instruments button');
+                console.log('instruments line');
+                this.scene.editorContext.checkedObject = new Line({});
+                this.scene.editorContext.mode           = sceneModes.pastObject;
             }),
 
-            curve : new ParsirButton({
+            curve           : new ParsirButton({
                 props       : {className   : 'button curve'}
             },function(){
-                console.log('instruments button');
+                console.log('instruments curve');
+                this.scene.editorContext.checkedObject = new Curve({});
+                this.scene.editorContext.mode           = sceneModes.pastObject;
             }),
 
-            fill : new ParsirButton({
+            fill            : new ParsirButton({
                 props       : {className   : 'button fill'}
             },function(){
                 console.log('instruments button');
             }),
 
-            stroke : new ParsirButton({
+            stroke          : new ParsirButton({
                 props       : {className   : 'button stroke'}
             },function(){
                 console.log('instruments button');
@@ -88,23 +97,23 @@ var scenarioTemplates = {
     },
 
     drawing: {
-        properties: {
-            'className': 'scenario-drawing'
+        properties      : {
+            'className' : 'scenario-drawing'
         }
     },
 
     objectManager: {
-        properties: {
-            'className': 'scenario-objectManager'
+        properties      : {
+            'className' : 'scenario-objectManager'
         },
-        childs: {
-            description: {
-                properties : {
-                    className : 'topMenu'
+        childs          : {
+            description : {
+                properties      : {
+                    className   : 'topMenu'
                 },
-                childs : {
-                    text : new ParsirText({text:'objects list'}),
-                    collapseButton : new ParsirButton({
+                childs          : {
+                    text        : new ParsirText({text:'objects list'}),
+                    collapseButton      : new ParsirButton({
                             innerHTML   : '-',
                             props       : {className: 'collapse'}
                         },
@@ -114,9 +123,9 @@ var scenarioTemplates = {
                     )
                 }
             },
-            list : {},
-            manager : {
-                childs:{
+            list            : {},
+            manager         : {
+                childs      : {
                     append  : {},
                     clone   : {},
                     delete  : {}

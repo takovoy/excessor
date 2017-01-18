@@ -6,10 +6,11 @@ function Scene (width,height){
     Drawing.apply(this,arguments);
 
     this.wrap = document.createElement('div');
-    parsir(scenarioTemplates,this.wrap);
+    parsir(scenarioTemplates,this.wrap,this);
 
     scenarioTemplates.drawing.dom.appendChild(this.DOMObject);
     this.wrap.className = 'scenario-wrap';
+    this.editorContext  = {};
 }
 
 Scene.prototype = Object.create(Drawing.prototype);

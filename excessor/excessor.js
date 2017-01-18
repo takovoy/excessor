@@ -789,7 +789,7 @@ var Curve = function(options){
 
 Curve.prototype = Object.create(CanvasObject.prototype);
 
-Object.defineProperties(Curve.prototype,{
+Object.defineProperties(CanvasObject.prototype,{
     points : {
         get: function(){
             if(this.radian != this.services.radian){
@@ -894,32 +894,6 @@ var Line = function(options){
 };
 
 Line.prototype = Object.create(CanvasObject.prototype);
-
-Object.defineProperties(Line.prototype,{
-    points : {
-        get: function(){
-            if(this.radian != this.services.radian){
-                if(!this.services.points){
-                    this.services.points = [];
-                }
-                var radian = this.radian - (Math.PI/4);
-                for(var key in this.now.points){
-                    this.services.points[key] = [
-                        this.now.points[key][0] * Math.cos(radian) -
-                        this.now.points[key][1] * Math.sin(radian),
-                        this.now.points[key][0] * Math.sin(radian) +
-                        this.now.points[key][1] * Math.cos(radian)
-                    ]
-                }
-                this.services.radian = this.radian;
-            }
-            return this.services.points;
-        },
-        set: function(value){
-            this.now.points = value;
-        }
-    }
-});
 
 Line.prototype.animate = function(context){
     if(this.now.points.length < 2){return;}
