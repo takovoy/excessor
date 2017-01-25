@@ -2,7 +2,7 @@
  * Created by takovoy on 22.11.2014.
  */
 
-
+//http://yabs.yandex.ru/count/0jMIl3QAw2S40000gQ1000AEkuoBY0LIbG6R0cv3jm4aCeYusn741eczXwCC0PsWkbGBfe88Yh8x9uuCtBH2X8GDlR__5zi8gYwbeZsP3Bodt88CZG7T0TwG9FIHl4Oej0INy3Z14pPa6qGBauKDeYwP1KACeurr0RQS472rcFXUeAKTW06leurr0REGg66qcFXUsQKTW07QaAXXb9pN4wULb3geiQEHOGIam0000BWChkWlWbU9GZWSiG6oj3000a2veBfK2xlrYr4mFff3q0N1__________yFmksmB3WpvzqGnOyFql__________3zF__________m_k0TlrowgZHPf3q0NVXGtbaF8hxOCezTmSHMU8BmBstq1ENCDkL7qY?q=%D0%B1%D1%80%D1%83%D1%81%D0%BE%D0%B2%D1%8B%D0%B5+%D0%B4%D0%BE%D0%BC%D0%B0+%D0%BE%D1%82+%D0%BF%D1%80%D0%BE%D0%B8%D0%B7%D0%B2%D0%BE%D0%B4%D0%B8%D1%82%D0%B5%D0%BB%D1%8F
 function Drawing (width,height){
     this.DOMObject          = document.createElement('canvas');
     this.DOMObject.width    = width || 0;

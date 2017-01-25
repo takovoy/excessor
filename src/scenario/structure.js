@@ -32,64 +32,139 @@ var scenarioTemplates = {
         }
     },
 
+    props : {
+        properties: {
+            'className': 'scenario-properties'
+        },
+        childs: {
+            x : new ParsirInput({
+                placeholder:'fps',
+                props:{type: 'number'},
+                events: {
+                    change : function(){
+                        if(+this.value < 0){
+                            this.value = 0
+                        }
+                    }
+                }
+            }),
+            y : new ParsirInput({
+                placeholder:'fps',
+                props:{type: 'number'},
+                events: {
+                    change : function(){
+                        if(+this.value < 0){
+                            this.value = 0
+                        }
+                    }
+                }
+            }),
+            radius : new ParsirInput({
+                placeholder:'fps',
+                props:{type: 'number'},
+                events: {
+                    change : function(){
+                        if(+this.value < 0){
+                            this.value = 0
+                        }
+                    }
+                }
+            }),
+            radian : new ParsirInput({
+                placeholder:'fps',
+                props:{type: 'number'},
+                events: {
+                    change : function(){
+                        if(+this.value < 0){
+                            this.value = 0
+                        }
+                    }
+                }
+            }),
+            fill : new ParsirInput({
+                placeholder:'fps',
+                props:{type: 'number'},
+                events: {
+                    change : function(){
+                        if(+this.value < 0){
+                            this.value = 0
+                        }
+                    }
+                }
+            }),
+            collapseInterfaceButton : new ParsirButton(
+                {
+                    innerHTML   : '-',
+                    props       : {className: 'collapse'}
+                },
+                function(){
+                    console.log('collapse')
+                }
+            )
+        }
+    },
+
     instruments: {
         properties: {
             'className': 'scenario-instruments'
         },
         childs: {
             arrow           : new ParsirButton({
-                props       : {className   : 'button arrow'}
+                props       : {className   : 'button arrow',innerHTML: 'ARR'}
             },function(){
                 console.log('instruments button');
             }),
 
             checkpoints     : new ParsirButton({
-                props       : {className   : 'button points'}
+                props       : {className   : 'button points',innerHTML: 'CHCK'}
             },function(){
                 console.log('instruments button');
             }),
 
             polygon         : new ParsirButton({
-                props       : {className   : 'button polygon'}
+                props       : {className   : 'button polygon',innerHTML: 'POLY'}
             },function(){
-                //this.scene = {};
-                console.log('instruments polygon');
-                this.scene.editorContext.checkedObject  = new Polygon({});
-                this.scene.editorContext.mode           = sceneModes.pastObject;
+                this.scene.editorContext.checkedObject  = new Polygon({
+                    drawing     : this.scene,
+                    sidesCount  : 6,
+                    settings    : {radius: 30,fill: '#000000'}
+                });
+                this.scene.editorContext.mode           = this.scene.editorContext.modes.pastObject;
             }),
 
             circle          : new ParsirButton({
-                props       : {className   : 'button circle'}
+                props       : {className   : 'button circle',innerHTML: 'CLE'}
             },function(){
-                console.log('instruments circle');
-                this.scene.editorContext.checkedObject = new Circle({});
-                this.scene.editorContext.mode           = sceneModes.pastObject;
+                this.scene.editorContext.checkedObject  = new Circle({
+                    drawing : this.scene,
+                    radius  : 30,
+                    settings: {fill: '#000000'}
+                });
+                this.scene.editorContext.mode           = this.scene.editorContext.modes.pastObject;
             }),
 
             line            : new ParsirButton({
-                props       : {className   : 'button line'}
+                props       : {className   : 'button line',innerHTML: 'LINE'}
             },function(){
-                console.log('instruments line');
-                this.scene.editorContext.checkedObject = new Line({});
-                this.scene.editorContext.mode           = sceneModes.pastObject;
+                this.scene.editorContext.checkedObject  = new Line();
+                this.scene.editorContext.mode           = this.scene.editorContext.modes.pastObject;
             }),
 
             curve           : new ParsirButton({
-                props       : {className   : 'button curve'}
+                props       : {className   : 'button curve',innerHTML: 'CRV'}
             },function(){
-                console.log('instruments curve');
-                this.scene.editorContext.checkedObject = new Curve({});
-                this.scene.editorContext.mode           = sceneModes.pastObject;
+                this.scene.editorContext.checkedObject  = new Curve();
+                this.scene.editorContext.mode           = this.scene.editorContext.modes.pastObject;
             }),
 
             fill            : new ParsirButton({
-                props       : {className   : 'button fill'}
+                props       : {className   : 'button fill',innerHTML: 'FILL'}
             },function(){
                 console.log('instruments button');
             }),
 
             stroke          : new ParsirButton({
-                props       : {className   : 'button stroke'}
+                props       : {className   : 'button stroke',innerHTML: 'STRK'}
             },function(){
                 console.log('instruments button');
             })

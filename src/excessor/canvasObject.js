@@ -3,6 +3,7 @@
  */
 
 var CanvasObject = function(options){
+    options             = options || {};
     this.id             = options.id || '' + Math.random();
     this.now            = options.settings || {};
     this.now.x          = this.now.x || options.x || 0;

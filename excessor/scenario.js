@@ -48,18 +48,29 @@ function Scene (width,height){
     parsir(scenarioTemplates,this.wrap,this);
 
     scenarioTemplates.drawing.dom.appendChild(this.DOMObject);
-    this.wrap.className = 'scenario-wrap';
-    this.editorContext  = {};
+    this.wrap.className     = 'scenario-wrap';
+    this.editorContext      = {
+        modes: {
+            pastObject  : function (event,scene) {
+                scene.fps                           = 10;
+                if(!scene.editorContext.checkedObject){
+                    return
+                }
+                scene.editorContext.checkedObject.x = event.layerX;
+                scene.editorContext.checkedObject.y = event.layerY;
+                scene.editorContext.checkedObject.start();
+            }
+        }
+    };
+
+    this.editorContext.mode = this.editorContext.modes.pastObject;
+    this.DOMObject.scene    = this;
+    this.DOMObject.onclick  = function (event) {
+        this.scene.editorContext.mode(event,this.scene);
+    };
 }
 
 Scene.prototype = Object.create(Drawing.prototype);
-/**
- * Created by yeIAmCrasyProgrammer on 18.01.2017.
- */
-
-var sceneModes = {
-    pastObject : 1
-};
 /**
  * Created by takovoy on 07.07.2016.
  */
@@ -100,58 +111,61 @@ var scenarioTemplates = {
         },
         childs: {
             arrow           : new ParsirButton({
-                props       : {className   : 'button arrow'}
+                props       : {className   : 'button arrow',innerHTML: 'ARR'}
             },function(){
                 console.log('instruments button');
             }),
 
             checkpoints     : new ParsirButton({
-                props       : {className   : 'button points'}
+                props       : {className   : 'button points',innerHTML: 'CHCK'}
             },function(){
                 console.log('instruments button');
             }),
 
             polygon         : new ParsirButton({
-                props       : {className   : 'button polygon'}
+                props       : {className   : 'button polygon',innerHTML: 'POLY'}
             },function(){
-                //this.scene = {};
-                console.log('instruments polygon');
-                this.scene.editorContext.checkedObject  = new Polygon({});
-                this.scene.editorContext.mode           = sceneModes.pastObject;
+                this.scene.editorContext.checkedObject  = new Polygon({
+                    drawing     : this.scene,
+                    sidesCount  : 6,
+                    settings    : {radius: 30,fill: '#000000'}
+                });
+                this.scene.editorContext.mode           = this.scene.editorContext.modes.pastObject;
             }),
 
             circle          : new ParsirButton({
-                props       : {className   : 'button circle'}
+                props       : {className   : 'button circle',innerHTML: 'CLE'}
             },function(){
-                console.log('instruments circle');
-                this.scene.editorContext.checkedObject = new Circle({});
-                this.scene.editorContext.mode           = sceneModes.pastObject;
+                this.scene.editorContext.checkedObject  = new Circle({
+                    drawing : this.scene,
+                    radius  : 30,
+                    settings: {fill: '#000000'}
+                });
+                this.scene.editorContext.mode           = this.scene.editorContext.modes.pastObject;
             }),
 
             line            : new ParsirButton({
-                props       : {className   : 'button line'}
+                props       : {className   : 'button line',innerHTML: 'LINE'}
             },function(){
-                console.log('instruments line');
-                this.scene.editorContext.checkedObject = new Line({});
-                this.scene.editorContext.mode           = sceneModes.pastObject;
+                this.scene.editorContext.checkedObject  = new Line();
+                this.scene.editorContext.mode           = this.scene.editorContext.modes.pastObject;
             }),
 
             curve           : new ParsirButton({
-                props       : {className   : 'button curve'}
+                props       : {className   : 'button curve',innerHTML: 'CRV'}
             },function(){
-                console.log('instruments curve');
-                this.scene.editorContext.checkedObject = new Curve({});
-                this.scene.editorContext.mode           = sceneModes.pastObject;
+                this.scene.editorContext.checkedObject  = new Curve();
+                this.scene.editorContext.mode           = this.scene.editorContext.modes.pastObject;
             }),
 
             fill            : new ParsirButton({
-                props       : {className   : 'button fill'}
+                props       : {className   : 'button fill',innerHTML: 'FILL'}
             },function(){
                 console.log('instruments button');
             }),
 
             stroke          : new ParsirButton({
-                props       : {className   : 'button stroke'}
+                props       : {className   : 'button stroke',innerHTML: 'STRK'}
             },function(){
                 console.log('instruments button');
             })
