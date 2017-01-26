@@ -30,7 +30,9 @@ Drawing.prototype.render = function(canvasObject,id){
 };
 
 Drawing.prototype.pause = function(){
-    this.fps = 0;
+    var fps     = this.fps;
+    this.fps    = 0;
+    this._fps   = fps;
 };
 
 Drawing.prototype.play = function(){
