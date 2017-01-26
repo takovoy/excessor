@@ -105,6 +105,78 @@ var scenarioTemplates = {
         }
     },
 
+    props : {
+        properties: {
+            'className': 'scenario-properties'
+        },
+        childs: {
+            x : new ParsirInput({
+                placeholder:'fps',
+                props:{type: 'number'},
+                events: {
+                    change : function(){
+                        if(+this.value < 0){
+                            this.value = 0
+                        }
+                    }
+                }
+            }),
+            y : new ParsirInput({
+                placeholder:'fps',
+                props:{type: 'number'},
+                events: {
+                    change : function(){
+                        if(+this.value < 0){
+                            this.value = 0
+                        }
+                    }
+                }
+            }),
+            radius : new ParsirInput({
+                placeholder:'fps',
+                props:{type: 'number'},
+                events: {
+                    change : function(){
+                        if(+this.value < 0){
+                            this.value = 0
+                        }
+                    }
+                }
+            }),
+            radian : new ParsirInput({
+                placeholder:'fps',
+                props:{type: 'number'},
+                events: {
+                    change : function(){
+                        if(+this.value < 0){
+                            this.value = 0
+                        }
+                    }
+                }
+            }),
+            fill : new ParsirInput({
+                placeholder:'fps',
+                props:{type: 'number'},
+                events: {
+                    change : function(){
+                        if(+this.value < 0){
+                            this.value = 0
+                        }
+                    }
+                }
+            }),
+            collapseInterfaceButton : new ParsirButton(
+                {
+                    innerHTML   : '-',
+                    props       : {className: 'collapse'}
+                },
+                function(){
+                    console.log('collapse')
+                }
+            )
+        }
+    },
+
     instruments: {
         properties: {
             'className': 'scenario-instruments'

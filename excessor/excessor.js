@@ -544,7 +544,6 @@ var dynamic = {
  * Created by takovoy on 22.11.2014.
  */
 
-
 function Drawing (width,height){
     this.DOMObject          = document.createElement('canvas');
     this.DOMObject.width    = width || 0;
@@ -572,7 +571,9 @@ Drawing.prototype.render = function(canvasObject,id){
 };
 
 Drawing.prototype.pause = function(){
-    this.fps = 0;
+    var fps     = this.fps;
+    this.fps    = 0;
+    this._fps   = fps;
 };
 
 Drawing.prototype.play = function(){
