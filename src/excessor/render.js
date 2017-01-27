@@ -35,14 +35,7 @@ Drawing.prototype.pause = function(){
 };
 
 Drawing.prototype.play = function(){
-    var self = this;
-    if(this.core){clearInterval(this.core)}
-    this.core = setInterval(function(){
-        self.context.clearRect(0,0,self.DOMObject.width,self.DOMObject.height);
-        for (var key in self.stack.list) {
-            self.render(self.stack.list[key],key);
-        }
-    },1000 / +self.fps);
+    this.fps    = this.fps;
 };
 
 Object.defineProperty(Drawing.prototype,'fps',{
