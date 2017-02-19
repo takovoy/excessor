@@ -317,40 +317,47 @@ var formula = {
     /**
      * @return {Array}
      */
-    HEXtoRGB    : function(color){
-        if(color[0] != "#"){return false}
-        var rgb = [];
-        rgb[0] = parseInt(color.substring(1,3),16);
-        rgb[1] = parseInt(color.substring(3,5),16);
-        rgb[2] = parseInt(color.substring(5),16);
-        return rgb;
+    HEXtoRGBA    : function(color){
+        var rgba = [];
+        rgba[0]  = parseInt(color.substring(1,3),16);
+        rgba[1]  = parseInt(color.substring(3,5),16);
+        rgba[2]  = parseInt(color.substring(5),16);
+        rgba[3]  = 1;
+        return rgba;
     },
 
     RGBtoRGBA    : function(color){
-        if(color.substring(1,3) != 7){return false}
-        var rgb = [];
-        rgb[0] = parseInt(color.substring(1,3),16);
-        rgb[1] = parseInt(color.substring(3,5),16);
-        rgb[2] = parseInt(color.substring(5),16);
-        return rgb;
+        var rgba = color.match(/\d{1,3}(\.\d+)?/g);
+        if ( rgba[3] === "0" ) {
+            rgba[3] = 0;
+        } else {
+            rgba[3] = +rgba[3] || 1;
+        }
+        return rgba;
     },
 
     changeColor : function(start,end,shift){
         var result      = [];
 
-        if(start[0] === '#'){start = formula.HEXtoRGB(start)}
-        else if ( start.substring(0,4) === "rgb(" ) {
-            start = start.match(/\d+/g);
-        }
-        if(end[0] === '#'){end = formula.HEXtoRGB(end)}
-        else if ( end.substring(0,4) === "rgb(" ) {
-            end = end.match(/\d+/g);
+        //проверка начальной позиции
+        if ( isRGBA(start) || isRGB(start) ) {
+            start = formula.RGBtoRGBA(start);
+        } else if ( isHEXColor(start) ) {
+            start = formula.HEXtoRGBA(start)
         }
 
-        for(var i = 0;i<3;i++){
+        //проверка конечной позиции
+        if ( isRGBA(end) || isRGB(end) ) {
+            end = formula.RGBtoRGBA(end);
+        } else if ( isHEXColor(end) ) {
+            end = formula.HEXtoRGBA(end)
+        }
+
+        for(var i = 0;i < 3;i++){
             result[i] = Math.round(+start[i] + (+end[i] - +start[i]) / 100 * shift);
         }
-        return 'rgb(' + result[0] + ',' + result[1] + ',' + result[2] + ')';
+        var opacity = +(+start[3] + (+end[3] - +start[3]) / 100 * shift).toFixed(4);
+        return 'rgba(' + result[0] + ',' + result[1] + ',' + result[2] + ',' + opacity + ')';
     }
 };
 /**
@@ -577,14 +584,7 @@ Drawing.prototype.pause = function(){
 };
 
 Drawing.prototype.play = function(){
-    var self = this;
-    if(this.core){clearInterval(this.core)}
-    this.core = setInterval(function(){
-        self.context.clearRect(0,0,self.DOMObject.width,self.DOMObject.height);
-        for (var key in self.stack.list) {
-            self.render(self.stack.list[key],key);
-        }
-    },1000 / +self.fps);
+    this.fps    = this.fps;
 };
 
 Object.defineProperty(Drawing.prototype,'fps',{
@@ -700,6 +700,29 @@ function markControlPoints ( points, context, corrective){
     }
 }
 /**
+ * Created by takovoy on 19.02.2017.
+ */
+
+function isNotNegativeNumber (value) {
+    return typeof +value === "number" && +value >= 0
+}
+
+function isHEXColor (string) {
+    return string.length === 7 && string.search(/#[0-9a-fA-F]{6}/i) === 0
+}
+
+function isRGB (string) {
+    return string.search(/rgb\((\d{1,3},){2}\d{1,3}\)/i) === 0
+}
+
+function isRGBA (string) {
+    return string.search(/rgba\((\d{1,3},){3}(\d(\.\d+)?)\)/i) === 0
+}
+
+function isColor (string) {
+    return isHEXColor(string) || isRGB(string) || isRGBA(string);
+}
+/**
  * Created by takovoySuper on 11.04.2015.
  */
 
@@ -812,6 +835,7 @@ Object.defineProperties(CanvasObject.prototype,{
             return this.services.points;
         },
         set: function(value){
+
             this.now.points = value;
         }
     }
@@ -822,7 +846,7 @@ Curve.prototype.animate = function(context){
         return
     }
 
-    //отобразить контрольные точки на холсте
+    //РѕС‚РѕР±СЂР°Р·РёС‚СЊ РєРѕРЅС‚СЂРѕР»СЊРЅС‹Рµ С‚РѕС‡РєРё РЅР° С…РѕР»СЃС‚Рµ
     if(this.now.showBreakpoints){
         context.beginPath();
 

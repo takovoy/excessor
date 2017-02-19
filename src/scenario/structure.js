@@ -38,57 +38,62 @@ var scenarioTemplates = {
         },
         childs: {
             x : new ParsirInput({
-                placeholder:'fps',
+                placeholder:'x',
                 props:{type: 'number'},
                 events: {
                     change : function(){
-                        if(+this.value < 0){
-                            this.value = 0
+                        if(!isNotNegativeNumber(this.value)){
+                            this.value = 0;
                         }
+                        this.scene.editorContext.checkedObject.x = this.value;
                     }
                 }
             }),
             y : new ParsirInput({
-                placeholder:'fps',
+                placeholder:'y',
                 props:{type: 'number'},
                 events: {
                     change : function(){
-                        if(+this.value < 0){
+                        if(!isNotNegativeNumber(this.value)){
                             this.value = 0
                         }
+                        this.scene.editorContext.checkedObject.y = this.value;
                     }
                 }
             }),
             radius : new ParsirInput({
-                placeholder:'fps',
+                placeholder:'radius',
                 props:{type: 'number'},
                 events: {
                     change : function(){
-                        if(+this.value < 0){
+                        if(!isNotNegativeNumber(this.value)){
                             this.value = 0
                         }
+                        this.scene.editorContext.checkedObject.now.radius = this.value;
                     }
                 }
             }),
             radian : new ParsirInput({
-                placeholder:'fps',
+                placeholder:'radian',
                 props:{type: 'number'},
                 events: {
                     change : function(){
-                        if(+this.value < 0){
+                        if(typeof +this.value !== "number"){
                             this.value = 0
                         }
+                        this.scene.editorContext.checkedObject.radian = this.value;
                     }
                 }
             }),
             fill : new ParsirInput({
-                placeholder:'fps',
-                props:{type: 'number'},
+                placeholder:'fill',
+                props:{type: 'text'},
                 events: {
                     change : function(){
-                        if(+this.value < 0){
-                            this.value = 0
+                        if(!isColor(this.value)){
+                            return
                         }
+                        this.scene.editorContext.checkedObject.now.fill = this.value;
                     }
                 }
             }),

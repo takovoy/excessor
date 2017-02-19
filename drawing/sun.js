@@ -32,7 +32,7 @@ var center  = new Circle({
     settings        : {fill: '#FFB151',x:150,y:150},
     radius          : 15
 }).start();
-//#054dca - ÒËÌËÈ ˆ‚ÂÚ
+//#054dca - —Å–∏–Ω–∏–π —Ü–≤–µ—Ç
 center
     .moveProperty('radius',47,1500)
     .operationContext
@@ -59,23 +59,23 @@ center
             .moveProperty('radius',30,800);
     });
 
-center
-    .moveProperty('radian',Math.PI*2,50000)
-    .operationContext
-    .options.recourse = true;
+//center
+//    .moveProperty('radian',Math.PI*2,50000)
+//    .operationContext
+//    .options.recourse = true;
 
 center
-    .append(new Circle({
+    .append(new Circle  ({
         id              : 1,
         settings        : {fill: '#ff8951'},
         radius          : 35
     }))
-    .append(new Circle({
+    .append(new Circle  ({
         id              : 2,
         settings        : {fill: '#ff5555'},
         radius          : 35
     }))
-    .append(new Curve({
+    .append(new Curve   ({
         id              : 'light',
         settings        : {
             fill        : '#FFB151',
@@ -123,28 +123,28 @@ center
     .operationContext
     .options.recourse = true;
 
-scene.DOMObject.onmouseover = function () {
-    center
-        .moveProperty('fill','#054dca',1000)
-        .transform().list.radian.reverse = true;
-
-    center.childrens.list[1]
-        .moveProperty('fill','#054dca',1000);
-    center.childrens.list[2]
-        .moveProperty('fill','#054dca',1000);
-    center.childrens.list.light
-        .moveProperty('fill','#054dca',1000);
-};
-
-scene.DOMObject.onmouseout = function () {
-    center
-        .moveProperty('fill','#FFB151',1000)
-        .transform().list.radian.reverse = false;
-
-    center.childrens.list[1]
-        .moveProperty('fill','#ff8951',1000);
-    center.childrens.list[2]
-        .moveProperty('fill','#ff5555',1000);
-    center.childrens.list.light
-        .moveProperty('fill','#FFB151',1000);
-};
+//scene.DOMObject.onmouseover = function () {
+//    center
+//        .moveProperty('fill','#054dca',1000)
+//        .transform().list.radian.reverse = true;
+//
+//    center.childrens.list[1]
+//        .moveProperty('fill','#054dca',1000);
+//    center.childrens.list[2]
+//        .moveProperty('fill','#054dca',1000);
+//    center.childrens.list.light
+//        .moveProperty('fill','#054dca',1000);
+//};
+//
+//scene.DOMObject.onmouseout = function () {
+//    center
+//        .moveProperty('fill','#FFB151',1000)
+//        .transform().list.radian.reverse = false;
+//
+//    center.childrens.list[1]
+//        .moveProperty('fill','#ff8951',1000);
+//    center.childrens.list[2]
+//        .moveProperty('fill','#ff5555',1000);
+//    center.childrens.list.light
+//        .moveProperty('fill','#FFB151',1000);
+//};

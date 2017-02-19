@@ -32,6 +32,7 @@ Object.defineProperties(CanvasObject.prototype,{
             return this.services.points;
         },
         set: function(value){
+
             this.now.points = value;
         }
     }
@@ -42,7 +43,7 @@ Curve.prototype.animate = function(context){
         return
     }
 
-    //отобразить контрольные точки на холсте
+    //РѕС‚РѕР±СЂР°Р·РёС‚СЊ РєРѕРЅС‚СЂРѕР»СЊРЅС‹Рµ С‚РѕС‡РєРё РЅР° С…РѕР»СЃС‚Рµ
     if(this.now.showBreakpoints){
         context.beginPath();
 

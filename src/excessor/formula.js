@@ -59,39 +59,46 @@ var formula = {
     /**
      * @return {Array}
      */
-    HEXtoRGB    : function(color){
-        if(color[0] != "#"){return false}
-        var rgb = [];
-        rgb[0] = parseInt(color.substring(1,3),16);
-        rgb[1] = parseInt(color.substring(3,5),16);
-        rgb[2] = parseInt(color.substring(5),16);
-        return rgb;
+    HEXtoRGBA    : function(color){
+        var rgba = [];
+        rgba[0]  = parseInt(color.substring(1,3),16);
+        rgba[1]  = parseInt(color.substring(3,5),16);
+        rgba[2]  = parseInt(color.substring(5),16);
+        rgba[3]  = 1;
+        return rgba;
     },
 
     RGBtoRGBA    : function(color){
-        if(color.substring(1,3) != 7){return false}
-        var rgb = [];
-        rgb[0] = parseInt(color.substring(1,3),16);
-        rgb[1] = parseInt(color.substring(3,5),16);
-        rgb[2] = parseInt(color.substring(5),16);
-        return rgb;
+        var rgba = color.match(/\d{1,3}(\.\d+)?/g);
+        if ( rgba[3] === "0" ) {
+            rgba[3] = 0;
+        } else {
+            rgba[3] = +rgba[3] || 1;
+        }
+        return rgba;
     },
 
     changeColor : function(start,end,shift){
         var result      = [];
 
-        if(start[0] === '#'){start = formula.HEXtoRGB(start)}
-        else if ( start.substring(0,4) === "rgb(" ) {
-            start = start.match(/\d+/g);
-        }
-        if(end[0] === '#'){end = formula.HEXtoRGB(end)}
-        else if ( end.substring(0,4) === "rgb(" ) {
-            end = end.match(/\d+/g);
+        //проверка начальной позиции
+        if ( isRGBA(start) || isRGB(start) ) {
+            start = formula.RGBtoRGBA(start);
+        } else if ( isHEXColor(start) ) {
+            start = formula.HEXtoRGBA(start)
         }
 
-        for(var i = 0;i<3;i++){
+        //проверка конечной позиции
+        if ( isRGBA(end) || isRGB(end) ) {
+            end = formula.RGBtoRGBA(end);
+        } else if ( isHEXColor(end) ) {
+            end = formula.HEXtoRGBA(end)
+        }
+
+        for(var i = 0;i < 3;i++){
             result[i] = Math.round(+start[i] + (+end[i] - +start[i]) / 100 * shift);
         }
-        return 'rgb(' + result[0] + ',' + result[1] + ',' + result[2] + ')';
+        var opacity = +(+start[3] + (+end[3] - +start[3]) / 100 * shift).toFixed(4);
+        return 'rgba(' + result[0] + ',' + result[1] + ',' + result[2] + ',' + opacity + ')';
     }
 };
