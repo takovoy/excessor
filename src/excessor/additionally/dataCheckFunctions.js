@@ -7,7 +7,7 @@ function isNotNegativeNumber (value) {
 }
 
 function isHEXColor (string) {
-    return string.length === 7 && string.search(/#[0-9a-fA-F]{6}/i) === 0
+    return string.length === 7 && string.search(/#[0-9a-f]{6}/i) === 0
 }
 
 function isRGB (string) {
