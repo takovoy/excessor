@@ -2,7 +2,7 @@
  * Created by takovoy on 22.11.2014.
  */
 
-var CanvasObject = function(options){
+var CanvasObject = function( options ){
     options             = options || {};
     this.id             = options.id || '' + Math.random();
     this.now            = options.settings || {};
@@ -12,13 +12,13 @@ var CanvasObject = function(options){
     this.services       = {};
     this._transform     = new Listing();
     this.childrens      = new PropertyListing(
-        function(self,object){
+        function( self, object ){
             object.parent           = self;
             object.drawing          = self.drawing;
             self.operationContext   = object;
             return self;
         },
-        function(self){
+        function( self ){
 
         },
         this
@@ -29,69 +29,69 @@ var CanvasObject = function(options){
 Object.defineProperties(CanvasObject.prototype,{
     x       : {
         get: function(){
-            if(this.parent){
+            if( this.parent ){
                 return (
-                    this.now.x * Math.cos(this.parent.radian) -
-                    this.now.y * Math.sin(this.parent.radian) +
+                    this.now.x * Math.cos( this.parent.radian ) -
+                    this.now.y * Math.sin( this.parent.radian ) +
                     this.parent.x
                 );
             }
             return +this.now.x;
         },
-        set: function(value){
+        set: function( value ){
             this.now.x = +value;
         }
     },
 
     y       : {
         get: function(){
-            if(this.parent){
+            if( this.parent ){
                 return (
-                    this.now.x * Math.sin(this.parent.radian) +
-                    this.now.y * Math.cos(this.parent.radian) +
+                    this.now.x * Math.sin( this.parent.radian ) +
+                    this.now.y * Math.cos( this.parent.radian ) +
                     this.parent.y
                 );
             }
             return +this.now.y;
         },
-        set: function(value){
+        set: function( value ){
             this.now.y = +value;
         }
     },
 
     radian  : {
         get: function(){
-            if(this.parent){
+            if( this.parent ){
                 return +this.parent.radian + +this.now.radian;
             }
             return +this.now.radian;
         },
-        set: function(value){
+        set: function( value ){
             this.now.radian = +value;
         }
     }
 });
 
 CanvasObject.prototype.start        = function(){
-    this.drawing.stack.append(this);
+    this.drawing.stack.append( this );
     return this;
 };
 CanvasObject.prototype.stop         = function(){
-    this.drawing.stack.remove(this.id);
+    this.drawing.stack.remove( this.id );
     return this;
 };
 CanvasObject.prototype.animate      = function(){};
-CanvasObject.prototype.transform    = function(transform){
-    if(!this._transform){
+CanvasObject.prototype.transform    = function( transform ){
+    if ( !this._transform ) {
         this._transform = new Listing();
     }
-    if (!transform) {return this._transform;}
-    this._transform.append(transform.id,transform);
+    if ( !transform ) {return this._transform;}
+    this._transform.append( transform.id, transform );
     this.operationContext = transform;
     return this;
 };
-CanvasObject.prototype.move         = function(coord,time){
-    if(!time){
+CanvasObject.prototype.move         = function( coord, time ){
+    if( !time ){
         this.x = coord[0];
         this.y = coord[1];
         return;
@@ -109,8 +109,8 @@ CanvasObject.prototype.move         = function(coord,time){
         time    : time
     }));
 };
-CanvasObject.prototype.moveProperty   = function(property,value,time){
-    if(!time){
+CanvasObject.prototype.moveProperty   = function( property, value, time ){
+    if( !time ){
         this.now[property] = value;
         return;
     }
@@ -121,8 +121,8 @@ CanvasObject.prototype.moveProperty   = function(property,value,time){
         time    : time
     }))
 };
-CanvasObject.prototype.append   = function(object){
-    return this.childrens.append(object);
+CanvasObject.prototype.append   = function( object ){
+    return this.childrens.append( object );
 };
 /**
  * Created by Пользователь on 06.03.2015.
@@ -155,104 +155,109 @@ var dataContextChanges = {
  * Created by yeIAmCrasyProgrammer on 10.10.2016.
  */
 
-function Cluster (count,correlation){
+function Cluster ( count, correlation ){
     this.parameters     = {
         list        : {},
         iteration   : false
     };
-    CanvasObject.apply(this,[{}]);
+    CanvasObject.apply( this, [{}] );
     this.correlation    = correlation || {};
-    this.count          = count;
+    this.count          = count || 0;
     this.iteration      = 1;
     this.constructor    = Cluster;
 }
 
-Cluster.prototype = Object.create(CanvasObject.prototype);
+Cluster.prototype = Object.create( CanvasObject.prototype );
 
+
+// отчистка метода трансформации
 Cluster.prototype.transform = function(){
-    if(!this._transform){
+    if( !this._transform ){
         this._transform = new Listing();
     }
     return this._transform;
 };
 
+
+// для кластеров анимация зацикленна в рекурсию
+// каждая итерация выводит новый элемент кластера
 Cluster.prototype.animate = function(){
-    if(this.iteration > this.count){
+    if( this.iteration > this.count ){
         this.iteration = 1;
         return;
     }
     this._animate = this.parent.animate;
-    this._animate(this.drawing.context);
+    this._animate( this.drawing.context );
     this.iteration++;
     this.animate();
 };
 
-Object.defineProperties(Cluster.prototype,{
+// параметры описаные дескриптором неизменяемы и возвращают данные уже изменённые согласно объекту correlation
+Object.defineProperties( Cluster.prototype,{
     now     : {
         get : function(){
-            if(this.parameters.iteration !== this.iteration && this.parent) {
-                for(var key in this.parent.now){
-                    if (!this.correlation[key]) {
+            if( this.parameters.iteration !== this.iteration && this.parent ) {
+                for( var key in this.parent.now ){
+                    if ( !this.correlation[key] ) {
                         this.parameters.list[key] = this.parent.now[key];
                         continue;
                     }
                     var correlation = +this.correlation[key];
-                    if(typeof this.correlation[key] == "function"){
-                        correlation = +this.correlation[key](this.iteration,this);
+                    if( typeof this.correlation[key] == "function" ){
+                        correlation = +this.correlation[key]( this.iteration, this );
                     }
-                    this.parameters.list[key] = this.parent.now[key] +
-                        (correlation * this.iteration);
+                    this.parameters.list[key] = this.parent.now[key] + (correlation * this.iteration);
                 }
                 this.parameters.iteration = +this.iteration;
             }
             return this.parameters.list;
         },
 
-        set : function(value){
+        set : function( value ){
             return this.parameters.list;
         }
     },
     x       : {
         get : function(){
-            if(this.parent.parent){
+            if( this.parent.parent ){
                 return (
-                    this.now.x * Math.cos(this.parent.parent.radian) -
-                    this.now.y * Math.sin(this.parent.parent.radian) +
+                    this.now.x * Math.cos( this.parent.parent.radian ) -
+                    this.now.y * Math.sin( this.parent.parent.radian ) +
                     this.parent.parent.x
                 );
             }
             return +this.now.x;
         },
-        set : function(value){
-            this.now.x = +value;
+        set : function( value ){
+            return +this.now.x;
         }
     },
 
     y       : {
         get : function(){
-            if(this.parent.parent){
+            if( this.parent.parent ){
                 return (
-                    this.now.x * Math.sin(this.parent.parent.radian) +
-                    this.now.y * Math.cos(this.parent.parent.radian) +
+                    this.now.x * Math.sin( this.parent.parent.radian ) +
+                    this.now.y * Math.cos( this.parent.parent.radian ) +
                     this.parent.parent.y
                 );
             }
             return +this.now.y;
         },
-        set : function(value){
-            this.now.y = +value;
+        set : function( value ){
+            return +this.now.y;
         }
     },
 
     radian  : {
         get: function(){
-            if(this.parent){
+            if( this.parent ){
                 return +this.parent.parent.radian + +this.now.radian;
             }
             return +this.now.radian;
         },
-        set: function(value){
-            this.now.radian = +value;
+        set: function( value ){
+            return +this.now.radian;
         }
     }
 });
@@ -339,14 +344,14 @@ var formula = {
     changeColor : function(start,end,shift){
         var result      = [];
 
-        //�������� ��������� �������
+        //проверка начальной позиции
         if ( isRGBA(start) || isRGB(start) ) {
             start = formula.RGBtoRGBA(start);
         } else if ( isHEXColor(start) ) {
             start = formula.HEXtoRGBA(start)
         }
 
-        //�������� �������� �������
+        //проверка конечной позиции
         if ( isRGBA(end) || isRGB(end) ) {
             end = formula.RGBtoRGBA(end);
         } else if ( isHEXColor(end) ) {
@@ -660,7 +665,7 @@ Transform.prototype.event = function(shift,action){
  * Created by takovoy on 31.07.2016.
  */
 
-// �������� ����������� ����� �� ������ ���������� � 4 �������
+// отмечает контрольные точки на холсте кружочками в 4 пикселя
 function markControlPoints ( points, context, corrective){
     corrective = corrective || {};
 
@@ -787,18 +792,19 @@ function toIdentifyTheCurve ( points, context, corrective, moveTo){
  * Created by takovoy on 30.11.2014.
  */
 
-var Circle = function(options){
-    CanvasObject.apply(this,arguments);
+var Circle = function( options ){
+    CanvasObject.apply( this, arguments );
     this.constructor    = Circle;
-    this.now.radius     = options.radius;
+    this.now.radius     = this.now.radius || options.radius || 0;
+    this.now.shift      = this.now.shift || options.shift || 100;
 };
 
-Circle.prototype = Object.create(CanvasObject.prototype);
+Circle.prototype = Object.create( CanvasObject.prototype );
 
-Circle.prototype.animate = function(context){
+Circle.prototype.animate = function( context ){
     context.beginPath();
-    context.arc(this.x,this.y,this.now.radius,0,Math.PI*2);
-    changeContext(context,this.now);
+    context.arc( this.x, this.y, this.now.radius, 0, Math.PI*2/100*this.now.shift );
+    changeContext( context, this.now );
     context.closePath();
 };
 /**
@@ -817,25 +823,27 @@ Curve.prototype = Object.create(CanvasObject.prototype);
 Object.defineProperties(CanvasObject.prototype,{
     points : {
         get: function(){
-            if(this.radian != this.services.radian){
-                if(!this.services.points){
-                    this.services.points = [];
-                }
-                var radian = this.radian - (Math.PI/4);
-                for(var key in this.now.points){
-                    this.services.points[key] = [
-                        this.now.points[key][0] * Math.cos(radian) -
-                        this.now.points[key][1] * Math.sin(radian),
-                        this.now.points[key][0] * Math.sin(radian) +
-                        this.now.points[key][1] * Math.cos(radian)
-                    ]
-                }
-                this.services.radian = this.radian;
+
+            if(!this.services.points){
+                this.services.points = [];
             }
+
+            var radian  = this.radian - ( Math.PI/4 ),
+                sin     = Math.sin( radian ),
+                cos     = Math.cos( radian );
+
+            for( var key in this.now.points ){
+                var coordinate = this.now.points[key];
+                this.services.points[key] = [
+                    coordinate[0] * cos - coordinate[1] * sin,
+                    coordinate[0] * sin + coordinate[1] * cos
+                ]
+            }
+
             return this.services.points;
+
         },
         set: function(value){
-
             this.now.points = value;
         }
     }
@@ -940,51 +948,34 @@ Line.prototype.animate = function(context){
     context.closePath();
 };
 /**
- * Created by takovoy on 17.09.2016.
- */
-
-function Point (coordinates){
-
-}
-/**
  * Created by Пользователь on 21.01.2015.
  */
 
-var Polygon = function(options){
-    CanvasObject.apply(this,arguments);
+var Polygon = function( options ){
+    CanvasObject.apply( this, arguments );
     this.constructor        = Polygon;
-    this.now.sidesCount     = options.sidesCount;
-    if(!this.now.radian){this.now.radian = Math.PI/180*270}
+    this.now.sidesCount     = this.now.sidesCount || options.sidesCount || 3;
+    this.now.radius         = this.now.radius || options.radius || 0;
 };
 
-Polygon.prototype           = Object.create(CanvasObject.prototype);
+Polygon.prototype           = Object.create( CanvasObject.prototype );
 
-Polygon.prototype.animate   = function(context){
-    if(this.now.sidesCount < 3){
-        return false
-    }
+Polygon.prototype.animate   = function( context ){
+    if( this.now.sidesCount < 3 ){ return false }
+
+    var start = formula.getPointOnCircle(this.radian,this.now.radius,this.x,this.y);
 
     context.beginPath();
+    context.moveTo( start[0], start[1] );
 
-    context.moveTo(
-        formula.getPointOnCircle(this.radian,this.now.radius,this.x,this.y)[0],
-        formula.getPointOnCircle(this.radian,this.now.radius,this.x,this.y)[1]
-    );
-
-    for(var i = 0;i < this.now.sidesCount;i++){
-        context.lineTo(
-            formula.getPointOnCircle(Math.PI*2 / this.now.sidesCount * i + this.radian,this.now.radius,this.x,this.y)[0],
-            formula.getPointOnCircle(Math.PI*2 / this.now.sidesCount * i + this.radian,this.now.radius,this.x,this.y)[1]
-        );
+    for( var i = 0; i < this.now.sidesCount; i++ ){
+        var coordinate = formula.getPointOnCircle( Math.PI*2/this.now.sidesCount*i+this.radian, this.now.radius, this.x, this.y );
+        context.lineTo( coordinate[0], coordinate[1] );
     }
 
-    context.lineTo(
-        formula.getPointOnCircle(this.radian,this.now.radius,this.x,this.y)[0],
-        formula.getPointOnCircle(this.radian,this.now.radius,this.x,this.y)[1]
-    );
+    context.lineTo( start[0], start[1] );
 
     changeContext(context,this.now);
-
     context.closePath();
 };
 /**
@@ -1001,12 +992,12 @@ Polyline.prototype = Object.create(CanvasObject.prototype);
 
 Polyline.prototype.animate = function(context){
 
-    //���� ������ �� ������ �� ����������
+    //если массив не пустой то продолжить
     if(this.now.points.length < 2) {
         return
     }
 
-    //���������� ����������� ����� �� ������
+    //отобразить контрольные точки на холсте
     if(this.now.showBreakpoints){
         context.beginPath();
 
@@ -1017,7 +1008,7 @@ Polyline.prototype.animate = function(context){
     }
 
     context.beginPath();
-    //������� � ������ ��������� �������
+    //переход к началу отрисовки объекта
     context.moveTo(
         this.now.points[0][0] + this.x,
         this.now.points[0][1] + this.y
@@ -1044,7 +1035,7 @@ function EventsListing (){
     this.list   = {};
 }
 
-//��������� ?
+//проверить ?
 EventsListing.prototype.append = function(property,theComparisonValue,operation){
     if(!this.list[property]){
         this.list[property] = {};

@@ -12,12 +12,12 @@ Polyline.prototype = Object.create(CanvasObject.prototype);
 
 Polyline.prototype.animate = function(context){
 
-    //если массив не пустой то продолжить
+    //РµСЃР»Рё РјР°СЃСЃРёРІ РЅРµ РїСѓСЃС‚РѕР№ С‚Рѕ РїСЂРѕРґРѕР»Р¶РёС‚СЊ
     if(this.now.points.length < 2) {
         return
     }
 
-    //отобразить контрольные точки на холсте
+    //РѕС‚РѕР±СЂР°Р·РёС‚СЊ РєРѕРЅС‚СЂРѕР»СЊРЅС‹Рµ С‚РѕС‡РєРё РЅР° С…РѕР»СЃС‚Рµ
     if(this.now.showBreakpoints){
         context.beginPath();
 
@@ -28,7 +28,7 @@ Polyline.prototype.animate = function(context){
     }
 
     context.beginPath();
-    //переход к началу отрисовки объекта
+    //РїРµСЂРµС…РѕРґ Рє РЅР°С‡Р°Р»Сѓ РѕС‚СЂРёСЃРѕРІРєРё РѕР±СЉРµРєС‚Р°
     context.moveTo(
         this.now.points[0][0] + this.x,
         this.now.points[0][1] + this.y

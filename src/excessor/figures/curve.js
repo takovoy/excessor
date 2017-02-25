@@ -14,25 +14,27 @@ Curve.prototype = Object.create(CanvasObject.prototype);
 Object.defineProperties(CanvasObject.prototype,{
     points : {
         get: function(){
-            if(this.radian != this.services.radian){
-                if(!this.services.points){
-                    this.services.points = [];
-                }
-                var radian = this.radian - (Math.PI/4);
-                for(var key in this.now.points){
-                    this.services.points[key] = [
-                        this.now.points[key][0] * Math.cos(radian) -
-                        this.now.points[key][1] * Math.sin(radian),
-                        this.now.points[key][0] * Math.sin(radian) +
-                        this.now.points[key][1] * Math.cos(radian)
-                    ]
-                }
-                this.services.radian = this.radian;
+
+            if(!this.services.points){
+                this.services.points = [];
             }
+
+            var radian  = this.radian - ( Math.PI/4 ),
+                sin     = Math.sin( radian ),
+                cos     = Math.cos( radian );
+
+            for( var key in this.now.points ){
+                var coordinate = this.now.points[key];
+                this.services.points[key] = [
+                    coordinate[0] * cos - coordinate[1] * sin,
+                    coordinate[0] * sin + coordinate[1] * cos
+                ]
+            }
+
             return this.services.points;
+
         },
         set: function(value){
-
             this.now.points = value;
         }
     }
@@ -47,7 +49,7 @@ Curve.prototype.animate = function(context){
     if(this.now.showBreakpoints){
         context.beginPath();
 
-        markControlPoints( this.points, context, this);
+        markControlPoints( this.points, context, this );
 
         context.fill();
         context.closePath();

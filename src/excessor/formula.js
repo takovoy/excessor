@@ -81,14 +81,14 @@ var formula = {
     changeColor : function(start,end,shift){
         var result      = [];
 
-        //проверка начальной позиции
+        //РїСЂРѕРІРµСЂРєР° РЅР°С‡Р°Р»СЊРЅРѕР№ РїРѕР·РёС†РёРё
         if ( isRGBA(start) || isRGB(start) ) {
             start = formula.RGBtoRGBA(start);
         } else if ( isHEXColor(start) ) {
             start = formula.HEXtoRGBA(start)
         }
 
-        //проверка конечной позиции
+        //РїСЂРѕРІРµСЂРєР° РєРѕРЅРµС‡РЅРѕР№ РїРѕР·РёС†РёРё
         if ( isRGBA(end) || isRGB(end) ) {
             end = formula.RGBtoRGBA(end);
         } else if ( isHEXColor(end) ) {

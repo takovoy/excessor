@@ -6,7 +6,7 @@ function EventsListing (){
     this.list   = {};
 }
 
-//проверить ?
+//РїСЂРѕРІРµСЂРёС‚СЊ ?
 EventsListing.prototype.append = function(property,theComparisonValue,operation){
     if(!this.list[property]){
         this.list[property] = {};

@@ -2,7 +2,7 @@
  * Created by takovoy on 31.07.2016.
  */
 
-// отмечает контрольные точки на холсте кружочками в 4 пикселя
+// РѕС‚РјРµС‡Р°РµС‚ РєРѕРЅС‚СЂРѕР»СЊРЅС‹Рµ С‚РѕС‡РєРё РЅР° С…РѕР»СЃС‚Рµ РєСЂСѓР¶РѕС‡РєР°РјРё РІ 4 РїРёРєСЃРµР»СЏ
 function markControlPoints ( points, context, corrective){
     corrective = corrective || {};
 
