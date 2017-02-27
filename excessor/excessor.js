@@ -169,8 +169,6 @@ function Cluster ( count, correlation ){
 
 Cluster.prototype = Object.create( CanvasObject.prototype );
 
-
-// отчистка метода трансформации
 Cluster.prototype.transform = function(){
     if( !this._transform ){
         this._transform = new Listing();
@@ -178,9 +176,6 @@ Cluster.prototype.transform = function(){
     return this._transform;
 };
 
-
-// для кластеров анимация зацикленна в рекурсию
-// каждая итерация выводит новый элемент кластера
 Cluster.prototype.animate = function(){
     if( this.iteration > this.count ){
         this.iteration = 1;
@@ -192,7 +187,6 @@ Cluster.prototype.animate = function(){
     this.animate();
 };
 
-// параметры описаные дескриптором неизменяемы и возвращают данные уже изменённые согласно объекту correlation
 Object.defineProperties( Cluster.prototype,{
     now     : {
         get : function(){
@@ -217,6 +211,8 @@ Object.defineProperties( Cluster.prototype,{
             return this.parameters.list;
         }
     },
+
+
     x       : {
         get : function(){
             if( this.parent.parent ){
@@ -251,7 +247,7 @@ Object.defineProperties( Cluster.prototype,{
 
     radian  : {
         get: function(){
-            if( this.parent ){
+            if( this.parent.parent ){
                 return +this.parent.parent.radian + +this.now.radian;
             }
             return +this.now.radian;
@@ -858,7 +854,7 @@ Curve.prototype.animate = function(context){
     if(this.now.showBreakpoints){
         context.beginPath();
 
-        markControlPoints( this.points, context, this);
+        markControlPoints( this.points, context, this );
 
         context.fill();
         context.closePath();
