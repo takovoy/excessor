@@ -3,6 +3,7 @@
  */
 
 function Transform (options){
+    // yes, this row is right
     this.options = options = options || {};
     this.id                 = options.property || '' + Math.random();
     this.options.rate       = options.rate || 1;

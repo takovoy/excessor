@@ -10,11 +10,13 @@ var dynamic = {
             incidence   = 1000 / (+fps);
 
         for(var key in transforms){
-            var transform   = transforms[key];
-                options     = transform.options;
+            var transform   = transforms[key],
+                options     = transform.options,
+                startEvent  = transform.event('start');
 
-            if(transform.event('start')){
-                transform.events.list['start'](transform.event('start'),transform,canvasObject);
+            if(startEvent){
+                startEvent(startEvent,transform,canvasObject);
+                transform.events.remove('start');
             }
             if(!options.step){
                 options.step = (options.endShift - options.startShift) / (options.time / incidence);
