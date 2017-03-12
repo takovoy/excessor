@@ -2,12 +2,12 @@
  * Created by takovoy on 30.11.2014.
  */
 
-var Circle = function( options ){
+function Circle ( options ) {
     CanvasObject.apply( this, arguments );
     this.constructor    = Circle;
     this.now.radius     = this.now.radius || options.radius || 0;
     this.now.shift      = this.now.shift || options.shift || 100;
-};
+}
 
 Circle.prototype = Object.create( CanvasObject.prototype );
 

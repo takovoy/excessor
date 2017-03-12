@@ -2,14 +2,14 @@
  * Created by takovoy on 22.01.2015.
  */
 
-var Curve = function(options){
+function Curve ( options ) {
     CanvasObject.apply(this,arguments);
     this.constructor    = Curve;
     this.now.points     = this.now.points || options.points || [];
     this.services.points= [];
-};
+}
 
-Curve.prototype = Object.create(CanvasObject.prototype);
+Curve.prototype = Object.create( CanvasObject.prototype );
 
 Object.defineProperties(CanvasObject.prototype,{
     points : {

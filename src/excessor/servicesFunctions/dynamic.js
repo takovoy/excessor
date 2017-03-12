@@ -24,9 +24,9 @@ var dynamic = {
 
             //the increase in displacement
             if(!transform.reverse){
-                options.shift    += +options.step * options.rate;
+                options.shift += +options.step * options.rate;
             } else {
-                options.shift    -= +options.step * options.rate;
+                options.shift -= +options.step * options.rate;
             }
 
             //processing frame

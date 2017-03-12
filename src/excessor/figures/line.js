@@ -2,12 +2,12 @@
  * Created by takovoy on 12.12.2014.
  */
 
-var Line = function(options){
+function Line ( options ) {
     CanvasObject.apply(this,arguments);
     this.constructor    = Line;
     this.now.points     = this.now.points || options.points || [];
     this.services.points= [];
-};
+}
 
 Line.prototype = Object.create(CanvasObject.prototype);
 

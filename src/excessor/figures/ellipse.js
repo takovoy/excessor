@@ -2,16 +2,11 @@
  * Created by takovoySuper on 25.06.2015.
  */
 
-var Ellipse = function(id,drawingObject,options){
-    this.now            = options || {};
-    this.id             = id || '' + Math.random();
-    this.constructor    = Ellipse;
-    if(drawingObject){
-        this.drawingObject = drawingObject;
-    }
-
-    this.now.step = this.now.step || 0.1;
-};
+function Ellipse ( options ) {
+    CanvasObject.apply(this,arguments);
+    this.constructor= Ellipse;
+    this.now.step   = this.now.step || 0.1;
+}
 
 Ellipse.prototype = Object.create(CanvasObject.prototype);
 

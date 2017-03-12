@@ -2,12 +2,12 @@
  * Created by Пользователь on 06.03.2015.
  */
 
-var changeContext = function(context,value){
+function changeContext (context,value){
     for(var key in value){
         if(!dataContextChanges[key] || !value[key])continue;
         dataContextChanges[key](context,value[key]);
     }
-};
+}
 
 var dataContextChanges = {
 

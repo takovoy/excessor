@@ -2,12 +2,12 @@
  * Created by Пользователь on 21.01.2015.
  */
 
-var Polygon = function( options ){
+function Polygon ( options ) {
     CanvasObject.apply( this, arguments );
     this.constructor        = Polygon;
     this.now.sidesCount     = this.now.sidesCount || options.sidesCount || 3;
     this.now.radius         = this.now.radius || options.radius || 0;
-};
+}
 
 Polygon.prototype           = Object.create( CanvasObject.prototype );
 

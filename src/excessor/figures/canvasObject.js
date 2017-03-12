@@ -2,7 +2,7 @@
  * Created by takovoy on 22.11.2014.
  */
 
-var CanvasObject = function( options ){
+function CanvasObject ( options ) {
     options             = options || {};
     this.id             = options.id || '' + Math.random();
     this.now            = options.settings || {};
@@ -24,7 +24,7 @@ var CanvasObject = function( options ){
         this
     );
     this.drawing = options.drawing || undefined;
-};
+}
 
 Object.defineProperties(CanvasObject.prototype,{
     x       : {
