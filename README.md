@@ -22,7 +22,7 @@ var circle = new Circle({
     // объект холста на котором необходимо отрисовать круг
     drawing : myDrawing,
     // объект свойств для отрисовки
-    now     : {
+    settings: {
         radius  : 40,
         fill    : "#000000"
     }
@@ -58,13 +58,13 @@ ___
 name    | type
 --------|---------------------------------
 id      | random number from 0 to 1
-now     | object (настройки для отрисовки)
+settings| object (настройки для отрисовки)
 x       | number
 y       | number
 radian  | number
 drawing | Drawing Object
 
-Список параметров объекта `now`
+Список параметров объекта `settings`
 
 name        | type                  | used classes
 ------------|-----------------------|----------------
@@ -117,7 +117,7 @@ ___
 ```js
 var curve = new Curve({
     id: "my wonder curve",
-    now: {
+    settings: {
         ...
         points  : [ [x1,y1], [x2,y2] ]
         ...
