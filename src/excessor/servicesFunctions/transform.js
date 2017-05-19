@@ -2,7 +2,7 @@
  * Created by 1 on 11.11.2015.
  */
 
-function Transform (options){
+function Transform ( options ) {
     // yes, this row is right
     this.options = options = options || {};
     this.id                 = options.property || '' + Math.random();
@@ -18,6 +18,10 @@ function Transform (options){
     this.options.recourse   = !!options.recourse;
     this.reverse            = false;
 }
+
+Transform.prototype.shift = function ( correlation ) {
+
+};
 
 Transform.prototype.play = function(rate){
     this.options.rate = rate || 1;

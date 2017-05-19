@@ -39,6 +39,23 @@ myDrawing.fps = 30;
 circle.start();
 ```
 
+Список методов класса `Drawing`
+
+name    | arguments
+--------|---------------------------------
+render()| canvasObject, id
+pause() | none
+play()  | none
+
+Список свойств класса `Drawing`
+
+name        | type
+------------|---------------------------------
+DOMObject   | DOM canvas object
+context     | canvas 2d context
+stack       | listObject
+fps         | number
+
 ___
 
 `new CanvasObject(options)`
@@ -70,7 +87,7 @@ name        | type                  | used classes
 ------------|-----------------------|----------------
 fill        | HEX or RGB            | all
 stroke      | HEX or RGB            | all
-strokeWidth | number                | all
+lineWidth   | number                | all
 x           | number                | all
 y           | number                | all
 radian      | number                | all

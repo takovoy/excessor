@@ -32,3 +32,15 @@ function Scene (width,height){
 }
 
 Scene.prototype = Object.create(Drawing.prototype);
+
+
+PropertyListing.prototype.append = function (object) {
+    this.list[object.id] = object;
+    var result = this.up(this.parent,object);
+    object.DOMObject;
+    return this.up(this.parent,object);
+};
+PropertyListing.prototype.remove = function (id) {
+    delete this.list[id];
+    this.rem(this.parent);
+};
