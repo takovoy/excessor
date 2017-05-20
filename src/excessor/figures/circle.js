@@ -13,7 +13,8 @@ Circle.prototype = Object.create( CanvasObject.prototype );
 
 Circle.prototype.animate = function( context ){
     context.beginPath();
-    context.arc( this.x, this.y, this.now.radius, 0, Math.PI*2/100*this.now.shift );
+    var radian = this.radian;
+    context.arc( this.x, this.y, this.now.radius, radian, Math.PI*2/100*this.now.shift + radian );
     changeContext( context, this.now );
     context.closePath();
 };

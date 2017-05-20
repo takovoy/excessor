@@ -14,6 +14,10 @@ function parsir (obj, parent, scene){
             elem[prop] = obj[key].properties[prop];
         }
 
+        for(var attr in obj[key].attributes){
+            elem.setAttribute(attr,obj[key].attributes[attr]);
+        }
+
         for(var event in obj[key].events){
             elem.addEventListener(event,obj[key].events[event])
         }
@@ -71,6 +75,41 @@ function Scene (width,height){
 }
 
 Scene.prototype = Object.create(Drawing.prototype);
+
+
+PropertyListing.prototype.append = function (object) {
+    this.list[object.id] = object;
+    var result = this.up(this.parent,object);
+    var list = scenarioTemplates.objectManager.childs.list.dom;
+    list.innerHTML = '';
+    list.appendChild(
+        getSceneStructure(object.drawing)
+    );
+    return this.up(this.parent,object);
+};
+PropertyListing.prototype.remove = function (id) {
+    delete this.list[id];
+    this.rem(this.parent);
+};
+function getSceneStructure ( scene ){
+    var map = arguments[1] || scene.stack.getObjectsMap();
+    var template = {};
+    for(var key in map){
+        template[key] = {
+            attributes : {
+                'data-id' : key
+            },
+            properties : {
+                'innerHTML' : key
+            }
+        };
+        template[key].childs = getSceneStructure( scene, map[key] );
+    }
+    if(!arguments[1]){
+        return parsir(template,false,scene);
+    }
+    return template
+}
 /**
  * Created by takovoy on 07.07.2016.
  */

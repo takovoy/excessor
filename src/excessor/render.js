@@ -34,8 +34,8 @@ Drawing.prototype.pause = function(){
     this._fps   = fps;
 };
 
-Drawing.prototype.play = function(){
-    this.fps    = this.fps;
+Drawing.prototype.play = function(fps){
+    this.fps    = +fps || this.fps;
 };
 
 Object.defineProperty(Drawing.prototype,'fps',{

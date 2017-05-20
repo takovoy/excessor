@@ -14,6 +14,10 @@ function parsir (obj, parent, scene){
             elem[prop] = obj[key].properties[prop];
         }
 
+        for(var attr in obj[key].attributes){
+            elem.setAttribute(attr,obj[key].attributes[attr]);
+        }
+
         for(var event in obj[key].events){
             elem.addEventListener(event,obj[key].events[event])
         }

@@ -37,7 +37,11 @@ Scene.prototype = Object.create(Drawing.prototype);
 PropertyListing.prototype.append = function (object) {
     this.list[object.id] = object;
     var result = this.up(this.parent,object);
-    object.DOMObject;
+    var list = scenarioTemplates.objectManager.childs.list.dom;
+    list.innerHTML = '';
+    list.appendChild(
+        getSceneStructure(object.drawing)
+    );
     return this.up(this.parent,object);
 };
 PropertyListing.prototype.remove = function (id) {
