@@ -152,3 +152,61 @@ ___
 В качестве коэфициента может быть либо число либо функция, 
 возвращающая необходимое число, согласно передаваемым ей параметрам.  
 Так же является наследником CanvasObject, но некоторые методы изменены.
+
+___
+
+`new Transform( options )`
+
+Конструктор анимаций, формируется такими методами как `.move() .moveProperty()`. 
+После использования данные методы возвращают графический объект на котором была применена анимация. 
+Последняя использованая анимация находится в свойстве `.operationContext` графического объекта.
+
+Пример использования:
+
+```js
+//создание объекта circle см. выше
+
+circle.moveProperty('radius',50,1000); //move radius; 40px -> 50px; time 1s
+var transform = circle.operationContext;
+
+or
+
+var transform = circle.moveProperty('radius',50,1000).operationContext;
+
+transform.event(50,function(event,transform,circle){ //complete 50% of animate
+    transform.pause();
+    //...
+    //something operations
+    //...
+});
+```
+
+Список методов класса `Transform`
+
+name    | arguments
+--------|---------------------------------
+stop()  | none
+pause() | none
+play()  | none
+repeat()| none
+event() | state of animate, function
+
+Список свойств класса `Transform`
+
+name        | type
+------------|---------------------------------
+options     | object
+id          | string
+events      | listObject
+reverse     | boolean
+
+Список свойств объекта `Transform.options`
+
+name        | type
+------------|---------------------------------
+endShift    | number
+startShift  | number
+start       | number
+end         | number
+time        | number
+recourse    | boolean
