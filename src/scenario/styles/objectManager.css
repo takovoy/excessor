@@ -10,6 +10,7 @@
 .scenario-objectManager > div {
     position: relative;
     border-bottom: solid 1px #f0f0f0;
+    overflow: hidden;
 }
 
 .scenario-objectManager button.collapse {
@@ -18,4 +19,16 @@
 
 .scenario-objectManager > .topMenu {
 
+}
+
+.scenario-objectManager .obj {
+    cursor: pointer;
+}
+
+.scenario-objectManager .obj:hover {
+    background: #eeeeee;
+}
+
+.scenario-objectManager .obj .obj {
+    padding-left: 5px;
 }
