@@ -135,9 +135,9 @@ ___
 var curve = new Curve({
     id: "my wonder curve",
     settings: {
-        ...
+        //...
         points  : [ [x1,y1], [x2,y2] ]
-        ...
+        //...
     }
 })
 ```
@@ -153,11 +153,45 @@ ___
 возвращающая необходимое число, согласно передаваемым ей параметрам.  
 Так же является наследником CanvasObject, но некоторые методы изменены.
 
+Пример использования:
+
+```js
+
+//создание объекта circle см. выше
+
+var cluster = new Cluster(150,{x : 15});
+circle.append(cluster);
+
+//else example
+
+var cluster = new Cluster(100,{
+    x : function(iteration,cluster){
+        return formula.getPointOnCircle(
+                (Math.PI*2/(cluster.count + 1)) * (iteration + 1),
+                externalRadius,
+                -cluster.parent.now.x,
+                -cluster.parent.now.y
+            )[0] / iteration
+    },
+    y : function(iteration,cluster){
+        return formula.getPointOnCircle(
+                (Math.PI*2/(cluster.count + 1)) * (iteration + 1),
+                externalRadius,
+                -cluster.parent.now.x,
+                -cluster.parent.now.y
+            )[1] / iteration
+    }
+});
+circle.append(cluster);
+
+```
+
 ___
 
 `new Transform( options )`
 
-Конструктор анимаций, формируется такими методами как `.move() .moveProperty()`. 
+Конструктор анимаций, формируется такими методами как `.move() .moveProperty()` 
+где большинство параметров формируются автоматически. 
 После использования данные методы возвращают графический объект на котором была применена анимация. 
 Последняя использованая анимация находится в свойстве `.operationContext` графического объекта.
 
@@ -165,16 +199,18 @@ ___
 
 ```js
 //создание объекта circle см. выше
-
+//----------
 circle.moveProperty('radius',50,1000); //move radius; 40px -> 50px; time 1s
 var transform = circle.operationContext;
-
-or
-
+//or
 var transform = circle.moveProperty('radius',50,1000).operationContext;
+//----------
 
 transform.event(50,function(event,transform,circle){ //complete 50% of animate
     transform.pause();
+    circle
+        .move([80,120],1500) //move coordinate to x=80px y=120px
+        .moveProperty('fill','#ff0000',1200);
     //...
     //something operations
     //...
