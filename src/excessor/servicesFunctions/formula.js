@@ -56,9 +56,6 @@ var formula = {
         return Math.sqrt(Math.pow(coordinates[0],2) + Math.pow(coordinates[1],2));
     },
 
-    /**
-     * @return {Array}
-     */
     HEXtoRGBA    : function(color){
         var rgba = [];
         rgba[0]  = parseInt(color.substring(1,3),16);
@@ -100,5 +97,31 @@ var formula = {
         }
         var opacity = +(+start[3] + (+end[3] - +start[3]) / 100 * shift).toFixed(4);
         return 'rgba(' + result[0] + ',' + result[1] + ',' + result[2] + ',' + opacity + ')';
+    }
+};
+
+formula.getLengthOfCurve = function (points, step) {
+    if(points.length == 2){
+        return this.getPointOnLine(shift,points);
+    }
+    var pointsPP = [];
+    for(var i = 1;i < points.length;i++){
+        pointsPP.push(this.getPointOnLine(shift,[
+            points[i - 1],
+            points[i]
+        ]));
+    }
+    return this.getPointOnCurve(shift,pointsPP);
+};
+
+formula.getMapOfSpline = function (points, step) {
+    var map = [];
+    var index = 0;
+    for(var i = 0;points[i];i++){
+        var curvePointsCount = map[index].length;
+        if(!curvePointsCount){
+            map[index] = [];
+        }
+        map[index][+curvePointsCount] = points[i];
     }
 };

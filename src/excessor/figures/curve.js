@@ -6,6 +6,7 @@ function Curve ( options ) {
     CanvasObject.apply(this,arguments);
     this.constructor    = Curve;
     this.now.points     = this.now.points || options.points || [];
+    this.now.step       = +this.now.step || +options.step || 1;
     this.services.points= [];
 }
 
