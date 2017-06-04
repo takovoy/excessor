@@ -101,27 +101,45 @@ var formula = {
 };
 
 formula.getLengthOfCurve = function (points, step) {
-    if(points.length == 2){
-        return this.getPointOnLine(shift,points);
+    var result = 0;
+    var lastPoint = points[0];
+    for(var sift = 0;sift <= 100;sift += step){
+        var coord = formula.getPointOnCurve(sift,points);
+        result += formula.getCenterToPointDistance([
+            coord[0] - lastPoint[0],
+            coord[1] - lastPoint[1]
+        ]);
+        lastPoint = coord;
     }
-    var pointsPP = [];
-    for(var i = 1;i < points.length;i++){
-        pointsPP.push(this.getPointOnLine(shift,[
-            points[i - 1],
-            points[i]
-        ]));
-    }
-    return this.getPointOnCurve(shift,pointsPP);
+    return result;
 };
 
 formula.getMapOfSpline = function (points, step) {
-    var map = [];
+    var map = [[]];
     var index = 0;
     for(var i = 0;points[i];i++){
         var curvePointsCount = map[index].length;
-        if(!curvePointsCount){
-            map[index] = [];
-        }
         map[index][+curvePointsCount] = points[i];
+        if(points[i][2] && i != points.length - 1){
+            map[index] = formula.getLengthOfCurve(map[index],step);
+            index++;
+            map[index] = [points[i]];
+        }
     }
+    map[index] = formula.getLengthOfCurve(map[index],step);
+    return map;
+};
+
+formula.getPointOnSpline = function (shift, points, services) {
+    var shiftLength = services.length / 100 * shift;
+    var lastControlPoint = 0;
+    var counter = 0;
+    for(var key in services.map){
+        counter += services.map[key];
+        if(counter > shiftLength){
+            lastControlPoint = key;
+            break;
+        }
+    }
+
 };

@@ -57,6 +57,85 @@ Object.defineProperty(Drawing.prototype,'fps',{
     }
 });
 /**
+ * Created by takovoySuper on 12.05.2015.
+ */
+
+function EventsListing (){
+    this.list   = {};
+}
+
+//проверить ?
+EventsListing.prototype.append = function(property,theComparisonValue,operation){
+    if(!this.list[property]){
+        this.list[property] = {};
+    }
+    if(!this.list[property][theComparisonValue]){
+        this.list[property][theComparisonValue] = [];
+    }
+    this.list[property][theComparisonValue].push(operation);
+};
+EventsListing.prototype.remove = function(property,theComparisonValue){
+    if(!theComparisonValue){
+        delete this.list[property];
+        return
+    }
+    delete this.list[property][theComparisonValue];
+    if(Object.keys(this.list[property]).length == 0){
+        delete this.list[property];
+    }
+};
+/**
+ * Created by takovoySuper on 14.04.2015.
+ */
+
+function Listing (){
+    this.list   = {};
+    this.append = function(name,data){
+        this.list[name] = data;
+    };
+    this.remove = function(name){
+        delete this.list[name];
+    };
+}
+/**
+ * Created by takovoy on 17.02.2015.
+ */
+
+function PropertyListing (append,remove,parent){
+    this.list   = {};
+    this.up     = append || function(){};
+    this.rem    = remove || function(){};
+    this.parent = parent;
+}
+
+PropertyListing.prototype.append = function (object) {
+    this.list[object.id] = object;
+    return this.up(this.parent,object);
+};
+PropertyListing.prototype.remove = function (id) {
+    delete this.list[id];
+    this.rem(this.parent);
+};
+PropertyListing.prototype.getObject = function (id,recourse) {
+    if(!recourse){
+        return this.list[id];
+    } else {
+        for(var key in this.list){
+            if(key == id)   {return this.list[key];}
+            var object = this.list[key].childrens.getObject(id,true);
+            if(object)      {return object;}
+        }
+        return false
+    }
+};
+PropertyListing.prototype.getObjectsMap = function(){
+    var map = {};
+    for(var key in this.list){
+        map[key] = this.list[key].childrens.getObjectsMap();
+    }
+    return map;
+};
+/**
  * Created by takovoy on 22.11.2014.
  */
 
@@ -315,6 +394,7 @@ Object.defineProperties( Cluster.prototype,{
 function Curve ( options ) {
     CanvasObject.apply(this,arguments);
     this.constructor    = Curve;
+    this.now.step       = +this.now.step || +options.step || 1;
     this.now.points     = this.now.points || options.points || [];
     this.services.points= [];
 }
@@ -345,6 +425,7 @@ Object.defineProperties(CanvasObject.prototype,{
 
         },
         set: function(value){
+            this.services.map = formula.getMapOfSpline(value,this.now.step);
             this.now.points = value;
         }
     }
@@ -522,85 +603,6 @@ Polyline.prototype.animate = function(context){
     changeContext(context,this.now);
 
     context.closePath();
-};
-/**
- * Created by takovoySuper on 12.05.2015.
- */
-
-function EventsListing (){
-    this.list   = {};
-}
-
-//проверить ?
-EventsListing.prototype.append = function(property,theComparisonValue,operation){
-    if(!this.list[property]){
-        this.list[property] = {};
-    }
-    if(!this.list[property][theComparisonValue]){
-        this.list[property][theComparisonValue] = [];
-    }
-    this.list[property][theComparisonValue].push(operation);
-};
-EventsListing.prototype.remove = function(property,theComparisonValue){
-    if(!theComparisonValue){
-        delete this.list[property];
-        return
-    }
-    delete this.list[property][theComparisonValue];
-    if(Object.keys(this.list[property]).length == 0){
-        delete this.list[property];
-    }
-};
-/**
- * Created by takovoySuper on 14.04.2015.
- */
-
-function Listing (){
-    this.list   = {};
-    this.append = function(name,data){
-        this.list[name] = data;
-    };
-    this.remove = function(name){
-        delete this.list[name];
-    };
-}
-/**
- * Created by takovoy on 17.02.2015.
- */
-
-function PropertyListing (append,remove,parent){
-    this.list   = {};
-    this.up     = append || function(){};
-    this.rem    = remove || function(){};
-    this.parent = parent;
-}
-
-PropertyListing.prototype.append = function (object) {
-    this.list[object.id] = object;
-    return this.up(this.parent,object);
-};
-PropertyListing.prototype.remove = function (id) {
-    delete this.list[id];
-    this.rem(this.parent);
-};
-PropertyListing.prototype.getObject = function (id,recourse) {
-    if(!recourse){
-        return this.list[id];
-    } else {
-        for(var key in this.list){
-            if(key == id)   {return this.list[key];}
-            var object = this.list[key].childrens.getObject(id,true);
-            if(object)      {return object;}
-        }
-        return false
-    }
-};
-PropertyListing.prototype.getObjectsMap = function(){
-    var map = {};
-    for(var key in this.list){
-        map[key] = this.list[key].childrens.getObjectsMap();
-    }
-    return map;
 };
 /**
  * Created by takovoy on 31.07.2016.
@@ -942,9 +944,6 @@ var formula = {
         return Math.sqrt(Math.pow(coordinates[0],2) + Math.pow(coordinates[1],2));
     },
 
-    /**
-     * @return {Array}
-     */
     HEXtoRGBA    : function(color){
         var rgba = [];
         rgba[0]  = parseInt(color.substring(1,3),16);
@@ -987,6 +986,36 @@ var formula = {
         var opacity = +(+start[3] + (+end[3] - +start[3]) / 100 * shift).toFixed(4);
         return 'rgba(' + result[0] + ',' + result[1] + ',' + result[2] + ',' + opacity + ')';
     }
+};
+
+formula.getLengthOfCurve = function (points, step) {
+    var result = 0;
+    var lastPoint = points[0];
+    for(var sift = 0;sift <= 100;sift += step){
+        var coord = formula.getPointOnCurve(sift,points);
+        result += formula.getCenterToPointDistance([
+            coord[0] - lastPoint[0],
+            coord[1] - lastPoint[1]
+        ]);
+        lastPoint = coord;
+    }
+    return result;
+};
+
+formula.getMapOfSpline = function (points, step) {
+    var map = [[]];
+    var index = 0;
+    for(var i = 0;points[i];i++){
+        var curvePointsCount = map[index].length;
+        map[index][+curvePointsCount] = points[i];
+        if(points[i][2] && i != points.length - 1){
+            map[index] = formula.getLengthOfCurve(map[index],step);
+            index++;
+            map[index] = [points[i]];
+        }
+    }
+    map[index] = formula.getLengthOfCurve(map[index],step);
+    return map;
 };
 /**
  * Created by takovoySuper on 11.04.2015.
