@@ -160,7 +160,7 @@ var dynamic = {
                     end         = transform.options.end,
                     shift       = transform.options.shift;
 
-                canvasObject.now.points = this.functions.pointsRecourse(start,end,shift);
+                canvasObject.points = this.functions.pointsRecourse(start,end,shift);
             },
 
             functions   : {

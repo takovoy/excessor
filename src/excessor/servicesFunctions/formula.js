@@ -32,7 +32,7 @@ var formula = {
         return coord;
     },
 
-    getPointOnCurve: function(shift,points){
+    getPointOnCurve: function(shift,points,debug){
         if(points.length == 2){
             return this.getPointOnLine(shift,points);
         }
@@ -43,7 +43,11 @@ var formula = {
                 points[i]
             ]));
         }
-        return this.getPointOnCurve(shift,pointsPP);
+        try {
+            return this.getPointOnCurve(shift,pointsPP);
+        } catch (error) {
+            //console.log(arguments);
+        }
     },
 
     getPointOnLine: function(shift,points){
@@ -104,7 +108,7 @@ formula.getLengthOfCurve = function (points, step) {
     var result = 0;
     var lastPoint = points[0];
     for(var sift = 0;sift <= 100;sift += step){
-        var coord = formula.getPointOnCurve(sift,points);
+        var coord = formula.getPointOnCurve(sift,points,'getLengthOfCurve');
         result += formula.getCenterToPointDistance([
             coord[0] - lastPoint[0],
             coord[1] - lastPoint[1]
@@ -132,14 +136,28 @@ formula.getMapOfSpline = function (points, step) {
 
 formula.getPointOnSpline = function (shift, points, services) {
     var shiftLength = services.length / 100 * shift;
+    if(shift >= 100){
+        shiftLength = services.length;
+    }
+    var counter = services.map[0];
     var lastControlPoint = 0;
-    var counter = 0;
-    for(var key in services.map){
-        counter += services.map[key];
-        if(counter > shiftLength){
-            lastControlPoint = key;
-            break;
+    var pointIndex = 0;
+    var controlPointsCounter = 0;
+    var checkedCurve = [];
+    for(; services.map[lastControlPoint] && counter < shiftLength; lastControlPoint++){
+        counter += services.map[lastControlPoint];
+    }
+    for(; points[pointIndex] && controlPointsCounter <= lastControlPoint; pointIndex++){
+        if(points[pointIndex][3]){
+            controlPointsCounter++;
+        }
+        if(controlPointsCounter >= lastControlPoint){
+            checkedCurve.push(points[pointIndex]);
         }
     }
-
+    var checkedCurveShift = (services.map[lastControlPoint] - (counter-shiftLength)) / (services.map[lastControlPoint] / 100);
+    return formula.getPointOnCurve(
+        checkedCurveShift,
+        checkedCurve,'getPointOnSpline'
+    );
 };

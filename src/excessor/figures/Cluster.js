@@ -102,5 +102,14 @@ Object.defineProperties( Cluster.prototype,{
         set: function( value ){
             return +this.now.radian;
         }
+    },
+
+    services: {
+        get: function(){
+            return this.parent.services;
+        },
+        set: function( value ){
+
+        }
     }
 });

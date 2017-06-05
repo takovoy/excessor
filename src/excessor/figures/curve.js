@@ -6,7 +6,7 @@ function Curve ( options ) {
     CanvasObject.apply(this,arguments);
     this.constructor    = Curve;
     this.now.step       = +this.now.step || +options.step || 1;
-    this.now.points     = this.now.points || options.points || [];
+    this.points         = this.now.points || options.points || [];
     this.services.points= [];
 }
 
@@ -36,8 +36,8 @@ Object.defineProperties(CanvasObject.prototype,{
 
         },
         set: function(value){
-            this.services.map = formula.getMapOfSpline(value,this.now.step);
-            this.services.length = 0;
+            this.services.map   = formula.getMapOfSpline(value,this.now.step);
+            this.services.length= 0;
             for(var key in this.services.map){
                 this.services.length += this.services.map[key];
             }
@@ -68,11 +68,12 @@ Curve.prototype.animate = function(context){
     );
 
     if(this.now.shift > 100){
-        this.now.shift = 101;
+        this.now.shift = 100;
     }
 
     for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnCurve(i,this.points);
+        var coord = formula.getPointOnSpline(i,this.points,this.services);
+        //var coord = formula.getPointOnCurve(i,this.points);
         context.lineTo(coord[0] + this.x,coord[1] + this.y);
     }
 
