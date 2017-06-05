@@ -32,7 +32,7 @@ var formula = {
         return coord;
     },
 
-    getPointOnCurve: function(shift,points,debug){
+    getPointOnCurve: function(shift,points){
         if(points.length == 2){
             return this.getPointOnLine(shift,points);
         }
@@ -43,11 +43,7 @@ var formula = {
                 points[i]
             ]));
         }
-        try {
-            return this.getPointOnCurve(shift,pointsPP);
-        } catch (error) {
-            //console.log(arguments);
-        }
+        return this.getPointOnCurve(shift,pointsPP);
     },
 
     getPointOnLine: function(shift,points){
@@ -108,7 +104,7 @@ formula.getLengthOfCurve = function (points, step) {
     var result = 0;
     var lastPoint = points[0];
     for(var sift = 0;sift <= 100;sift += step){
-        var coord = formula.getPointOnCurve(sift,points,'getLengthOfCurve');
+        var coord = formula.getPointOnCurve(sift,points);
         result += formula.getCenterToPointDistance([
             coord[0] - lastPoint[0],
             coord[1] - lastPoint[1]
@@ -155,9 +151,8 @@ formula.getPointOnSpline = function (shift, points, services) {
             checkedCurve.push(points[pointIndex]);
         }
     }
-    var checkedCurveShift = (services.map[lastControlPoint] - (counter-shiftLength)) / (services.map[lastControlPoint] / 100);
     return formula.getPointOnCurve(
-        checkedCurveShift,
-        checkedCurve,'getPointOnSpline'
+        (services.map[lastControlPoint] - (counter-shiftLength)) / (services.map[lastControlPoint] / 100),
+        checkedCurve
     );
 };
