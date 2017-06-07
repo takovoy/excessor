@@ -28,7 +28,8 @@ Object.defineProperties(CanvasObject.prototype,{
                 var coordinate = this.now.points[key];
                 this.services.points[key] = [
                     coordinate[0] * cos - coordinate[1] * sin,
-                    coordinate[0] * sin + coordinate[1] * cos
+                    coordinate[0] * sin + coordinate[1] * cos,
+                    coordinate[2]
                 ]
             }
 
