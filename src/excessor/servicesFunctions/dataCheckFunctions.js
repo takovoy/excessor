@@ -7,15 +7,15 @@ function isNotNegativeNumber (value) {
 }
 
 function isHEXColor (string) {
-    return string.length === 7 && string.search(/#[0-9a-f]{6}/i) === 0
+    return (string.length === 7 && string.search(/#[0-9a-f]{6}/i) === 0) || (string.length === 4 && string.search(/#[0-9a-f]{3}/i) === 0)
 }
 
 function isRGB (string) {
-    return string.search(/rgb\((\d{1,3},){2}\d{1,3}\)/i) === 0
+    return string.search(/rgb\(( ?\d{1,3},){2} ?\d{1,3}\)/i) === 0
 }
 
 function isRGBA (string) {
-    return string.search(/rgba\((\d{1,3},){3}(\d(\.\d+)?)\)/i) === 0
+    return string.search(/rgba\(( ?\d{1,3},){3}( ?\d(\.\d+)?)\)/i) === 0
 }
 
 function isColor (string) {

@@ -58,10 +58,17 @@ var formula = {
 
     HEXtoRGBA    : function(color){
         var rgba = [];
-        rgba[0]  = parseInt(color.substring(1,3),16);
-        rgba[1]  = parseInt(color.substring(3,5),16);
-        rgba[2]  = parseInt(color.substring(5),16);
-        rgba[3]  = 1;
+        if(color.length === 4){
+            rgba[0] = parseInt(color.substring(1,2) + color.substring(1,2),16);
+            rgba[1] = parseInt(color.substring(2,3) + color.substring(2,3),16);
+            rgba[2] = parseInt(color.substring(3) + color.substring(3),16);
+        }
+        if(color.length === 7){
+            rgba[0] = parseInt(color.substring(1,3),16);
+            rgba[1] = parseInt(color.substring(3,5),16);
+            rgba[2] = parseInt(color.substring(5),16);
+        }
+        rgba[3] = 1;
         return rgba;
     },
 

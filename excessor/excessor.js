@@ -426,7 +426,8 @@ Object.defineProperties(CanvasObject.prototype,{
                 var coordinate = this.now.points[key];
                 this.services.points[key] = [
                     coordinate[0] * cos - coordinate[1] * sin,
-                    coordinate[0] * sin + coordinate[1] * cos
+                    coordinate[0] * sin + coordinate[1] * cos,
+                    coordinate[2]
                 ]
             }
 
@@ -697,15 +698,15 @@ function isNotNegativeNumber (value) {
 }
 
 function isHEXColor (string) {
-    return string.length === 7 && string.search(/#[0-9a-f]{6}/i) === 0
+    return (string.length === 7 && string.search(/#[0-9a-f]{6}/i) === 0) || (string.length === 4 && string.search(/#[0-9a-f]{3}/i) === 0)
 }
 
 function isRGB (string) {
-    return string.search(/rgb\((\d{1,3},){2}\d{1,3}\)/i) === 0
+    return string.search(/rgb\(( ?\d{1,3},){2} ?\d{1,3}\)/i) === 0
 }
 
 function isRGBA (string) {
-    return string.search(/rgba\((\d{1,3},){3}(\d(\.\d+)?)\)/i) === 0
+    return string.search(/rgba\(( ?\d{1,3},){3}( ?\d(\.\d+)?)\)/i) === 0
 }
 
 function isColor (string) {
@@ -934,7 +935,7 @@ var formula = {
         return coord;
     },
 
-    getPointOnCurve: function(shift,points,debug){
+    getPointOnCurve: function(shift,points){
         if(points.length == 2){
             return this.getPointOnLine(shift,points);
         }
@@ -945,11 +946,7 @@ var formula = {
                 points[i]
             ]));
         }
-        try {
-            return this.getPointOnCurve(shift,pointsPP);
-        } catch (error) {
-            //console.log(arguments);
-        }
+        return this.getPointOnCurve(shift,pointsPP);
     },
 
     getPointOnLine: function(shift,points){
@@ -964,10 +961,17 @@ var formula = {
 
     HEXtoRGBA    : function(color){
         var rgba = [];
-        rgba[0]  = parseInt(color.substring(1,3),16);
-        rgba[1]  = parseInt(color.substring(3,5),16);
-        rgba[2]  = parseInt(color.substring(5),16);
-        rgba[3]  = 1;
+        if(color.length === 4){
+            rgba[0] = parseInt(color.substring(1,2) + color.substring(1,2),16);
+            rgba[1] = parseInt(color.substring(2,3) + color.substring(2,3),16);
+            rgba[2] = parseInt(color.substring(3) + color.substring(3),16);
+        }
+        if(color.length === 7){
+            rgba[0] = parseInt(color.substring(1,3),16);
+            rgba[1] = parseInt(color.substring(3,5),16);
+            rgba[2] = parseInt(color.substring(5),16);
+        }
+        rgba[3] = 1;
         return rgba;
     },
 
@@ -1010,7 +1014,7 @@ formula.getLengthOfCurve = function (points, step) {
     var result = 0;
     var lastPoint = points[0];
     for(var sift = 0;sift <= 100;sift += step){
-        var coord = formula.getPointOnCurve(sift,points,'getLengthOfCurve');
+        var coord = formula.getPointOnCurve(sift,points);
         result += formula.getCenterToPointDistance([
             coord[0] - lastPoint[0],
             coord[1] - lastPoint[1]
@@ -1057,10 +1061,9 @@ formula.getPointOnSpline = function (shift, points, services) {
             checkedCurve.push(points[pointIndex]);
         }
     }
-    var checkedCurveShift = (services.map[lastControlPoint] - (counter-shiftLength)) / (services.map[lastControlPoint] / 100);
     return formula.getPointOnCurve(
-        checkedCurveShift,
-        checkedCurve,'getPointOnSpline'
+        (services.map[lastControlPoint] - (counter-shiftLength)) / (services.map[lastControlPoint] / 100),
+        checkedCurve
     );
 };
 /**
