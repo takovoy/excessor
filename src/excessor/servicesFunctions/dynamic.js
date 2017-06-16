@@ -33,7 +33,7 @@ var dynamic = {
             if(this.data[key]){
                 this.data[key].prepareData(canvasObject);
             } else {
-                canvasObject.now[key] = options.start + (options.end - options.start) / 100 * options.shift;
+                canvasObject.now[key] = options.start + (options.end - options.start) / 100 * transform.shift;
             }
 
             //initiate events
@@ -85,7 +85,7 @@ var dynamic = {
             prepareData : function(canvasObject){
                 var key         = this.type,
                     transform   = canvasObject.transform().list[key],
-                    coord       = this.functions[transform.options.type](transform.options);
+                    coord       = this.functions[transform.options.type](transform.options,transform.shift);
 
                 canvasObject.x      = coord[0];
                 canvasObject.y      = coord[1];
@@ -93,26 +93,26 @@ var dynamic = {
 
             functions   : {
 
-                circle  : function(data){
-                    var shift = Math.PI * 2 / 100 * data.shift;
+                circle  : function(data,transformShift){
+                    var shift = Math.PI * 2 / 100 * transformShift;
 
                     if(data.reverse){
-                        shift = Math.PI * 2 - Math.PI * 2 / 100 * data.shift
+                        shift = Math.PI * 2 - Math.PI * 2 / 100 * transformShift
                     }
 
                     return formula.getPointOnCircle(shift, data.radius, data.center[0], data.center[1]);
                 },
 
-                polygon : function(data){
+                polygon : function(data,shift){
 
                 },
 
-                line    : function(data){
-                    return formula.getPointOnLine(data.shift,data.points);
+                line    : function(data,shift){
+                    return formula.getPointOnLine(shift,data.points);
                 },
 
-                curve   : function(data){
-                    return formula.getPointOnCurve(data.shift,data.points);
+                curve   : function(data,shift){
+                    return formula.getPointOnCurve(shift,data.points);
                 }
 
             }
@@ -128,7 +128,7 @@ var dynamic = {
                     transform   = canvasObject.transform().list[key],
                     start       = transform.options.start,
                     end         = transform.options.end,
-                    shift         = transform.options.shift;
+                    shift       = transform.shift;
 
                 canvasObject.now.fill = formula.changeColor(start,end,shift);
             }
@@ -144,7 +144,7 @@ var dynamic = {
                     transform   = canvasObject.transform().list[key],
                     start       = transform.options.start,
                     end         = transform.options.end,
-                    shift         = transform.options.shift;
+                    shift       = transform.shift;
 
                 canvasObject.now.stroke = formula.changeColor(start,end,shift);
             }
@@ -158,7 +158,7 @@ var dynamic = {
                     transform   = canvasObject.transform().list[key],
                     start       = transform.options.start,
                     end         = transform.options.end,
-                    shift       = transform.options.shift;
+                    shift       = transform.shift;
 
                 canvasObject.points = this.functions.pointsRecourse(start,end,shift);
             },

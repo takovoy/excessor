@@ -5,20 +5,24 @@ describe('Расчёт сплайна', function () {
         [40,68,true],
         [150,70,true]
     ];
-    describe('Высокое сглаживание, шаг 0.001%', function () {
-        var step = 0.001;
+    var step = 0.001;
+    describe('Высокое сглаживание, шаг ' + step + '%', function () {
         var services = {};
 
         it('Создание карты сплайна', function () {
-            services.map   = formula.getMapOfSpline(points,step);
+            services.map = formula.getMapOfSpline(points,step);
         });
 
-        services.length = 0;
-        for(var key in services.map){
-            services.length += services.map[key];
-        }
-
         it('Прогон для проверки на ошибки', function () {
+            services.map = formula.getMapOfSpline(points,step);
+            services.length = 0;
+
+            for(var key in services.map){
+                services.length += services.map[key];
+            }
+
+            console.log('services: ',services);
+
             for(var i = 0;i <= 100;i += step){
                 formula.getPointOnSpline(i,points,services);
             }

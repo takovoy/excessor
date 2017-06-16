@@ -47,38 +47,22 @@ Object.defineProperties(CanvasObject.prototype,{
     }
 });
 Curve.prototype.animate = function(context){
-
-    if(this.now.points.length < 2) {
-        return
-    }
-
-    //отобразить контрольные точки на холсте
-    if(this.now.showBreakpoints){
-        context.beginPath();
-
-        markControlPoints( this.points, context, this );
-
-        context.fill();
-        context.closePath();
-    }
-
+    var points = this.points;
+    var center = [this.x,this.y];
+    if(points.length < 2) {return}
     context.beginPath();
     context.moveTo(
-        this.points[0][0] + this.x,
-        this.points[0][1] + this.y
+        points[0][0] + center[0],
+        points[0][1] + center[1]
     );
-
     if(this.now.shift > 100){
         this.now.shift = 100;
     }
-
     for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnSpline(i,this.points,this.services);
+        var coord = formula.getPointOnSpline(i,points,this.services);
         //var coord = formula.getPointOnCurve(i,this.points);
-        context.lineTo(coord[0] + this.x,coord[1] + this.y);
+        context.lineTo(coord[0] + center[0],coord[1] + center[1]);
     }
-
     changeContext(context,this.now);
-
     context.closePath();
 };

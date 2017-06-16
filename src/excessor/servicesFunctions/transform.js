@@ -19,10 +19,6 @@ function Transform ( options ) {
     this.reverse            = false;
 }
 
-Transform.prototype.shift = function ( correlation ) {
-
-};
-
 Transform.prototype.play = function(rate){
     this.options.rate = rate || 1;
     return this;
@@ -54,3 +50,30 @@ Transform.prototype.event = function(shift,action){
     this.events.append(shift,action);
     return this;
 };
+
+Object.defineProperties(Transform.prototype,{
+    shift : {
+        get: function(){
+            if(this.options.timingFunction){
+                return this.options.shift * formula.getPointOnCurve(this.options.shift,this.timingFunction)[1];
+            }
+
+            return this.options.shift;
+        },
+        set: function(value){
+            return this.shift;
+        }
+    },
+    timingFunction : {
+        get: function(){
+            var array = [[0,0]];
+            array = array.concat(this.options.timingFunction);
+            array.push([1,1]);
+
+            return array;
+        },
+        set: function(value){
+            this.options.timingFunction = value;
+        }
+    }
+});

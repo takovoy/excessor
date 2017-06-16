@@ -57,85 +57,6 @@ Object.defineProperty(Drawing.prototype,'fps',{
     }
 });
 /**
- * Created by takovoySuper on 12.05.2015.
- */
-
-function EventsListing (){
-    this.list   = {};
-}
-
-//проверить ?
-EventsListing.prototype.append = function(property,theComparisonValue,operation){
-    if(!this.list[property]){
-        this.list[property] = {};
-    }
-    if(!this.list[property][theComparisonValue]){
-        this.list[property][theComparisonValue] = [];
-    }
-    this.list[property][theComparisonValue].push(operation);
-};
-EventsListing.prototype.remove = function(property,theComparisonValue){
-    if(!theComparisonValue){
-        delete this.list[property];
-        return
-    }
-    delete this.list[property][theComparisonValue];
-    if(Object.keys(this.list[property]).length == 0){
-        delete this.list[property];
-    }
-};
-/**
- * Created by takovoySuper on 14.04.2015.
- */
-
-function Listing (){
-    this.list   = {};
-    this.append = function(name,data){
-        this.list[name] = data;
-    };
-    this.remove = function(name){
-        delete this.list[name];
-    };
-}
-/**
- * Created by takovoy on 17.02.2015.
- */
-
-function PropertyListing (append,remove,parent){
-    this.list   = {};
-    this.up     = append || function(){};
-    this.rem    = remove || function(){};
-    this.parent = parent;
-}
-
-PropertyListing.prototype.append = function (object) {
-    this.list[object.id] = object;
-    return this.up(this.parent,object);
-};
-PropertyListing.prototype.remove = function (id) {
-    delete this.list[id];
-    this.rem(this.parent);
-};
-PropertyListing.prototype.getObject = function (id,recourse) {
-    if(!recourse){
-        return this.list[id];
-    } else {
-        for(var key in this.list){
-            if(key == id)   {return this.list[key];}
-            var object = this.list[key].childrens.getObject(id,true);
-            if(object)      {return object;}
-        }
-        return false
-    }
-};
-PropertyListing.prototype.getObjectsMap = function(){
-    var map = {};
-    for(var key in this.list){
-        map[key] = this.list[key].childrens.getObjectsMap();
-    }
-    return map;
-};
-/**
  * Created by takovoy on 22.11.2014.
  */
 
@@ -445,39 +366,23 @@ Object.defineProperties(CanvasObject.prototype,{
     }
 });
 Curve.prototype.animate = function(context){
-
-    if(this.now.points.length < 2) {
-        return
-    }
-
-    //отобразить контрольные точки на холсте
-    if(this.now.showBreakpoints){
-        context.beginPath();
-
-        markControlPoints( this.points, context, this );
-
-        context.fill();
-        context.closePath();
-    }
-
+    var points = this.points;
+    var center = [this.x,this.y];
+    if(points.length < 2) {return}
     context.beginPath();
     context.moveTo(
-        this.points[0][0] + this.x,
-        this.points[0][1] + this.y
+        points[0][0] + center[0],
+        points[0][1] + center[1]
     );
-
     if(this.now.shift > 100){
         this.now.shift = 100;
     }
-
     for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnSpline(i,this.points,this.services);
+        var coord = formula.getPointOnSpline(i,points,this.services);
         //var coord = formula.getPointOnCurve(i,this.points);
-        context.lineTo(coord[0] + this.x,coord[1] + this.y);
+        context.lineTo(coord[0] + center[0],coord[1] + center[1]);
     }
-
     changeContext(context,this.now);
-
     context.closePath();
 };
 /**
@@ -620,6 +525,113 @@ Polyline.prototype.animate = function(context){
     context.closePath();
 };
 /**
+ * Created by takovoy on 30.11.2014.
+ */
+
+function Rect ( options ) {
+    CanvasObject.apply( this, arguments );
+    this.constructor    = Rect;
+    this.now.width      = this.now.width || options.width || 0;
+    this.now.height     = this.now.height || options.height || this.now.width;
+}
+
+Rect.prototype = Object.create( CanvasObject.prototype );
+
+Rect.prototype.animate = function( context ){
+    context.beginPath();
+    var radian = this.radian;
+    var coord  = [this.x,this.y];
+    context.moveTo(coord[0],coord[1]);
+    coord = formula.getPointOnCircle(radian,this.width,coord[0],coord[1]);
+    context.lineTo(coord[0],coord[1]);
+    coord = formula.getPointOnCircle(radian + Math.PI / 2,this.height,coord[0],coord[1]);
+    context.lineTo(coord[0],coord[1]);
+    coord = formula.getPointOnCircle(radian + Math.PI / 2,this.height,this.x,this.y);
+    context.lineTo(coord[0],coord[1]);
+    context.lineTo(this.x,this.y);
+    changeContext( context, this.now );
+    context.closePath();
+};
+/**
+ * Created by takovoySuper on 12.05.2015.
+ */
+
+function EventsListing (){
+    this.list   = {};
+}
+
+//проверить ?
+EventsListing.prototype.append = function(property,theComparisonValue,operation){
+    if(!this.list[property]){
+        this.list[property] = {};
+    }
+    if(!this.list[property][theComparisonValue]){
+        this.list[property][theComparisonValue] = [];
+    }
+    this.list[property][theComparisonValue].push(operation);
+};
+EventsListing.prototype.remove = function(property,theComparisonValue){
+    if(!theComparisonValue){
+        delete this.list[property];
+        return
+    }
+    delete this.list[property][theComparisonValue];
+    if(Object.keys(this.list[property]).length == 0){
+        delete this.list[property];
+    }
+};
+/**
+ * Created by takovoySuper on 14.04.2015.
+ */
+
+function Listing (){
+    this.list   = {};
+    this.append = function(name,data){
+        this.list[name] = data;
+    };
+    this.remove = function(name){
+        delete this.list[name];
+    };
+}
+/**
+ * Created by takovoy on 17.02.2015.
+ */
+
+function PropertyListing (append,remove,parent){
+    this.list   = {};
+    this.up     = append || function(){};
+    this.rem    = remove || function(){};
+    this.parent = parent;
+}
+
+PropertyListing.prototype.append = function (object) {
+    this.list[object.id] = object;
+    return this.up(this.parent,object);
+};
+PropertyListing.prototype.remove = function (id) {
+    delete this.list[id];
+    this.rem(this.parent);
+};
+PropertyListing.prototype.getObject = function (id,recourse) {
+    if(!recourse){
+        return this.list[id];
+    } else {
+        for(var key in this.list){
+            if(key == id)   {return this.list[key];}
+            var object = this.list[key].childrens.getObject(id,true);
+            if(object)      {return object;}
+        }
+        return false
+    }
+};
+PropertyListing.prototype.getObjectsMap = function(){
+    var map = {};
+    for(var key in this.list){
+        map[key] = this.list[key].childrens.getObjectsMap();
+    }
+    return map;
+};
+/**
  * Created by takovoy on 31.07.2016.
  */
 
@@ -747,7 +759,7 @@ var dynamic = {
             if(this.data[key]){
                 this.data[key].prepareData(canvasObject);
             } else {
-                canvasObject.now[key] = options.start + (options.end - options.start) / 100 * options.shift;
+                canvasObject.now[key] = options.start + (options.end - options.start) / 100 * transform.shift;
             }
 
             //initiate events
@@ -799,7 +811,7 @@ var dynamic = {
             prepareData : function(canvasObject){
                 var key         = this.type,
                     transform   = canvasObject.transform().list[key],
-                    coord       = this.functions[transform.options.type](transform.options);
+                    coord       = this.functions[transform.options.type](transform.options,transform.shift);
 
                 canvasObject.x      = coord[0];
                 canvasObject.y      = coord[1];
@@ -807,26 +819,26 @@ var dynamic = {
 
             functions   : {
 
-                circle  : function(data){
-                    var shift = Math.PI * 2 / 100 * data.shift;
+                circle  : function(data,transformShift){
+                    var shift = Math.PI * 2 / 100 * transformShift;
 
                     if(data.reverse){
-                        shift = Math.PI * 2 - Math.PI * 2 / 100 * data.shift
+                        shift = Math.PI * 2 - Math.PI * 2 / 100 * transformShift
                     }
 
                     return formula.getPointOnCircle(shift, data.radius, data.center[0], data.center[1]);
                 },
 
-                polygon : function(data){
+                polygon : function(data,shift){
 
                 },
 
-                line    : function(data){
-                    return formula.getPointOnLine(data.shift,data.points);
+                line    : function(data,shift){
+                    return formula.getPointOnLine(shift,data.points);
                 },
 
-                curve   : function(data){
-                    return formula.getPointOnCurve(data.shift,data.points);
+                curve   : function(data,shift){
+                    return formula.getPointOnCurve(shift,data.points);
                 }
 
             }
@@ -842,7 +854,7 @@ var dynamic = {
                     transform   = canvasObject.transform().list[key],
                     start       = transform.options.start,
                     end         = transform.options.end,
-                    shift         = transform.options.shift;
+                    shift       = transform.shift;
 
                 canvasObject.now.fill = formula.changeColor(start,end,shift);
             }
@@ -858,7 +870,7 @@ var dynamic = {
                     transform   = canvasObject.transform().list[key],
                     start       = transform.options.start,
                     end         = transform.options.end,
-                    shift         = transform.options.shift;
+                    shift       = transform.shift;
 
                 canvasObject.now.stroke = formula.changeColor(start,end,shift);
             }
@@ -872,7 +884,7 @@ var dynamic = {
                     transform   = canvasObject.transform().list[key],
                     start       = transform.options.start,
                     end         = transform.options.end,
-                    shift       = transform.options.shift;
+                    shift       = transform.shift;
 
                 canvasObject.points = this.functions.pointsRecourse(start,end,shift);
             },
@@ -1078,56 +1090,6 @@ function getRandomRGB (min,max){
     return 'rgb(' + random(min,max) + ',' + random(min,max) + ',' + random(min,max) + ')'
 }
 /**
- * Created by takovoy on 31.07.2016.
- */
-
-function toIdentifyTheLine ( points, context, corrective, moveTo){
-    corrective = corrective || {};
-
-    if(moveTo){
-        context.moveTo(
-            points[0][0] + +corrective.x,
-            points[0][1] + +corrective.y
-        );
-    }
-
-    for(var point = 0;points[point];point++){
-        if(typeof points[point][0] === 'object'){
-            toIdentifyTheLine(
-                points[point],
-                context,
-                corrective
-            );
-            continue;
-        }
-
-        context.lineTo(
-            points[point][0] + +corrective.x,
-            points[point][1] + +corrective.y
-        );
-    }
-}
-
-function toIdentifyTheCurve ( points, context, corrective, moveTo){
-    corrective = corrective || {};
-
-    if(moveTo){
-        context.moveTo(
-            points[0][0] + +corrective.x,
-            points[0][1] + +corrective.y
-        );
-    }
-
-    for(var point = 0;points[point];point++){
-        var coord = formula.getPointOnCurve(i,this.now.points);
-        context.lineTo(
-            coord[0] + this.parent.x,
-            coord[1] + this.parent.y
-        );
-    }
-}
-
-/**
  * Created by 1 on 11.11.2015.
  */
 
@@ -1147,10 +1109,6 @@ function Transform ( options ) {
     this.options.recourse   = !!options.recourse;
     this.reverse            = false;
 }
-
-Transform.prototype.shift = function ( correlation ) {
-
-};
 
 Transform.prototype.play = function(rate){
     this.options.rate = rate || 1;
@@ -1183,3 +1141,30 @@ Transform.prototype.event = function(shift,action){
     this.events.append(shift,action);
     return this;
 };
+
+Object.defineProperties(Transform.prototype,{
+    shift : {
+        get: function(){
+            if(this.options.timingFunction){
+                return this.options.shift * formula.getPointOnCurve(this.options.shift,this.timingFunction)[1];
+            }
+
+            return this.options.shift;
+        },
+        set: function(value){
+            return this.shift;
+        }
+    },
+    timingFunction : {
+        get: function(){
+            var array = [[0,0]];
+            array = array.concat(this.options.timingFunction);
+            array.push([1,1]);
+
+            return array;
+        },
+        set: function(value){
+            this.options.timingFunction = value;
+        }
+    }
+});
