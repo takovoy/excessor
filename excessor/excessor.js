@@ -57,6 +57,85 @@ Object.defineProperty(Drawing.prototype,'fps',{
     }
 });
 /**
+ * Created by takovoySuper on 12.05.2015.
+ */
+
+function EventsListing (){
+    this.list   = {};
+}
+
+//проверить ?
+EventsListing.prototype.append = function(property,theComparisonValue,operation){
+    if(!this.list[property]){
+        this.list[property] = {};
+    }
+    if(!this.list[property][theComparisonValue]){
+        this.list[property][theComparisonValue] = [];
+    }
+    this.list[property][theComparisonValue].push(operation);
+};
+EventsListing.prototype.remove = function(property,theComparisonValue){
+    if(!theComparisonValue){
+        delete this.list[property];
+        return
+    }
+    delete this.list[property][theComparisonValue];
+    if(Object.keys(this.list[property]).length == 0){
+        delete this.list[property];
+    }
+};
+/**
+ * Created by takovoySuper on 14.04.2015.
+ */
+
+function Listing (){
+    this.list   = {};
+    this.append = function(name,data){
+        this.list[name] = data;
+    };
+    this.remove = function(name){
+        delete this.list[name];
+    };
+}
+/**
+ * Created by takovoy on 17.02.2015.
+ */
+
+function PropertyListing (append,remove,parent){
+    this.list   = {};
+    this.up     = append || function(){};
+    this.rem    = remove || function(){};
+    this.parent = parent;
+}
+
+PropertyListing.prototype.append = function (object) {
+    this.list[object.id] = object;
+    return this.up(this.parent,object);
+};
+PropertyListing.prototype.remove = function (id) {
+    delete this.list[id];
+    this.rem(this.parent);
+};
+PropertyListing.prototype.getObject = function (id,recourse) {
+    if(!recourse){
+        return this.list[id];
+    } else {
+        for(var key in this.list){
+            if(key == id)   {return this.list[key];}
+            var object = this.list[key].childrens.getObject(id,true);
+            if(object)      {return object;}
+        }
+        return false
+    }
+};
+PropertyListing.prototype.getObjectsMap = function(){
+    var map = {};
+    for(var key in this.list){
+        map[key] = this.list[key].childrens.getObjectsMap();
+    }
+    return map;
+};
+/**
  * Created by takovoy on 22.11.2014.
  */
 
@@ -553,85 +632,6 @@ Rect.prototype.animate = function( context ){
     context.closePath();
 };
 /**
- * Created by takovoySuper on 12.05.2015.
- */
-
-function EventsListing (){
-    this.list   = {};
-}
-
-//проверить ?
-EventsListing.prototype.append = function(property,theComparisonValue,operation){
-    if(!this.list[property]){
-        this.list[property] = {};
-    }
-    if(!this.list[property][theComparisonValue]){
-        this.list[property][theComparisonValue] = [];
-    }
-    this.list[property][theComparisonValue].push(operation);
-};
-EventsListing.prototype.remove = function(property,theComparisonValue){
-    if(!theComparisonValue){
-        delete this.list[property];
-        return
-    }
-    delete this.list[property][theComparisonValue];
-    if(Object.keys(this.list[property]).length == 0){
-        delete this.list[property];
-    }
-};
-/**
- * Created by takovoySuper on 14.04.2015.
- */
-
-function Listing (){
-    this.list   = {};
-    this.append = function(name,data){
-        this.list[name] = data;
-    };
-    this.remove = function(name){
-        delete this.list[name];
-    };
-}
-/**
- * Created by takovoy on 17.02.2015.
- */
-
-function PropertyListing (append,remove,parent){
-    this.list   = {};
-    this.up     = append || function(){};
-    this.rem    = remove || function(){};
-    this.parent = parent;
-}
-
-PropertyListing.prototype.append = function (object) {
-    this.list[object.id] = object;
-    return this.up(this.parent,object);
-};
-PropertyListing.prototype.remove = function (id) {
-    delete this.list[id];
-    this.rem(this.parent);
-};
-PropertyListing.prototype.getObject = function (id,recourse) {
-    if(!recourse){
-        return this.list[id];
-    } else {
-        for(var key in this.list){
-            if(key == id)   {return this.list[key];}
-            var object = this.list[key].childrens.getObject(id,true);
-            if(object)      {return object;}
-        }
-        return false
-    }
-};
-PropertyListing.prototype.getObjectsMap = function(){
-    var map = {};
-    for(var key in this.list){
-        map[key] = this.list[key].childrens.getObjectsMap();
-    }
-    return map;
-};
-/**
  * Created by takovoy on 31.07.2016.
  */
 
@@ -948,17 +948,17 @@ var formula = {
     },
 
     getPointOnCurve: function(shift,points){
-        if(points.length == 2){
-            return this.getPointOnLine(shift,points);
+        var result = [0,0];
+        var powerOfCurve = points.length - 1;
+        shift = shift/100;
+        for(var i = 0;points[i];i++){
+            var polynom = (this.factorial(powerOfCurve)/(this.factorial(i)*this.factorial(powerOfCurve - i))) *
+                Math.pow(shift,i) *
+                Math.pow(1-shift,powerOfCurve - i);
+            result[0] += points[i][0] * polynom;
+            result[1] += points[i][1] * polynom;
         }
-        var pointsPP = [];
-        for(var i = 1;i < points.length;i++){
-            pointsPP.push(this.getPointOnLine(shift,[
-                points[i - 1],
-                points[i]
-            ]));
-        }
-        return this.getPointOnCurve(shift,pointsPP);
+        return result;
     },
 
     getPointOnLine: function(shift,points){
@@ -1019,6 +1019,14 @@ var formula = {
         }
         var opacity = +(+start[3] + (+end[3] - +start[3]) / 100 * shift).toFixed(4);
         return 'rgba(' + result[0] + ',' + result[1] + ',' + result[2] + ',' + opacity + ')';
+    },
+
+    factorial : function (number) {
+        var result = 1;
+        while(number){
+            result *= number--;
+        }
+        return result;
     }
 };
 

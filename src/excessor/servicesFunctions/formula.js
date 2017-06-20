@@ -33,17 +33,17 @@ var formula = {
     },
 
     getPointOnCurve: function(shift,points){
-        if(points.length == 2){
-            return this.getPointOnLine(shift,points);
+        var result = [0,0];
+        var powerOfCurve = points.length - 1;
+        shift = shift/100;
+        for(var i = 0;points[i];i++){
+            var polynom = (this.factorial(powerOfCurve)/(this.factorial(i)*this.factorial(powerOfCurve - i))) *
+                Math.pow(shift,i) *
+                Math.pow(1-shift,powerOfCurve - i);
+            result[0] += points[i][0] * polynom;
+            result[1] += points[i][1] * polynom;
         }
-        var pointsPP = [];
-        for(var i = 1;i < points.length;i++){
-            pointsPP.push(this.getPointOnLine(shift,[
-                points[i - 1],
-                points[i]
-            ]));
-        }
-        return this.getPointOnCurve(shift,pointsPP);
+        return result;
     },
 
     getPointOnLine: function(shift,points){
@@ -104,6 +104,14 @@ var formula = {
         }
         var opacity = +(+start[3] + (+end[3] - +start[3]) / 100 * shift).toFixed(4);
         return 'rgba(' + result[0] + ',' + result[1] + ',' + result[2] + ',' + opacity + ')';
+    },
+
+    factorial : function (number) {
+        var result = 1;
+        while(number){
+            result *= number--;
+        }
+        return result;
     }
 };
 
