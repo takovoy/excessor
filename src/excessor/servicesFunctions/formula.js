@@ -11,12 +11,12 @@ var formula = {
         return  [centerX + x,centerY + y];
     },
 
-    getPointOnEllipse: function(semiAxisX,semiAxisY,shift,tilt,centerX,centerY){
+    getPointOnEllipse: function(radiusX,radiusY,shift,tilt,centerX,centerY){
         tilt    = tilt || 0;
         tilt    *= -1;
 
-        var x1  = semiAxisX*Math.cos(+shift),
-            y1  = semiAxisY*Math.sin(+shift),
+        var x1  = radiusX*Math.cos(+shift),
+            y1  = radiusY*Math.sin(+shift),
             x2  = x1 * Math.cos(tilt) + y1 * Math.sin(tilt),
             y2  = -x1 * Math.sin(tilt) + y1 * Math.cos(tilt);
 
