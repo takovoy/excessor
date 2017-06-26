@@ -14,6 +14,8 @@ var formula = {
     getPointOnEllipse: function(radiusX,radiusY,shift,tilt,centerX,centerY){
         tilt    = tilt || 0;
         tilt    *= -1;
+        centerX = centerX || 0;
+        centerY = centerY || 0;
 
         var x1  = radiusX*Math.cos(+shift),
             y1  = radiusY*Math.sin(+shift),
@@ -150,16 +152,15 @@ formula.getPointOnSpline = function (shift, points, services) {
     if(shift >= 100){
         shiftLength = services.length;
     }
-    var counter = services.map[0];
+    var counter = 0;
     var lastControlPoint = 0;
-    var pointIndex = 0;
     var controlPointsCounter = 0;
     var checkedCurve = [];
-    for(; services.map[lastControlPoint] && counter < shiftLength; lastControlPoint++){
+    for(; services.map[lastControlPoint] && counter + services.map[lastControlPoint] < shiftLength; lastControlPoint++){
         counter += services.map[lastControlPoint];
     }
-    for(; points[pointIndex] && controlPointsCounter <= lastControlPoint; pointIndex++){
-        if(points[pointIndex][3]){
+    for(var pointIndex = 0; points[pointIndex] && controlPointsCounter <= lastControlPoint; pointIndex++){
+        if(points[pointIndex][2] === true){
             controlPointsCounter++;
         }
         if(controlPointsCounter >= lastControlPoint){
@@ -167,7 +168,53 @@ formula.getPointOnSpline = function (shift, points, services) {
         }
     }
     return formula.getPointOnCurve(
-        (services.map[lastControlPoint] - (counter-shiftLength)) / (services.map[lastControlPoint] / 100),
+        (shiftLength - counter) / (services.map[lastControlPoint] / 100),
         checkedCurve
     );
+};
+
+formula.getLengthOfEllipticArc = function (radiusX, radiusY, startRadian, endRadian, step) {
+    var length = 0;
+    var something = this.getPointOnEllipse(radiusX,radiusY,startRadian);
+    for(var i = startRadian;i<=endRadian;i+=step){
+        var point = this.getPointOnEllipse(radiusX,radiusY,i);
+        length += this.getCenterToPointDistance([point[0]-something[0],point[1]-something[1]]);
+        something = point;
+    }
+    return length;
+};
+
+formula.getMapOfPath = function (points, step) {
+    var map = [[]];
+    var index = 0;
+    for(var i = 0;points[i];i++){
+        if(points[i].length > 3){
+            if(i>1){index++}
+            map[index] = this.getLengthOfEllipticArc(points[i][0],points[i][1],points[i][2],points[i][3],step || 0.01);
+            index++;
+            if(!points[i+1]){continue}
+            var centerOfArc = this.getPointOnEllipse(
+                points[i][0],
+                points[i][1],
+                points[i][2] + Math.PI,
+                points[i][4],
+                points[i-1][0] || 0,
+                points[i-1][1] || 0
+            );
+            var endOfArc = this.getPointOnEllipse(
+                points[i][0],
+                points[i][1],
+                points[i][2] + Math.PI,
+                points[i][4],
+                centerOfArc[0],
+                centerOfArc[1]
+            );
+            map[index] = [endOfArc];
+            continue;
+        }
+    }
+};
+
+formula.getPointOnPath = function (shift, points, services) {
+
 };

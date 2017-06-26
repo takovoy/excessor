@@ -57,85 +57,6 @@ Object.defineProperty(Drawing.prototype,'fps',{
     }
 });
 /**
- * Created by takovoySuper on 12.05.2015.
- */
-
-function EventsListing (){
-    this.list   = {};
-}
-
-//проверить ?
-EventsListing.prototype.append = function(property,theComparisonValue,operation){
-    if(!this.list[property]){
-        this.list[property] = {};
-    }
-    if(!this.list[property][theComparisonValue]){
-        this.list[property][theComparisonValue] = [];
-    }
-    this.list[property][theComparisonValue].push(operation);
-};
-EventsListing.prototype.remove = function(property,theComparisonValue){
-    if(!theComparisonValue){
-        delete this.list[property];
-        return
-    }
-    delete this.list[property][theComparisonValue];
-    if(Object.keys(this.list[property]).length == 0){
-        delete this.list[property];
-    }
-};
-/**
- * Created by takovoySuper on 14.04.2015.
- */
-
-function Listing (){
-    this.list   = {};
-    this.append = function(name,data){
-        this.list[name] = data;
-    };
-    this.remove = function(name){
-        delete this.list[name];
-    };
-}
-/**
- * Created by takovoy on 17.02.2015.
- */
-
-function PropertyListing (append,remove,parent){
-    this.list   = {};
-    this.up     = append || function(){};
-    this.rem    = remove || function(){};
-    this.parent = parent;
-}
-
-PropertyListing.prototype.append = function (object) {
-    this.list[object.id] = object;
-    return this.up(this.parent,object);
-};
-PropertyListing.prototype.remove = function (id) {
-    delete this.list[id];
-    this.rem(this.parent);
-};
-PropertyListing.prototype.getObject = function (id,recourse) {
-    if(!recourse){
-        return this.list[id];
-    } else {
-        for(var key in this.list){
-            if(key == id)   {return this.list[key];}
-            var object = this.list[key].childrens.getObject(id,true);
-            if(object)      {return object;}
-        }
-        return false
-    }
-};
-PropertyListing.prototype.getObjectsMap = function(){
-    var map = {};
-    for(var key in this.list){
-        map[key] = this.list[key].childrens.getObjectsMap();
-    }
-    return map;
-};
-/**
  * Created by takovoy on 22.11.2014.
  */
 
@@ -422,7 +343,7 @@ Object.defineProperties(CanvasObject.prototype,{
                 sin     = Math.sin( radian ),
                 cos     = Math.cos( radian );
 
-            for( var key in this.now.points ){
+            for( var key = 0;this.now.points[key];key++){
                 var coordinate = this.now.points[key];
                 this.services.points[key] = [
                     coordinate[0] * cos - coordinate[1] * sin,
@@ -630,6 +551,85 @@ Rect.prototype.animate = function( context ){
     context.lineTo(this.x,this.y);
     changeContext( context, this.now );
     context.closePath();
+};
+/**
+ * Created by takovoySuper on 12.05.2015.
+ */
+
+function EventsListing (){
+    this.list   = {};
+}
+
+//проверить ?
+EventsListing.prototype.append = function(property,theComparisonValue,operation){
+    if(!this.list[property]){
+        this.list[property] = {};
+    }
+    if(!this.list[property][theComparisonValue]){
+        this.list[property][theComparisonValue] = [];
+    }
+    this.list[property][theComparisonValue].push(operation);
+};
+EventsListing.prototype.remove = function(property,theComparisonValue){
+    if(!theComparisonValue){
+        delete this.list[property];
+        return
+    }
+    delete this.list[property][theComparisonValue];
+    if(Object.keys(this.list[property]).length == 0){
+        delete this.list[property];
+    }
+};
+/**
+ * Created by takovoySuper on 14.04.2015.
+ */
+
+function Listing (){
+    this.list   = {};
+    this.append = function(name,data){
+        this.list[name] = data;
+    };
+    this.remove = function(name){
+        delete this.list[name];
+    };
+}
+/**
+ * Created by takovoy on 17.02.2015.
+ */
+
+function PropertyListing (append,remove,parent){
+    this.list   = {};
+    this.up     = append || function(){};
+    this.rem    = remove || function(){};
+    this.parent = parent;
+}
+
+PropertyListing.prototype.append = function (object) {
+    this.list[object.id] = object;
+    return this.up(this.parent,object);
+};
+PropertyListing.prototype.remove = function (id) {
+    delete this.list[id];
+    this.rem(this.parent);
+};
+PropertyListing.prototype.getObject = function (id,recourse) {
+    if(!recourse){
+        return this.list[id];
+    } else {
+        for(var key in this.list){
+            if(key == id)   {return this.list[key];}
+            var object = this.list[key].childrens.getObject(id,true);
+            if(object)      {return object;}
+        }
+        return false
+    }
+};
+PropertyListing.prototype.getObjectsMap = function(){
+    var map = {};
+    for(var key in this.list){
+        map[key] = this.list[key].childrens.getObjectsMap();
+    }
+    return map;
 };
 /**
  * Created by takovoy on 31.07.2016.
@@ -926,12 +926,14 @@ var formula = {
         return  [centerX + x,centerY + y];
     },
 
-    getPointOnEllipse: function(semiAxisX,semiAxisY,shift,tilt,centerX,centerY){
+    getPointOnEllipse: function(radiusX,radiusY,shift,tilt,centerX,centerY){
         tilt    = tilt || 0;
         tilt    *= -1;
+        centerX = centerX || 0;
+        centerY = centerY || 0;
 
-        var x1  = semiAxisX*Math.cos(+shift),
-            y1  = semiAxisY*Math.sin(+shift),
+        var x1  = radiusX*Math.cos(+shift),
+            y1  = radiusY*Math.sin(+shift),
             x2  = x1 * Math.cos(tilt) + y1 * Math.sin(tilt),
             y2  = -x1 * Math.sin(tilt) + y1 * Math.cos(tilt);
 
@@ -1065,16 +1067,15 @@ formula.getPointOnSpline = function (shift, points, services) {
     if(shift >= 100){
         shiftLength = services.length;
     }
-    var counter = services.map[0];
+    var counter = 0;
     var lastControlPoint = 0;
-    var pointIndex = 0;
     var controlPointsCounter = 0;
     var checkedCurve = [];
-    for(; services.map[lastControlPoint] && counter < shiftLength; lastControlPoint++){
+    for(; services.map[lastControlPoint] && counter + services.map[lastControlPoint] < shiftLength; lastControlPoint++){
         counter += services.map[lastControlPoint];
     }
-    for(; points[pointIndex] && controlPointsCounter <= lastControlPoint; pointIndex++){
-        if(points[pointIndex][3]){
+    for(var pointIndex = 0; points[pointIndex] && controlPointsCounter <= lastControlPoint; pointIndex++){
+        if(points[pointIndex][2] === true){
             controlPointsCounter++;
         }
         if(controlPointsCounter >= lastControlPoint){
@@ -1082,9 +1083,55 @@ formula.getPointOnSpline = function (shift, points, services) {
         }
     }
     return formula.getPointOnCurve(
-        (services.map[lastControlPoint] - (counter-shiftLength)) / (services.map[lastControlPoint] / 100),
+        (shiftLength - counter) / (services.map[lastControlPoint] / 100),
         checkedCurve
     );
+};
+
+formula.getLengthOfEllipticArc = function (radiusX, radiusY, startRadian, endRadian, step) {
+    var length = 0;
+    var something = this.getPointOnEllipse(radiusX,radiusY,startRadian);
+    for(var i = startRadian;i<=endRadian;i+=step){
+        var point = this.getPointOnEllipse(radiusX,radiusY,i);
+        length += this.getCenterToPointDistance([point[0]-something[0],point[1]-something[1]]);
+        something = point;
+    }
+    return length;
+};
+
+formula.getMapOfPath = function (points, step) {
+    var map = [[]];
+    var index = 0;
+    for(var i = 0;points[i];i++){
+        if(points[i].length > 3){
+            if(i>1){index++}
+            map[index] = this.getLengthOfEllipticArc(points[i][0],points[i][1],points[i][2],points[i][3],step || 0.01);
+            index++;
+            if(!points[i+1]){continue}
+            var centerOfArc = this.getPointOnEllipse(
+                points[i][0],
+                points[i][1],
+                points[i][2] + Math.PI,
+                points[i][4],
+                points[i-1][0] || 0,
+                points[i-1][1] || 0
+            );
+            var endOfArc = this.getPointOnEllipse(
+                points[i][0],
+                points[i][1],
+                points[i][2] + Math.PI,
+                points[i][4],
+                centerOfArc[0],
+                centerOfArc[1]
+            );
+            map[index] = [endOfArc];
+            continue;
+        }
+    }
+};
+
+formula.getPointOnPath = function (shift, points, services) {
+
 };
 /**
  * Created by takovoySuper on 11.04.2015.
@@ -1096,6 +1143,44 @@ function random (min,max){
 
 function getRandomRGB (min,max){
     return 'rgb(' + random(min,max) + ',' + random(min,max) + ',' + random(min,max) + ')'
+}
+/**
+ * Created by takovoy on 24.06.2017.
+ */
+
+function SVGParser ( string ) {
+    var data = string.match(/d="( |,|\.|\d*|[A-Z])*"/g);
+    var path = [];
+    for(var i = 0;data[i];i++){
+        path[i] = data[i].match(/[A-Z] ( ?\d*(.\d{1,3})+,\d*(.\d{1,3})+){1,3}/g);
+        for(var j = 1;path[i][j];j++){
+            var previous = [];
+            if(j===1){
+                previous = path[i][0].match(/\d+(\.\d+)?( |,)\d+(\.\d+)?/g);
+            }
+            path[i][j-1] = previous.concat(
+                path[i][j]
+                    .match(/\d+(\.\d+)?( |,)\d+(\.\d+)?/g)
+            );
+            for(var k = 0;path[i][j-1][k];k++){
+                path[i][j-1][k] = path[i][j-1][k].split(',');
+                path[i][j-1][k][0] = +path[i][j-1][k][0];
+                path[i][j-1][k][1] = +path[i][j-1][k][1];
+                if(k === path[i][j-1].length - 1){
+                    path[i][j-1][k][path[i][j-1][k].length] = true;
+                }
+            }
+            if(j===path[i].length - 1){
+                delete path[i][j];
+            }
+        }
+        var split = [];
+        for(var j = 0;path[i][j];j++){
+            split = split.concat(path[i][j]);
+        }
+        path[i] = split;
+    }
+    return path;
 }
 /**
  * Created by 1 on 11.11.2015.

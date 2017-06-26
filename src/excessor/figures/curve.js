@@ -24,7 +24,7 @@ Object.defineProperties(CanvasObject.prototype,{
                 sin     = Math.sin( radian ),
                 cos     = Math.cos( radian );
 
-            for( var key in this.now.points ){
+            for( var key = 0;this.now.points[key];key++){
                 var coordinate = this.now.points[key];
                 this.services.points[key] = [
                     coordinate[0] * cos - coordinate[1] * sin,
