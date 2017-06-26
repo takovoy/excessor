@@ -2,17 +2,17 @@
  * Created by takovoy on 22.01.2015.
  */
 
-function Curve ( options ) {
+function Spline ( options ) {
     CanvasObject.apply(this,arguments);
-    this.constructor    = Curve;
+    this.constructor    = Spline;
     this.now.step       = +this.now.step || +options.step || 1;
     this.points         = this.now.points || options.points || [];
     this.services.points= [];
 }
 
-Curve.prototype = Object.create( CanvasObject.prototype );
+Spline.prototype = Object.create( CanvasObject.prototype );
 
-Object.defineProperties(CanvasObject.prototype,{
+Object.defineProperties(Spline.prototype,{
     points : {
         get: function(){
 
@@ -37,12 +37,16 @@ Object.defineProperties(CanvasObject.prototype,{
 
         },
         set: function(value){
-            this.services.length = formula.getLengthOfCurve(value,this.now.step);
+            this.services.map   = formula.getMapOfSpline(value,this.now.step);
+            this.services.length= 0;
+            for(var key in this.services.map){
+                this.services.length += this.services.map[key];
+            }
             this.now.points = value;
         }
     }
 });
-Curve.prototype.animate = function(context){
+Spline.prototype.animate = function(context){
     var points = this.points;
     var center = [this.x,this.y];
     if(points.length < 2) {return}
@@ -56,8 +60,7 @@ Curve.prototype.animate = function(context){
     }
     var lastPoint = points[0];
     for(var i = 0;i <= this.now.shift;i += this.now.step){
-        //var coord = formula.getPointOnSpline(i,points,this.services);
-        var coord = formula.getPointOnCurve(i,this.points);
+        var coord = formula.getPointOnSpline(i,points,this.services);
         if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
         lastPoint = coord;
         context.lineTo(coord[0] + center[0],coord[1] + center[1]);

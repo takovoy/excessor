@@ -356,11 +356,7 @@ Object.defineProperties(CanvasObject.prototype,{
 
         },
         set: function(value){
-            this.services.map   = formula.getMapOfSpline(value,this.now.step);
-            this.services.length= 0;
-            for(var key in this.services.map){
-                this.services.length += this.services.map[key];
-            }
+            this.services.length = formula.getLengthOfCurve(value,this.now.step);
             this.now.points = value;
         }
     }
@@ -377,9 +373,12 @@ Curve.prototype.animate = function(context){
     if(this.now.shift > 100){
         this.now.shift = 100;
     }
+    var lastPoint = points[0];
     for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnSpline(i,points,this.services);
-        //var coord = formula.getPointOnCurve(i,this.points);
+        //var coord = formula.getPointOnSpline(i,points,this.services);
+        var coord = formula.getPointOnCurve(i,this.points);
+        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
+        lastPoint = coord;
         context.lineTo(coord[0] + center[0],coord[1] + center[1]);
     }
     changeContext(context,this.now);
@@ -440,6 +439,77 @@ Line.prototype.animate = function(context){
     for(var i = 0;i <= this.now.shift;i += this.now.step){
         var coord = formula.getPointOnLine(i,this.points);
         context.lineTo(coord[0] + this.x,coord[1] + this.y);
+    }
+    changeContext(context,this.now);
+    context.closePath();
+};
+/**
+ * Created by takovoy on 22.01.2015.
+ */
+
+function Path ( options ) {
+    CanvasObject.apply(this,arguments);
+    this.constructor    = Path;
+    this.now.step       = +this.now.step || +options.step || 1;
+    this.points         = this.now.points || options.points || [];
+    this.services.points= [];
+}
+
+Path.prototype = Object.create( CanvasObject.prototype );
+
+Object.defineProperties(Path.prototype,{
+    points : {
+        get: function(){
+
+            if(!this.services.points){
+                this.services.points = [];
+            }
+
+            var radian  = this.radian - ( Math.PI/4 ),
+                sin     = Math.sin( radian ),
+                cos     = Math.cos( radian );
+
+            for( var key = 0;this.now.points[key];key++){
+                var coordinate = this.now.points[key];
+                this.services.points[key] = [
+                    coordinate[0] * cos - coordinate[1] * sin,
+                    coordinate[0] * sin + coordinate[1] * cos,
+                    coordinate[2]
+                ]
+            }
+
+            return this.services.points;
+
+        },
+        set: function(value){
+            this.services.map   = formula.getMapOfPath(value,this.now.step);
+            this.services.length= 0;
+            for(var key in this.services.map){
+                this.services.length += this.services.map[key];
+            }
+            this.now.points = value;
+        }
+    }
+});
+Path.prototype.animate = function(context){
+    var points = this.points;
+    var center = [this.x,this.y];
+    if(points.length < 2) {return}
+    context.beginPath();
+    context.moveTo(
+        points[0][0] + center[0],
+        points[0][1] + center[1]
+    );
+    if(this.now.shift > 100){
+        this.now.shift = 100;
+    }
+    var lastPoint = points[0];
+    for(var i = 0;i <= this.now.shift;i += this.now.step){
+        //var coord = formula.getPointOnSpline(i,points,this.services);
+        var coord = formula.getPointOnPath(i,this.points);
+        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
+        lastPoint = coord;
+        context.lineTo(coord[0] + center[0],coord[1] + center[1]);
     }
     changeContext(context,this.now);
     context.closePath();
@@ -550,6 +620,76 @@ Rect.prototype.animate = function( context ){
     context.lineTo(coord[0],coord[1]);
     context.lineTo(this.x,this.y);
     changeContext( context, this.now );
+    context.closePath();
+};
+/**
+ * Created by takovoy on 22.01.2015.
+ */
+
+function Spline ( options ) {
+    CanvasObject.apply(this,arguments);
+    this.constructor    = Spline;
+    this.now.step       = +this.now.step || +options.step || 1;
+    this.points         = this.now.points || options.points || [];
+    this.services.points= [];
+}
+
+Spline.prototype = Object.create( CanvasObject.prototype );
+
+Object.defineProperties(Spline.prototype,{
+    points : {
+        get: function(){
+
+            if(!this.services.points){
+                this.services.points = [];
+            }
+
+            var radian  = this.radian - ( Math.PI/4 ),
+                sin     = Math.sin( radian ),
+                cos     = Math.cos( radian );
+
+            for( var key = 0;this.now.points[key];key++){
+                var coordinate = this.now.points[key];
+                this.services.points[key] = [
+                    coordinate[0] * cos - coordinate[1] * sin,
+                    coordinate[0] * sin + coordinate[1] * cos,
+                    coordinate[2]
+                ]
+            }
+
+            return this.services.points;
+
+        },
+        set: function(value){
+            this.services.map   = formula.getMapOfSpline(value,this.now.step);
+            this.services.length= 0;
+            for(var key in this.services.map){
+                this.services.length += this.services.map[key];
+            }
+            this.now.points = value;
+        }
+    }
+});
+Spline.prototype.animate = function(context){
+    var points = this.points;
+    var center = [this.x,this.y];
+    if(points.length < 2) {return}
+    context.beginPath();
+    context.moveTo(
+        points[0][0] + center[0],
+        points[0][1] + center[1]
+    );
+    if(this.now.shift > 100){
+        this.now.shift = 100;
+    }
+    var lastPoint = points[0];
+    for(var i = 0;i <= this.now.shift;i += this.now.step){
+        var coord = formula.getPointOnSpline(i,points,this.services);
+        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
+        lastPoint = coord;
+        context.lineTo(coord[0] + center[0],coord[1] + center[1]);
+    }
+    changeContext(context,this.now);
     context.closePath();
 };
 /**
@@ -1103,35 +1243,82 @@ formula.getMapOfPath = function (points, step) {
     var map = [[]];
     var index = 0;
     for(var i = 0;points[i];i++){
+        var point = points[i];
         if(points[i].length > 3){
-            if(i>1){index++}
-            map[index] = this.getLengthOfEllipticArc(points[i][0],points[i][1],points[i][2],points[i][3],step || 0.01);
+            if(i>1 && !map[index][0]){index++}
+            var lastPoint = map[index][0] || [];
+            map[index] = this.getLengthOfEllipticArc(point[0], point[1], point[2], point[3], step || 0.01);
             index++;
             if(!points[i+1]){continue}
             var centerOfArc = this.getPointOnEllipse(
-                points[i][0],
-                points[i][1],
-                points[i][2] + Math.PI,
-                points[i][4],
-                points[i-1][0] || 0,
-                points[i-1][1] || 0
+                point[0], point[1], point[2] + Math.PI, point[4],
+                lastPoint[0] || points[i-1][0] || 0, lastPoint[1] || points[i-1][1] || 0
             );
-            var endOfArc = this.getPointOnEllipse(
-                points[i][0],
-                points[i][1],
-                points[i][2] + Math.PI,
-                points[i][4],
-                centerOfArc[0],
-                centerOfArc[1]
-            );
+            var endOfArc = this.getPointOnEllipse(point[0], point[1], point[3], point[4], centerOfArc[0], centerOfArc[1]);
             map[index] = [endOfArc];
             continue;
         }
+        var curvePointsCount = map[index].length;
+        map[index][+curvePointsCount] = point;
+        if(point[2] && i != points.length - 1){
+            map[index] = formula.getLengthOfCurve(map[index],step);
+            index++;
+            map[index] = [point];
+        }
     }
+    if(typeof map[index] !== 'number'){map[index] = formula.getLengthOfCurve(map[index],step);}
+    return map;
 };
 
 formula.getPointOnPath = function (shift, points, services) {
-
+    var shiftLength = services.length / 100 * shift;
+    if(shift >= 100){
+        shiftLength = services.length;
+    }
+    var counter = 0;
+    var lastControlPoint = 0;
+    var controlPointsCounter = 0;
+    var checkedCurve = [];
+    for(; services.map[lastControlPoint] && counter + services.map[lastControlPoint] < shiftLength; lastControlPoint++){
+        counter += services.map[lastControlPoint];
+    }
+    var lastPoint = [];
+    for(var pointIndex = 0; points[pointIndex] && controlPointsCounter <= lastControlPoint; pointIndex++){
+        var point = points[pointIndex];
+        if(point[2] === true || point.length > 3){
+            controlPointsCounter++;
+        }
+        if(controlPointsCounter === lastControlPoint && point.length > 3){
+            var centerOfArc = this.getPointOnEllipse(
+                point[0], point[1], point[2] + Math.PI, point[4],
+                lastPoint[0] || 0, lastPoint[1] || 0
+            );
+            var radian = point[3] - point[2];
+            var len = shiftLength - counter;
+            var percent = len / (services.map[lastControlPoint] / 100);
+            var resultRadian = point[2] + (radian/100*percent);
+            return this.getPointOnEllipse(point[0], point[1], resultRadian, point[4], centerOfArc[0], centerOfArc[1]);
+        }
+        if(controlPointsCounter >= lastControlPoint){
+            checkedCurve.push(point);
+        }
+        if(point.length > 3){
+            lastPoint = this.getPointOnEllipse(
+                point[0],
+                point[1],
+                point[3]+Math.PI,
+                point[4],
+                lastPoint[0],
+                lastPoint[1]
+            );
+            continue
+        }
+        lastPoint = point;
+    }
+    return this.getPointOnCurve(
+        (shiftLength - counter) / (services.map[lastControlPoint] / 100),
+        checkedCurve
+    );
 };
 /**
  * Created by takovoySuper on 11.04.2015.

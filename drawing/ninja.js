@@ -8,7 +8,7 @@ var wrap = new CanvasObject({
 }).start();
 
 for(var i = 0;ninjaPath[i];i++){
-    var spline = new Curve({
+    var spline = new Spline({
         points: ninjaPath[i],
         settings: {
             stroke: '#000000',

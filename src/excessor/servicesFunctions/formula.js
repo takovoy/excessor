@@ -188,33 +188,80 @@ formula.getMapOfPath = function (points, step) {
     var map = [[]];
     var index = 0;
     for(var i = 0;points[i];i++){
+        var point = points[i];
         if(points[i].length > 3){
-            if(i>1){index++}
-            map[index] = this.getLengthOfEllipticArc(points[i][0],points[i][1],points[i][2],points[i][3],step || 0.01);
+            if(i>1 && !map[index][0]){index++}
+            var lastPoint = map[index][0] || [];
+            map[index] = this.getLengthOfEllipticArc(point[0], point[1], point[2], point[3], step || 0.01);
             index++;
             if(!points[i+1]){continue}
             var centerOfArc = this.getPointOnEllipse(
-                points[i][0],
-                points[i][1],
-                points[i][2] + Math.PI,
-                points[i][4],
-                points[i-1][0] || 0,
-                points[i-1][1] || 0
+                point[0], point[1], point[2] + Math.PI, point[4],
+                lastPoint[0] || points[i-1][0] || 0, lastPoint[1] || points[i-1][1] || 0
             );
-            var endOfArc = this.getPointOnEllipse(
-                points[i][0],
-                points[i][1],
-                points[i][2] + Math.PI,
-                points[i][4],
-                centerOfArc[0],
-                centerOfArc[1]
-            );
+            var endOfArc = this.getPointOnEllipse(point[0], point[1], point[3], point[4], centerOfArc[0], centerOfArc[1]);
             map[index] = [endOfArc];
             continue;
         }
+        var curvePointsCount = map[index].length;
+        map[index][+curvePointsCount] = point;
+        if(point[2] && i != points.length - 1){
+            map[index] = formula.getLengthOfCurve(map[index],step);
+            index++;
+            map[index] = [point];
+        }
     }
+    if(typeof map[index] !== 'number'){map[index] = formula.getLengthOfCurve(map[index],step);}
+    return map;
 };
 
 formula.getPointOnPath = function (shift, points, services) {
-
+    var shiftLength = services.length / 100 * shift;
+    if(shift >= 100){
+        shiftLength = services.length;
+    }
+    var counter = 0;
+    var lastControlPoint = 0;
+    var controlPointsCounter = 0;
+    var checkedCurve = [];
+    for(; services.map[lastControlPoint] && counter + services.map[lastControlPoint] < shiftLength; lastControlPoint++){
+        counter += services.map[lastControlPoint];
+    }
+    var lastPoint = [];
+    for(var pointIndex = 0; points[pointIndex] && controlPointsCounter <= lastControlPoint; pointIndex++){
+        var point = points[pointIndex];
+        if(point[2] === true || point.length > 3){
+            controlPointsCounter++;
+        }
+        if(controlPointsCounter === lastControlPoint && point.length > 3){
+            var centerOfArc = this.getPointOnEllipse(
+                point[0], point[1], point[2] + Math.PI, point[4],
+                lastPoint[0] || 0, lastPoint[1] || 0
+            );
+            var radian = point[3] - point[2];
+            var len = shiftLength - counter;
+            var percent = len / (services.map[lastControlPoint] / 100);
+            var resultRadian = point[2] + (radian/100*percent);
+            return this.getPointOnEllipse(point[0], point[1], resultRadian, point[4], centerOfArc[0], centerOfArc[1]);
+        }
+        if(controlPointsCounter >= lastControlPoint){
+            checkedCurve.push(point);
+        }
+        if(point.length > 3){
+            lastPoint = this.getPointOnEllipse(
+                point[0],
+                point[1],
+                point[3]+Math.PI,
+                point[4],
+                lastPoint[0],
+                lastPoint[1]
+            );
+            continue
+        }
+        lastPoint = point;
+    }
+    return this.getPointOnCurve(
+        (shiftLength - counter) / (services.map[lastControlPoint] / 100),
+        checkedCurve
+    );
 };
