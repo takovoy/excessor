@@ -11,6 +11,35 @@ function Line ( options ) {
 
 Line.prototype = Object.create(CanvasObject.prototype);
 
+Object.defineProperties(Line.prototype,{
+    points : {
+        get: function(){
+
+            if(!this.services.points){
+                this.services.points = [];
+            }
+
+            var radian  = this.radian - ( Math.PI/4 ),
+                sin     = Math.sin( radian ),
+                cos     = Math.cos( radian );
+
+            for( var key = 0;this.now.points[key];key++){
+                var coordinate = this.now.points[key];
+                this.services.points[key] = [
+                    coordinate[0] * cos - coordinate[1] * sin,
+                    coordinate[0] * sin + coordinate[1] * cos,
+                    coordinate[2]
+                ]
+            }
+
+            return this.services.points;
+        },
+        set: function(value){
+            this.now.points = value;
+        }
+    }
+});
+
 Line.prototype.animate = function(context){
     if(this.now.points.length < 2){return;}
     context.beginPath();

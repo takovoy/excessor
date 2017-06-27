@@ -57,6 +57,85 @@ Object.defineProperty(Drawing.prototype,'fps',{
     }
 });
 /**
+ * Created by takovoySuper on 12.05.2015.
+ */
+
+function EventsListing (){
+    this.list   = {};
+}
+
+//проверить ?
+EventsListing.prototype.append = function(property,theComparisonValue,operation){
+    if(!this.list[property]){
+        this.list[property] = {};
+    }
+    if(!this.list[property][theComparisonValue]){
+        this.list[property][theComparisonValue] = [];
+    }
+    this.list[property][theComparisonValue].push(operation);
+};
+EventsListing.prototype.remove = function(property,theComparisonValue){
+    if(!theComparisonValue){
+        delete this.list[property];
+        return
+    }
+    delete this.list[property][theComparisonValue];
+    if(Object.keys(this.list[property]).length == 0){
+        delete this.list[property];
+    }
+};
+/**
+ * Created by takovoySuper on 14.04.2015.
+ */
+
+function Listing (){
+    this.list   = {};
+    this.append = function(name,data){
+        this.list[name] = data;
+    };
+    this.remove = function(name){
+        delete this.list[name];
+    };
+}
+/**
+ * Created by takovoy on 17.02.2015.
+ */
+
+function PropertyListing (append,remove,parent){
+    this.list   = {};
+    this.up     = append || function(){};
+    this.rem    = remove || function(){};
+    this.parent = parent;
+}
+
+PropertyListing.prototype.append = function (object) {
+    this.list[object.id] = object;
+    return this.up(this.parent,object);
+};
+PropertyListing.prototype.remove = function (id) {
+    delete this.list[id];
+    this.rem(this.parent);
+};
+PropertyListing.prototype.getObject = function (id,recourse) {
+    if(!recourse){
+        return this.list[id];
+    } else {
+        for(var key in this.list){
+            if(key == id)   {return this.list[key];}
+            var object = this.list[key].childrens.getObject(id,true);
+            if(object)      {return object;}
+        }
+        return false
+    }
+};
+PropertyListing.prototype.getObjectsMap = function(){
+    var map = {};
+    for(var key in this.list){
+        map[key] = this.list[key].childrens.getObjectsMap();
+    }
+    return map;
+};
+/**
  * Created by takovoy on 22.11.2014.
  */
 
@@ -425,6 +504,35 @@ function Line ( options ) {
 
 Line.prototype = Object.create(CanvasObject.prototype);
 
+Object.defineProperties(Line.prototype,{
+    points : {
+        get: function(){
+
+            if(!this.services.points){
+                this.services.points = [];
+            }
+
+            var radian  = this.radian - ( Math.PI/4 ),
+                sin     = Math.sin( radian ),
+                cos     = Math.cos( radian );
+
+            for( var key = 0;this.now.points[key];key++){
+                var coordinate = this.now.points[key];
+                this.services.points[key] = [
+                    coordinate[0] * cos - coordinate[1] * sin,
+                    coordinate[0] * sin + coordinate[1] * cos,
+                    coordinate[2]
+                ]
+            }
+
+            return this.services.points;
+        },
+        set: function(value){
+            this.now.points = value;
+        }
+    }
+});
+
 Line.prototype.animate = function(context){
     if(this.now.points.length < 2){return;}
     context.beginPath();
@@ -691,85 +799,6 @@ Spline.prototype.animate = function(context){
     }
     changeContext(context,this.now);
     context.closePath();
-};
-/**
- * Created by takovoySuper on 12.05.2015.
- */
-
-function EventsListing (){
-    this.list   = {};
-}
-
-//проверить ?
-EventsListing.prototype.append = function(property,theComparisonValue,operation){
-    if(!this.list[property]){
-        this.list[property] = {};
-    }
-    if(!this.list[property][theComparisonValue]){
-        this.list[property][theComparisonValue] = [];
-    }
-    this.list[property][theComparisonValue].push(operation);
-};
-EventsListing.prototype.remove = function(property,theComparisonValue){
-    if(!theComparisonValue){
-        delete this.list[property];
-        return
-    }
-    delete this.list[property][theComparisonValue];
-    if(Object.keys(this.list[property]).length == 0){
-        delete this.list[property];
-    }
-};
-/**
- * Created by takovoySuper on 14.04.2015.
- */
-
-function Listing (){
-    this.list   = {};
-    this.append = function(name,data){
-        this.list[name] = data;
-    };
-    this.remove = function(name){
-        delete this.list[name];
-    };
-}
-/**
- * Created by takovoy on 17.02.2015.
- */
-
-function PropertyListing (append,remove,parent){
-    this.list   = {};
-    this.up     = append || function(){};
-    this.rem    = remove || function(){};
-    this.parent = parent;
-}
-
-PropertyListing.prototype.append = function (object) {
-    this.list[object.id] = object;
-    return this.up(this.parent,object);
-};
-PropertyListing.prototype.remove = function (id) {
-    delete this.list[id];
-    this.rem(this.parent);
-};
-PropertyListing.prototype.getObject = function (id,recourse) {
-    if(!recourse){
-        return this.list[id];
-    } else {
-        for(var key in this.list){
-            if(key == id)   {return this.list[key];}
-            var object = this.list[key].childrens.getObject(id,true);
-            if(object)      {return object;}
-        }
-        return false
-    }
-};
-PropertyListing.prototype.getObjectsMap = function(){
-    var map = {};
-    for(var key in this.list){
-        map[key] = this.list[key].childrens.getObjectsMap();
-    }
-    return map;
 };
 /**
  * Created by takovoy on 31.07.2016.
