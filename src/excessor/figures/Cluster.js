@@ -1,7 +1,3 @@
-/**
- * Created by yeIAmCrasyProgrammer on 10.10.2016.
- */
-
 function Cluster ( count, correlation ){
     this.parameters     = {
         list        : {},

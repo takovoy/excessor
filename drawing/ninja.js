@@ -2,7 +2,7 @@ var ninjaPath = SVGParser('<svg xmlns:xlink="http://www.w3.org/1999/xlink" xmlns
 
 var wrap = new CanvasObject({
     drawing: scene,
-    radian: -Math.PI*0.75,
+    radian: -Math.PI,
     x:500,
     y:1000
 }).start();

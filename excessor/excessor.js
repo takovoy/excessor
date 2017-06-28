@@ -57,85 +57,6 @@ Object.defineProperty(Drawing.prototype,'fps',{
     }
 });
 /**
- * Created by takovoySuper on 12.05.2015.
- */
-
-function EventsListing (){
-    this.list   = {};
-}
-
-//проверить ?
-EventsListing.prototype.append = function(property,theComparisonValue,operation){
-    if(!this.list[property]){
-        this.list[property] = {};
-    }
-    if(!this.list[property][theComparisonValue]){
-        this.list[property][theComparisonValue] = [];
-    }
-    this.list[property][theComparisonValue].push(operation);
-};
-EventsListing.prototype.remove = function(property,theComparisonValue){
-    if(!theComparisonValue){
-        delete this.list[property];
-        return
-    }
-    delete this.list[property][theComparisonValue];
-    if(Object.keys(this.list[property]).length == 0){
-        delete this.list[property];
-    }
-};
-/**
- * Created by takovoySuper on 14.04.2015.
- */
-
-function Listing (){
-    this.list   = {};
-    this.append = function(name,data){
-        this.list[name] = data;
-    };
-    this.remove = function(name){
-        delete this.list[name];
-    };
-}
-/**
- * Created by takovoy on 17.02.2015.
- */
-
-function PropertyListing (append,remove,parent){
-    this.list   = {};
-    this.up     = append || function(){};
-    this.rem    = remove || function(){};
-    this.parent = parent;
-}
-
-PropertyListing.prototype.append = function (object) {
-    this.list[object.id] = object;
-    return this.up(this.parent,object);
-};
-PropertyListing.prototype.remove = function (id) {
-    delete this.list[id];
-    this.rem(this.parent);
-};
-PropertyListing.prototype.getObject = function (id,recourse) {
-    if(!recourse){
-        return this.list[id];
-    } else {
-        for(var key in this.list){
-            if(key == id)   {return this.list[key];}
-            var object = this.list[key].childrens.getObject(id,true);
-            if(object)      {return object;}
-        }
-        return false
-    }
-};
-PropertyListing.prototype.getObjectsMap = function(){
-    var map = {};
-    for(var key in this.list){
-        map[key] = this.list[key].childrens.getObjectsMap();
-    }
-    return map;
-};
-/**
  * Created by takovoy on 22.11.2014.
  */
 
@@ -205,6 +126,32 @@ Object.defineProperties(CanvasObject.prototype,{
         },
         set: function( value ){
             this.now.radian = +value;
+        }
+    },
+    points : {
+        get: function(){
+            if(!this.now.points){return}
+            if(!this.services.points){
+                this.services.points = [];
+            }
+
+            var radian  = this.radian,
+                sin     = Math.sin( radian ),
+                cos     = Math.cos( radian );
+
+            for( var key = 0;this.now.points[key];key++){
+                var coordinate = this.now.points[key];
+                this.services.points[key] = [
+                    coordinate[0] * cos - coordinate[1] * sin,
+                    coordinate[0] * sin + coordinate[1] * cos,
+                    coordinate[2]
+                ]
+            }
+
+            return this.services.points;
+        },
+        set: function( value ){
+
         }
     }
 });
@@ -396,29 +343,21 @@ Object.defineProperties( Cluster.prototype,{
         }
     }
 });
-/**
- * Created by takovoy on 22.01.2015.
- */
-
 function Curve ( options ) {
-    CanvasObject.apply(this,arguments);
-    this.constructor    = Curve;
-    this.now.step       = +this.now.step || +options.step || 1;
-    this.points         = this.now.points || options.points || [];
-    this.services.points= [];
+    Line.apply(this,arguments);
+    this.constructor = Curve;
 }
 
 Curve.prototype = Object.create( CanvasObject.prototype );
 
-Object.defineProperties(CanvasObject.prototype,{
+Object.defineProperties(Curve.prototype,{
     points : {
         get: function(){
-
             if(!this.services.points){
                 this.services.points = [];
             }
 
-            var radian  = this.radian - ( Math.PI/4 ),
+            var radian  = this.radian,
                 sin     = Math.sin( radian ),
                 cos     = Math.cos( radian );
 
@@ -432,7 +371,6 @@ Object.defineProperties(CanvasObject.prototype,{
             }
 
             return this.services.points;
-
         },
         set: function(value){
             this.services.length = formula.getLengthOfCurve(value,this.now.step);
@@ -498,8 +436,14 @@ Ellipse.prototype.animate = function(context){
 function Line ( options ) {
     CanvasObject.apply(this,arguments);
     this.constructor    = Line;
-    this.now.points     = this.now.points || options.points || [];
+    this.points         = this.now.points || options.points || [];
+    this.now.step       = +this.now.step || +options.step || 1;
     this.services.points= [];
+    if(this.now.shift === 0 || options.shift === 0){
+        this.now.shift  = 0;
+    } else {
+        this.now.shift  = this.now.shift || options.shift || 100;
+    }
 }
 
 Line.prototype = Object.create(CanvasObject.prototype);
@@ -507,12 +451,11 @@ Line.prototype = Object.create(CanvasObject.prototype);
 Object.defineProperties(Line.prototype,{
     points : {
         get: function(){
-
             if(!this.services.points){
                 this.services.points = [];
             }
 
-            var radian  = this.radian - ( Math.PI/4 ),
+            var radian  = this.radian,
                 sin     = Math.sin( radian ),
                 cos     = Math.cos( radian );
 
@@ -735,11 +678,10 @@ Rect.prototype.animate = function( context ){
  */
 
 function Spline ( options ) {
-    CanvasObject.apply(this,arguments);
+    Curve.apply(this,arguments);
     this.constructor    = Spline;
     this.now.step       = +this.now.step || +options.step || 1;
     this.points         = this.now.points || options.points || [];
-    this.services.points= [];
 }
 
 Spline.prototype = Object.create( CanvasObject.prototype );
@@ -747,12 +689,11 @@ Spline.prototype = Object.create( CanvasObject.prototype );
 Object.defineProperties(Spline.prototype,{
     points : {
         get: function(){
-
             if(!this.services.points){
                 this.services.points = [];
             }
 
-            var radian  = this.radian - ( Math.PI/4 ),
+            var radian  = this.radian,
                 sin     = Math.sin( radian ),
                 cos     = Math.cos( radian );
 
@@ -766,7 +707,6 @@ Object.defineProperties(Spline.prototype,{
             }
 
             return this.services.points;
-
         },
         set: function(value){
             this.services.map   = formula.getMapOfSpline(value,this.now.step);
@@ -799,6 +739,85 @@ Spline.prototype.animate = function(context){
     }
     changeContext(context,this.now);
     context.closePath();
+};
+/**
+ * Created by takovoySuper on 12.05.2015.
+ */
+
+function EventsListing (){
+    this.list   = {};
+}
+
+//проверить ?
+EventsListing.prototype.append = function(property,theComparisonValue,operation){
+    if(!this.list[property]){
+        this.list[property] = {};
+    }
+    if(!this.list[property][theComparisonValue]){
+        this.list[property][theComparisonValue] = [];
+    }
+    this.list[property][theComparisonValue].push(operation);
+};
+EventsListing.prototype.remove = function(property,theComparisonValue){
+    if(!theComparisonValue){
+        delete this.list[property];
+        return
+    }
+    delete this.list[property][theComparisonValue];
+    if(Object.keys(this.list[property]).length == 0){
+        delete this.list[property];
+    }
+};
+/**
+ * Created by takovoySuper on 14.04.2015.
+ */
+
+function Listing (){
+    this.list   = {};
+    this.append = function(name,data){
+        this.list[name] = data;
+    };
+    this.remove = function(name){
+        delete this.list[name];
+    };
+}
+/**
+ * Created by takovoy on 17.02.2015.
+ */
+
+function PropertyListing (append,remove,parent){
+    this.list   = {};
+    this.up     = append || function(){};
+    this.rem    = remove || function(){};
+    this.parent = parent;
+}
+
+PropertyListing.prototype.append = function (object) {
+    this.list[object.id] = object;
+    return this.up(this.parent,object);
+};
+PropertyListing.prototype.remove = function (id) {
+    delete this.list[id];
+    this.rem(this.parent);
+};
+PropertyListing.prototype.getObject = function (id,recourse) {
+    if(!recourse){
+        return this.list[id];
+    } else {
+        for(var key in this.list){
+            if(key == id)   {return this.list[key];}
+            var object = this.list[key].childrens.getObject(id,true);
+            if(object)      {return object;}
+        }
+        return false
+    }
+};
+PropertyListing.prototype.getObjectsMap = function(){
+    var map = {};
+    for(var key in this.list){
+        map[key] = this.list[key].childrens.getObjectsMap();
+    }
+    return map;
 };
 /**
  * Created by takovoy on 31.07.2016.

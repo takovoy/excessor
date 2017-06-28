@@ -1,7 +1,3 @@
-/**
- * Created by takovoy on 14.09.2014.
- */
-
 var formula = {
     getPointOnCircle: function(radian,radius,centerX,centerY){
         centerX = +centerX || 0;

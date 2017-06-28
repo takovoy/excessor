@@ -1,26 +1,18 @@
-/**
- * Created by takovoy on 22.01.2015.
- */
-
 function Curve ( options ) {
-    CanvasObject.apply(this,arguments);
-    this.constructor    = Curve;
-    this.now.step       = +this.now.step || +options.step || 1;
-    this.points         = this.now.points || options.points || [];
-    this.services.points= [];
+    Line.apply(this,arguments);
+    this.constructor = Curve;
 }
 
 Curve.prototype = Object.create( CanvasObject.prototype );
 
-Object.defineProperties(CanvasObject.prototype,{
+Object.defineProperties(Curve.prototype,{
     points : {
         get: function(){
-
             if(!this.services.points){
                 this.services.points = [];
             }
 
-            var radian  = this.radian - ( Math.PI/4 ),
+            var radian  = this.radian,
                 sin     = Math.sin( radian ),
                 cos     = Math.cos( radian );
 
@@ -34,7 +26,6 @@ Object.defineProperties(CanvasObject.prototype,{
             }
 
             return this.services.points;
-
         },
         set: function(value){
             this.services.length = formula.getLengthOfCurve(value,this.now.step);
