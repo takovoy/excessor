@@ -1,13 +1,7 @@
-/**
- * Created by takovoy on 22.01.2015.
- */
 
 function Path ( options ) {
-    CanvasObject.apply(this,arguments);
-    this.constructor    = Path;
-    this.now.step       = +this.now.step || +options.step || 1;
-    this.points         = this.now.points || options.points || [];
-    this.services.points= [];
+    Line.apply(this,arguments);
+    this.constructor = Path;
 }
 
 Path.prototype = Object.create( CanvasObject.prototype );
@@ -15,12 +9,11 @@ Path.prototype = Object.create( CanvasObject.prototype );
 Object.defineProperties(Path.prototype,{
     points : {
         get: function(){
-
             if(!this.services.points){
                 this.services.points = [];
             }
 
-            var radian  = this.radian - ( Math.PI/4 ),
+            var radian  = this.radian,
                 sin     = Math.sin( radian ),
                 cos     = Math.cos( radian );
 
@@ -60,8 +53,7 @@ Path.prototype.animate = function(context){
     }
     var lastPoint = points[0];
     for(var i = 0;i <= this.now.shift;i += this.now.step){
-        //var coord = formula.getPointOnSpline(i,points,this.services);
-        var coord = formula.getPointOnPath(i,this.points);
+        var coord = formula.getPointOnPath(i,this.points,this.services);
         if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
         lastPoint = coord;
         context.lineTo(coord[0] + center[0],coord[1] + center[1]);

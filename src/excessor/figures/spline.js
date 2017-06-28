@@ -1,13 +1,7 @@
-/**
- * Created by takovoy on 22.01.2015.
- */
 
 function Spline ( options ) {
-    CanvasObject.apply(this,arguments);
+    Line.apply(this,arguments);
     this.constructor    = Spline;
-    this.now.step       = +this.now.step || +options.step || 1;
-    this.points         = this.now.points || options.points || [];
-    this.services.points= [];
 }
 
 Spline.prototype = Object.create( CanvasObject.prototype );
@@ -15,12 +9,11 @@ Spline.prototype = Object.create( CanvasObject.prototype );
 Object.defineProperties(Spline.prototype,{
     points : {
         get: function(){
-
             if(!this.services.points){
                 this.services.points = [];
             }
 
-            var radian  = this.radian - ( Math.PI/4 ),
+            var radian  = this.radian,
                 sin     = Math.sin( radian ),
                 cos     = Math.cos( radian );
 

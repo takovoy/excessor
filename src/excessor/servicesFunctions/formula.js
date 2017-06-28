@@ -207,7 +207,7 @@ formula.getMapOfPath = function (points, step) {
             map[index] = [point];
         }
     }
-    if(typeof map[index] !== 'number'){map[index] = formula.getLengthOfCurve(map[index],step);}
+    if(typeof map[index] === 'number'){map[index] = formula.getLengthOfCurve(map[index],step);}
     return map;
 };
 

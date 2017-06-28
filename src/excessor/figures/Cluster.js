@@ -1,3 +1,4 @@
+
 function Cluster ( count, correlation ){
     this.parameters     = {
         list        : {},

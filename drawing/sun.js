@@ -45,17 +45,7 @@ center
     .append(new Curve   ({
         id              : 'light',
         settings        : {fill: '#FFB151', radian: -Math.PI/2}, x: 70,
-        points          : [
-            [0,0],
-            [20,0],
-            [45,50],
-            [-50,10],
-            [0,130],
-            [50,10],
-            [-45,50],
-            [-20,0],
-            [0,0]
-        ]
+        points          : [[0,0], [20,0], [45,50], [-50,10], [0,130], [50,10], [-45,50], [-20,0], [0,0]]
     }))
     .operationContext
     .append(beamsCluster)

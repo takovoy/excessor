@@ -1,12 +1,15 @@
-/**
- * Created by takovoy on 12.12.2014.
- */
 
 function Line ( options ) {
     CanvasObject.apply(this,arguments);
     this.constructor    = Line;
-    this.now.points     = this.now.points || options.points || [];
+    this.now.step       = +this.now.step || +options.step || 1;
+    this.points         = this.now.points || options.points || [];
     this.services.points= [];
+    if(this.now.shift === 0 || options.shift === 0){
+        this.now.shift  = 0;
+    } else {
+        this.now.shift  = this.now.shift || options.shift || 100;
+    }
 }
 
 Line.prototype = Object.create(CanvasObject.prototype);
@@ -14,12 +17,11 @@ Line.prototype = Object.create(CanvasObject.prototype);
 Object.defineProperties(Line.prototype,{
     points : {
         get: function(){
-
             if(!this.services.points){
                 this.services.points = [];
             }
 
-            var radian  = this.radian - ( Math.PI/4 ),
+            var radian  = this.radian,
                 sin     = Math.sin( radian ),
                 cos     = Math.cos( radian );
 

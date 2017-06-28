@@ -1,3 +1,4 @@
+
 function Curve ( options ) {
     Line.apply(this,arguments);
     this.constructor = Curve;
@@ -47,7 +48,6 @@ Curve.prototype.animate = function(context){
     }
     var lastPoint = points[0];
     for(var i = 0;i <= this.now.shift;i += this.now.step){
-        //var coord = formula.getPointOnSpline(i,points,this.services);
         var coord = formula.getPointOnCurve(i,this.points);
         if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
         lastPoint = coord;

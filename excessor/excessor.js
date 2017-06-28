@@ -56,9 +56,6 @@ Object.defineProperty(Drawing.prototype,'fps',{
         this._fps = value
     }
 });
-/**
- * Created by takovoy on 22.11.2014.
- */
 
 function CanvasObject ( options ) {
     options             = options || {};
@@ -131,13 +128,10 @@ Object.defineProperties(CanvasObject.prototype,{
     points : {
         get: function(){
             if(!this.now.points){return}
-            if(!this.services.points){
-                this.services.points = [];
-            }
 
-            var radian  = this.radian,
-                sin     = Math.sin( radian ),
-                cos     = Math.cos( radian );
+            if(!this.services.points){this.services.points = [];}
+
+            var radian = this.radian, sin = Math.sin( radian ), cos = Math.cos( radian );
 
             for( var key = 0;this.now.points[key];key++){
                 var coordinate = this.now.points[key];
@@ -149,10 +143,9 @@ Object.defineProperties(CanvasObject.prototype,{
             }
 
             return this.services.points;
-        },
-        set: function( value ){
 
-        }
+        },
+        set: function(value){}
     }
 });
 
@@ -216,7 +209,11 @@ function Circle ( options ) {
     CanvasObject.apply( this, arguments );
     this.constructor    = Circle;
     this.now.radius     = this.now.radius || options.radius || 0;
-    this.now.shift      = this.now.shift || options.shift || 100;
+    if(this.now.shift === 0 || options.shift === 0){
+        this.now.shift  = 0;
+    } else {
+        this.now.shift  = this.now.shift || options.shift || 100;
+    }
 }
 
 Circle.prototype = Object.create( CanvasObject.prototype );
@@ -228,9 +225,6 @@ Circle.prototype.animate = function( context ){
     changeContext( context, this.now );
     context.closePath();
 };
-/**
- * Created by yeIAmCrasyProgrammer on 10.10.2016.
- */
 
 function Cluster ( count, correlation ){
     this.parameters     = {
@@ -343,6 +337,7 @@ Object.defineProperties( Cluster.prototype,{
         }
     }
 });
+
 function Curve ( options ) {
     Line.apply(this,arguments);
     this.constructor = Curve;
@@ -392,7 +387,6 @@ Curve.prototype.animate = function(context){
     }
     var lastPoint = points[0];
     for(var i = 0;i <= this.now.shift;i += this.now.step){
-        //var coord = formula.getPointOnSpline(i,points,this.services);
         var coord = formula.getPointOnCurve(i,this.points);
         if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
         lastPoint = coord;
@@ -429,15 +423,12 @@ Ellipse.prototype.animate = function(context){
 
     context.closePath();
 };
-/**
- * Created by takovoy on 12.12.2014.
- */
 
 function Line ( options ) {
     CanvasObject.apply(this,arguments);
     this.constructor    = Line;
-    this.points         = this.now.points || options.points || [];
     this.now.step       = +this.now.step || +options.step || 1;
+    this.points         = this.now.points || options.points || [];
     this.services.points= [];
     if(this.now.shift === 0 || options.shift === 0){
         this.now.shift  = 0;
@@ -494,16 +485,10 @@ Line.prototype.animate = function(context){
     changeContext(context,this.now);
     context.closePath();
 };
-/**
- * Created by takovoy on 22.01.2015.
- */
 
 function Path ( options ) {
-    CanvasObject.apply(this,arguments);
-    this.constructor    = Path;
-    this.now.step       = +this.now.step || +options.step || 1;
-    this.points         = this.now.points || options.points || [];
-    this.services.points= [];
+    Line.apply(this,arguments);
+    this.constructor = Path;
 }
 
 Path.prototype = Object.create( CanvasObject.prototype );
@@ -511,12 +496,11 @@ Path.prototype = Object.create( CanvasObject.prototype );
 Object.defineProperties(Path.prototype,{
     points : {
         get: function(){
-
             if(!this.services.points){
                 this.services.points = [];
             }
 
-            var radian  = this.radian - ( Math.PI/4 ),
+            var radian  = this.radian,
                 sin     = Math.sin( radian ),
                 cos     = Math.cos( radian );
 
@@ -556,8 +540,7 @@ Path.prototype.animate = function(context){
     }
     var lastPoint = points[0];
     for(var i = 0;i <= this.now.shift;i += this.now.step){
-        //var coord = formula.getPointOnSpline(i,points,this.services);
-        var coord = formula.getPointOnPath(i,this.points);
+        var coord = formula.getPointOnPath(i,this.points,this.services);
         if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
         lastPoint = coord;
         context.lineTo(coord[0] + center[0],coord[1] + center[1]);
@@ -673,15 +656,10 @@ Rect.prototype.animate = function( context ){
     changeContext( context, this.now );
     context.closePath();
 };
-/**
- * Created by takovoy on 22.01.2015.
- */
 
 function Spline ( options ) {
-    Curve.apply(this,arguments);
+    Line.apply(this,arguments);
     this.constructor    = Spline;
-    this.now.step       = +this.now.step || +options.step || 1;
-    this.points         = this.now.points || options.points || [];
 }
 
 Spline.prototype = Object.create( CanvasObject.prototype );
@@ -707,6 +685,7 @@ Object.defineProperties(Spline.prototype,{
             }
 
             return this.services.points;
+
         },
         set: function(value){
             this.services.map   = formula.getMapOfSpline(value,this.now.step);
@@ -1101,10 +1080,6 @@ var dynamic = {
         }
     }
 };
-/**
- * Created by takovoy on 14.09.2014.
- */
-
 var formula = {
     getPointOnCircle: function(radian,radius,centerX,centerY){
         centerX = +centerX || 0;
@@ -1314,7 +1289,7 @@ formula.getMapOfPath = function (points, step) {
             map[index] = [point];
         }
     }
-    if(typeof map[index] !== 'number'){map[index] = formula.getLengthOfCurve(map[index],step);}
+    if(typeof map[index] === 'number'){map[index] = formula.getLengthOfCurve(map[index],step);}
     return map;
 };
 

@@ -6,7 +6,11 @@ function Circle ( options ) {
     CanvasObject.apply( this, arguments );
     this.constructor    = Circle;
     this.now.radius     = this.now.radius || options.radius || 0;
-    this.now.shift      = this.now.shift || options.shift || 100;
+    if(this.now.shift === 0 || options.shift === 0){
+        this.now.shift  = 0;
+    } else {
+        this.now.shift  = this.now.shift || options.shift || 100;
+    }
 }
 
 Circle.prototype = Object.create( CanvasObject.prototype );

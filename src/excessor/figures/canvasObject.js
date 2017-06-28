@@ -1,6 +1,3 @@
-/**
- * Created by takovoy on 22.11.2014.
- */
 
 function CanvasObject ( options ) {
     options             = options || {};
@@ -69,6 +66,28 @@ Object.defineProperties(CanvasObject.prototype,{
         set: function( value ){
             this.now.radian = +value;
         }
+    },
+    points : {
+        get: function(){
+            if(!this.now.points){return}
+
+            if(!this.services.points){this.services.points = [];}
+
+            var radian = this.radian, sin = Math.sin( radian ), cos = Math.cos( radian );
+
+            for( var key = 0;this.now.points[key];key++){
+                var coordinate = this.now.points[key];
+                this.services.points[key] = [
+                    coordinate[0] * cos - coordinate[1] * sin,
+                    coordinate[0] * sin + coordinate[1] * cos,
+                    coordinate[2]
+                ]
+            }
+
+            return this.services.points;
+
+        },
+        set: function(value){}
     }
 });
 
