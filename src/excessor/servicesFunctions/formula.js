@@ -171,11 +171,11 @@ formula.getPointOnSpline = function (shift, points, services) {
 
 formula.getLengthOfEllipticArc = function (radiusX, radiusY, startRadian, endRadian, step) {
     var length = 0;
-    var something = this.getPointOnEllipse(radiusX,radiusY,startRadian);
+    var lastPoint = this.getPointOnEllipse(radiusX,radiusY,startRadian);
     for(var i = startRadian;i<=endRadian;i+=step){
         var point = this.getPointOnEllipse(radiusX,radiusY,i);
-        length += this.getCenterToPointDistance([point[0]-something[0],point[1]-something[1]]);
-        something = point;
+        length += this.getCenterToPointDistance([point[0]-lastPoint[0],point[1]-lastPoint[1]]);
+        lastPoint = point;
     }
     return length;
 };
@@ -183,31 +183,32 @@ formula.getLengthOfEllipticArc = function (radiusX, radiusY, startRadian, endRad
 formula.getMapOfPath = function (points, step) {
     var map = [[]];
     var index = 0;
+    var lastPoint = [];
     for(var i = 0;points[i];i++){
         var point = points[i];
         if(points[i].length > 3){
-            if(i>1 && !map[index][0]){index++}
-            var lastPoint = map[index][0] || [];
-            map[index] = this.getLengthOfEllipticArc(point[0], point[1], point[2], point[3], step || 0.01);
-            index++;
+            map[index] = this.getLengthOfEllipticArc(point[0], point[1], point[2], point[3], 0.01);
             if(!points[i+1]){continue}
             var centerOfArc = this.getPointOnEllipse(
                 point[0], point[1], point[2] + Math.PI, point[4],
-                lastPoint[0] || points[i-1][0] || 0, lastPoint[1] || points[i-1][1] || 0
+                lastPoint[0] || 0, lastPoint[1] || 0
             );
             var endOfArc = this.getPointOnEllipse(point[0], point[1], point[3], point[4], centerOfArc[0], centerOfArc[1]);
+            index++;
             map[index] = [endOfArc];
+            lastPoint = endOfArc;
             continue;
         }
         var curvePointsCount = map[index].length;
         map[index][+curvePointsCount] = point;
-        if(point[2] && i != points.length - 1){
+        if((point[2] || (points[i+1] && points[i+1].length > 3)) && i != points.length - 1){
             map[index] = formula.getLengthOfCurve(map[index],step);
             index++;
             map[index] = [point];
         }
+        lastPoint = point;
     }
-    if(typeof map[index] === 'number'){map[index] = formula.getLengthOfCurve(map[index],step);}
+    if(typeof map[index] !== 'number'){map[index] = formula.getLengthOfCurve(map[index],step);}
     return map;
 };
 

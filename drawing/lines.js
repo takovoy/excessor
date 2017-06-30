@@ -1,8 +1,8 @@
-//var line = new Line({
-//    drawing: scene,
-//    points: [[100,100], [200,200]],
-//    settings: {stroke: '#000000'}
-//}).start();
+var line = new Line({
+    drawing: scene,
+    points: [[100,100], [200,200]],
+    settings: {stroke: '#000000'}
+}).start();
 
 var path = new Path({
     drawing: scene,
