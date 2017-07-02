@@ -48,7 +48,7 @@ Curve.prototype.animate = function(context){
     }
     var lastPoint = points[0];
     for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnCurve(i,this.points);
+        var coord = formula.getPointOnCurve(i,points);
         if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
         lastPoint = coord;
         context.lineTo(coord[0] + center[0],coord[1] + center[1]);

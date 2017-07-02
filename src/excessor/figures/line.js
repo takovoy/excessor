@@ -43,18 +43,22 @@ Object.defineProperties(Line.prototype,{
 });
 
 Line.prototype.animate = function(context){
-    if(this.now.points.length < 2){return;}
+    var points = this.points;
+    var center = [this.x,this.y];
+    if(points.length < 2) {return}
     context.beginPath();
     context.moveTo(
-        this.points[0][0] + this.x,
-        this.points[0][1] + this.y
+        points[0][0] + center[0],
+        points[0][1] + center[1]
     );
-
     if(this.now.shift > 101){
         this.now.shift = 101;
     }
+    var lastPoint = points[0];
     for(var i = 0;i <= this.now.shift;i += this.now.step){
         var coord = formula.getPointOnLine(i,this.points);
+        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
+        lastPoint = coord;
         context.lineTo(coord[0] + this.x,coord[1] + this.y);
     }
     changeContext(context,this.now);

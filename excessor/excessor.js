@@ -56,6 +56,760 @@ Object.defineProperty(Drawing.prototype,'fps',{
         this._fps = value
     }
 });
+
+function CanvasObject ( options ) {
+    options             = options || {};
+    this.id             = options.id || '' + Math.random();
+    this.now            = options.settings || {};
+    this.now.x          = this.now.x || options.x || 0;
+    this.now.y          = this.now.y || options.y || 0;
+    this.now.radian     = this.now.radian || options.radian || 0;
+    this.services       = {};
+    this._transform     = new Listing();
+    this.childrens      = new PropertyListing(
+        function( self, object ){
+            object.parent           = self;
+            object.drawing          = self.drawing;
+            self.operationContext   = object;
+            return self;
+        },
+        function( self ){
+
+        },
+        this
+    );
+    this.drawing = options.drawing || undefined;
+}
+
+Object.defineProperties(CanvasObject.prototype,{
+    x       : {
+        get: function(){
+            if( this.parent ){
+                return (
+                    this.now.x * Math.cos( this.parent.radian ) -
+                    this.now.y * Math.sin( this.parent.radian ) +
+                    this.parent.x
+                );
+            }
+            return +this.now.x;
+        },
+        set: function( value ){
+            this.now.x = +value;
+        }
+    },
+
+    y       : {
+        get: function(){
+            if( this.parent ){
+                return (
+                    this.now.x * Math.sin( this.parent.radian ) +
+                    this.now.y * Math.cos( this.parent.radian ) +
+                    this.parent.y
+                );
+            }
+            return +this.now.y;
+        },
+        set: function( value ){
+            this.now.y = +value;
+        }
+    },
+
+    radian  : {
+        get: function(){
+            if( this.parent ){
+                return +this.parent.radian + +this.now.radian;
+            }
+            return +this.now.radian;
+        },
+        set: function( value ){
+            this.now.radian = +value;
+        }
+    },
+    points : {
+        get: function(){
+            if(!this.now.points){return}
+
+            if(!this.services.points){this.services.points = [];}
+
+            var radian = this.radian, sin = Math.sin( radian ), cos = Math.cos( radian );
+
+            for( var key = 0;this.now.points[key];key++){
+                var coordinate = this.now.points[key];
+                this.services.points[key] = [
+                    coordinate[0] * cos - coordinate[1] * sin,
+                    coordinate[0] * sin + coordinate[1] * cos,
+                    coordinate[2]
+                ]
+            }
+
+            return this.services.points;
+
+        },
+        set: function(value){}
+    }
+});
+
+CanvasObject.prototype.start        = function(){
+    this.drawing.stack.append( this );
+    return this;
+};
+CanvasObject.prototype.stop         = function(){
+    this.drawing.stack.remove( this.id );
+    return this;
+};
+CanvasObject.prototype.animate      = function(){};
+CanvasObject.prototype.transform    = function( transform ){
+    if ( !this._transform ) {
+        this._transform = new Listing();
+    }
+    if ( !transform ) {return this._transform;}
+    this._transform.append( transform.id, transform );
+    this.operationContext = transform;
+    return this;
+};
+CanvasObject.prototype.move         = function( coord, time ){
+    if( !time ){
+        this.x = coord[0];
+        this.y = coord[1];
+        return;
+    }
+    return this.transform(new Transform({
+        property: 'trajectory',
+        type    : 'line',
+        points  : [
+            [
+                this.x,
+                this.y
+            ],
+            coord
+        ],
+        time    : time
+    }));
+};
+CanvasObject.prototype.moveProperty   = function( property, value, time ){
+    if( !time ){
+        this.now[property] = value;
+        return;
+    }
+    return this.transform(new Transform({
+        property:property,
+        start   : this.now[property],
+        end     : value,
+        time    : time
+    }))
+};
+CanvasObject.prototype.append   = function( object ){
+    return this.childrens.append( object );
+};
+/**
+ * Created by takovoy on 30.11.2014.
+ */
+
+function Circle ( options ) {
+    CanvasObject.apply( this, arguments );
+    this.constructor    = Circle;
+    this.now.radius     = this.now.radius || options.radius || 0;
+    if(this.now.shift === 0 || options.shift === 0){
+        this.now.shift  = 0;
+    } else {
+        this.now.shift  = this.now.shift || options.shift || 100;
+    }
+}
+
+Circle.prototype = Object.create( CanvasObject.prototype );
+
+Circle.prototype.animate = function( context ){
+    context.beginPath();
+    var radian = this.radian;
+    context.arc( this.x, this.y, this.now.radius, radian, Math.PI*2/100*this.now.shift + radian );
+    changeContext( context, this.now );
+    context.closePath();
+};
+
+function Cluster ( count, correlation ){
+    this.parameters     = {
+        list        : {},
+        iteration   : false
+    };
+    CanvasObject.apply( this, [{}] );
+    this.correlation    = correlation || {};
+    this.count          = count || 0;
+    this.iteration      = 1;
+    this.constructor    = Cluster;
+}
+
+Cluster.prototype = Object.create( CanvasObject.prototype );
+
+Cluster.prototype.transform = function(){
+    if( !this._transform ){
+        this._transform = new Listing();
+    }
+    return this._transform;
+};
+
+Cluster.prototype.animate = function(){
+    if( this.iteration > this.count ){
+        this.iteration = 1;
+        return;
+    }
+    this._animate = this.parent.animate;
+    this._animate( this.drawing.context );
+    this.iteration++;
+    this.animate();
+};
+
+Object.defineProperties( Cluster.prototype,{
+    now     : {
+        get : function(){
+            if( this.parameters.iteration !== this.iteration && this.parent ) {
+                for( var key in this.parent.now ){
+                    if ( !this.correlation[key] ) {
+                        this.parameters.list[key] = this.parent.now[key];
+                        continue;
+                    }
+                    var correlation = +this.correlation[key];
+                    if( typeof this.correlation[key] == "function" ){
+                        correlation = +this.correlation[key]( this.iteration, this );
+                    }
+                    this.parameters.list[key] = this.parent.now[key] + (correlation * this.iteration);
+                }
+                this.parameters.iteration = +this.iteration;
+            }
+            return this.parameters.list;
+        },
+
+        set : function( value ){
+            return this.parameters.list;
+        }
+    },
+
+
+    x       : {
+        get : function(){
+            if( this.parent.parent ){
+                return (
+                    this.now.x * Math.cos( this.parent.parent.radian ) -
+                    this.now.y * Math.sin( this.parent.parent.radian ) +
+                    this.parent.parent.x
+                );
+            }
+            return +this.now.x;
+        },
+        set : function( value ){
+            return +this.now.x;
+        }
+    },
+
+    y       : {
+        get : function(){
+            if( this.parent.parent ){
+                return (
+                    this.now.x * Math.sin( this.parent.parent.radian ) +
+                    this.now.y * Math.cos( this.parent.parent.radian ) +
+                    this.parent.parent.y
+                );
+            }
+            return +this.now.y;
+        },
+        set : function( value ){
+            return +this.now.y;
+        }
+    },
+
+    radian  : {
+        get: function(){
+            if( this.parent.parent ){
+                return +this.parent.parent.radian + +this.now.radian;
+            }
+            return +this.now.radian;
+        },
+        set: function( value ){
+            return +this.now.radian;
+        }
+    },
+
+    services: {
+        get: function(){
+            return this.parent.services;
+        },
+        set: function( value ){
+
+        }
+    }
+});
+
+function Curve ( options ) {
+    Line.apply(this,arguments);
+    this.constructor = Curve;
+}
+
+Curve.prototype = Object.create( CanvasObject.prototype );
+
+Object.defineProperties(Curve.prototype,{
+    points : {
+        get: function(){
+            if(!this.services.points){
+                this.services.points = [];
+            }
+
+            var radian  = this.radian,
+                sin     = Math.sin( radian ),
+                cos     = Math.cos( radian );
+
+            for( var key = 0;this.now.points[key];key++){
+                var coordinate = this.now.points[key];
+                this.services.points[key] = [
+                    coordinate[0] * cos - coordinate[1] * sin,
+                    coordinate[0] * sin + coordinate[1] * cos,
+                    coordinate[2]
+                ]
+            }
+
+            return this.services.points;
+        },
+        set: function(value){
+            this.services.length = formula.getLengthOfCurve(value,this.now.step);
+            this.now.points = value;
+        }
+    }
+});
+Curve.prototype.animate = function(context){
+    var points = this.points;
+    var center = [this.x,this.y];
+    if(points.length < 2) {return}
+    context.beginPath();
+    context.moveTo(
+        points[0][0] + center[0],
+        points[0][1] + center[1]
+    );
+    if(this.now.shift > 100){
+        this.now.shift = 100;
+    }
+    var lastPoint = points[0];
+    for(var i = 0;i <= this.now.shift;i += this.now.step){
+        var coord = formula.getPointOnCurve(i,points);
+        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
+        lastPoint = coord;
+        context.lineTo(coord[0] + center[0],coord[1] + center[1]);
+    }
+    changeContext(context,this.now);
+    context.closePath();
+};
+/**
+ * Created by takovoySuper on 25.06.2015.
+ */
+
+function Ellipse ( options ) {
+    CanvasObject.apply(this,arguments);
+    this.constructor= Ellipse;
+    this.now.step   = this.now.step || 0.1;
+}
+
+Ellipse.prototype = Object.create(CanvasObject.prototype);
+
+Ellipse.prototype.animate = function(context){
+    context.beginPath();
+    var shift = 0;
+    var coord = formula.getPointOnEllipse(this.now.semiAxisX,this.now.semiAxisY,shift,this.now.radian,this.x,this.y);
+    context.moveTo(coord[0],coord[1]);
+
+    for(;shift <= Math.PI*2;shift += this.now.step){
+        var coordinate = formula.getPointOnEllipse(this.now.semiAxisX,this.now.semiAxisY,shift,this.now.radian,this.x,this.y);
+        context.lineTo(coordinate[0],coordinate[1]);
+    }
+    context.lineTo(coord[0],coord[1]);
+
+    changeContext(context,this.now);
+
+    context.closePath();
+};
+
+function Line ( options ) {
+    CanvasObject.apply(this,arguments);
+    this.constructor    = Line;
+    this.now.step       = +this.now.step || +options.step || 1;
+    this.points         = this.now.points || options.points || [];
+    this.services.points= [];
+    if(this.now.shift === 0 || options.shift === 0){
+        this.now.shift  = 0;
+    } else {
+        this.now.shift  = this.now.shift || options.shift || 100;
+    }
+}
+
+Line.prototype = Object.create(CanvasObject.prototype);
+
+Object.defineProperties(Line.prototype,{
+    points : {
+        get: function(){
+            if(!this.services.points){
+                this.services.points = [];
+            }
+
+            var radian  = this.radian,
+                sin     = Math.sin( radian ),
+                cos     = Math.cos( radian );
+
+            for( var key = 0;this.now.points[key];key++){
+                var coordinate = this.now.points[key];
+                this.services.points[key] = [
+                    coordinate[0] * cos - coordinate[1] * sin,
+                    coordinate[0] * sin + coordinate[1] * cos,
+                    coordinate[2]
+                ]
+            }
+
+            return this.services.points;
+        },
+        set: function(value){
+            this.now.points = value;
+        }
+    }
+});
+
+Line.prototype.animate = function(context){
+    var points = this.points;
+    var center = [this.x,this.y];
+    if(points.length < 2) {return}
+    context.beginPath();
+    context.moveTo(
+        points[0][0] + center[0],
+        points[0][1] + center[1]
+    );
+    if(this.now.shift > 101){
+        this.now.shift = 101;
+    }
+    var lastPoint = points[0];
+    for(var i = 0;i <= this.now.shift;i += this.now.step){
+        var coord = formula.getPointOnLine(i,this.points);
+        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
+        lastPoint = coord;
+        context.lineTo(coord[0] + this.x,coord[1] + this.y);
+    }
+    changeContext(context,this.now);
+    context.closePath();
+};
+
+function Path ( options ) {
+    Line.apply(this,arguments);
+    this.constructor = Path;
+}
+
+Path.prototype = Object.create( CanvasObject.prototype );
+
+Object.defineProperties(Path.prototype,{
+    points : {
+        get: function(){
+            if(!this.services.points){
+                this.services.points = [];
+            }
+
+            var radian  = this.radian,
+                sin     = Math.sin( radian ),
+                cos     = Math.cos( radian );
+
+            for( var key = 0;this.now.points[key];key++){
+                var coordinate = this.now.points[key];
+                if(this.now.points[key].length > 3){
+                    this.services.points[key] = this.now.points[key];
+                    this.services.points[key][4] = (this.services.points[key][4] || 0) + radian;
+                    continue;
+                }
+                this.services.points[key] = [
+                    coordinate[0] * cos - coordinate[1] * sin,
+                    coordinate[0] * sin + coordinate[1] * cos,
+                    coordinate[2]
+                ]
+            }
+
+            return this.services.points;
+
+        },
+        set: function(value){
+            this.services.map   = formula.getMapOfPath(value,this.now.step);
+            this.services.length= 0;
+            for(var key in this.services.map){
+                this.services.length += this.services.map[key];
+            }
+            this.now.points = value;
+        }
+    }
+});
+Path.prototype.animate = function(context){
+    var points = this.points;
+    var center = [this.x,this.y];
+    context.beginPath();
+    var toMovePoint = points[0];
+    if(toMovePoint.length > 3){
+        toMovePoint = [0,0];
+    }
+    context.moveTo(
+        toMovePoint[0] + center[0],
+        toMovePoint[1] + center[1]
+    );
+    if(this.now.shift > 100){
+        this.now.shift = 100;
+    }
+    var lastPoint = points[0];
+    for(var i = 0;i <= this.now.shift;i += this.now.step){
+        var coord = formula.getPointOnPath(i,points,this.services);
+        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
+        lastPoint = coord;
+        context.lineTo(coord[0] + center[0],coord[1] + center[1]);
+    }
+    changeContext(context,this.now);
+    context.closePath();
+};
+/**
+ * Created by Пользователь on 21.01.2015.
+ */
+
+function Polygon ( options ) {
+    CanvasObject.apply( this, arguments );
+    this.constructor        = Polygon;
+    this.now.sidesCount     = this.now.sidesCount || options.sidesCount || 3;
+    this.now.radius         = this.now.radius || options.radius || 0;
+}
+
+Polygon.prototype           = Object.create( CanvasObject.prototype );
+
+Polygon.prototype.animate   = function( context ){
+    if( this.now.sidesCount < 3 ){ return false }
+
+    var start = formula.getPointOnCircle(this.radian,this.now.radius,this.x,this.y);
+
+    context.beginPath();
+    context.moveTo( start[0], start[1] );
+
+    for( var i = 0; i < this.now.sidesCount; i++ ){
+        var coordinate = formula.getPointOnCircle( Math.PI*2/this.now.sidesCount*i+this.radian, this.now.radius, this.x, this.y );
+        context.lineTo( coordinate[0], coordinate[1] );
+    }
+
+    context.lineTo( start[0], start[1] );
+
+    changeContext(context,this.now);
+    context.closePath();
+};
+/**
+ * Created by takovoy on 31.07.2016.
+ */
+
+function Polyline (options){
+    CanvasObject.apply(this,arguments);
+    this.constructor    = Polyline;
+    this.now.points     = options.points;
+}
+
+Polyline.prototype = Object.create(CanvasObject.prototype);
+
+Polyline.prototype.animate = function(context){
+
+    //если массив не пустой то продолжить
+    if(this.now.points.length < 2) {
+        return
+    }
+
+    //отобразить контрольные точки на холсте
+    if(this.now.showBreakpoints){
+        context.beginPath();
+
+        markControlPoints( this.now.points, context, this);
+
+        context.fill();
+        context.closePath();
+    }
+
+    context.beginPath();
+    //переход к началу отрисовки объекта
+    context.moveTo(
+        this.now.points[0][0] + this.x,
+        this.now.points[0][1] + this.y
+    );
+
+    if(this.now.shift > 101){
+        this.now.shift = 101;
+    }
+
+    for(var i = 0;i <= this.now.shift;i += this.now.step){
+        var coord = formula.getPointOnCurve(i,this.now.points);
+        context.lineTo(coord[0] + this.parent.x,coord[1] + this.parent.y);
+    }
+
+    changeContext(context,this.now);
+
+    context.closePath();
+};
+/**
+ * Created by takovoy on 30.11.2014.
+ */
+
+function Rect ( options ) {
+    CanvasObject.apply( this, arguments );
+    this.constructor    = Rect;
+    this.now.width      = this.now.width || options.width || 0;
+    this.now.height     = this.now.height || options.height || this.now.width;
+}
+
+Rect.prototype = Object.create( CanvasObject.prototype );
+
+Rect.prototype.animate = function( context ){
+    context.beginPath();
+    var radian = this.radian;
+    var coord  = [this.x,this.y];
+    context.moveTo(coord[0],coord[1]);
+    coord = formula.getPointOnCircle(radian,this.width,coord[0],coord[1]);
+    context.lineTo(coord[0],coord[1]);
+    coord = formula.getPointOnCircle(radian + Math.PI / 2,this.height,coord[0],coord[1]);
+    context.lineTo(coord[0],coord[1]);
+    coord = formula.getPointOnCircle(radian + Math.PI / 2,this.height,this.x,this.y);
+    context.lineTo(coord[0],coord[1]);
+    context.lineTo(this.x,this.y);
+    changeContext( context, this.now );
+    context.closePath();
+};
+
+function Spline ( options ) {
+    Line.apply(this,arguments);
+    this.constructor    = Spline;
+}
+
+Spline.prototype = Object.create( CanvasObject.prototype );
+
+Object.defineProperties(Spline.prototype,{
+    points : {
+        get: function(){
+            if(!this.services.points){
+                this.services.points = [];
+            }
+
+            var radian  = this.radian,
+                sin     = Math.sin( radian ),
+                cos     = Math.cos( radian );
+
+            for( var key = 0;this.now.points[key];key++){
+                var coordinate = this.now.points[key];
+                this.services.points[key] = [
+                    coordinate[0] * cos - coordinate[1] * sin,
+                    coordinate[0] * sin + coordinate[1] * cos,
+                    coordinate[2]
+                ]
+            }
+
+            return this.services.points;
+
+        },
+        set: function(value){
+            this.services.map   = formula.getMapOfSpline(value,this.now.step);
+            this.services.length= 0;
+            for(var key in this.services.map){
+                this.services.length += this.services.map[key];
+            }
+            this.now.points = value;
+        }
+    }
+});
+Spline.prototype.animate = function(context){
+    var points = this.points;
+    var center = [this.x,this.y];
+    if(points.length < 2) {return}
+    context.beginPath();
+    context.moveTo(
+        points[0][0] + center[0],
+        points[0][1] + center[1]
+    );
+    if(this.now.shift > 100){
+        this.now.shift = 100;
+    }
+    var lastPoint = points[0];
+    for(var i = 0;i <= this.now.shift;i += this.now.step){
+        var coord = formula.getPointOnSpline(i,points,this.services);
+        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
+        lastPoint = coord;
+        context.lineTo(coord[0] + center[0],coord[1] + center[1]);
+    }
+    changeContext(context,this.now);
+    context.closePath();
+};
+/**
+ * Created by takovoySuper on 12.05.2015.
+ */
+
+function EventsListing (){
+    this.list   = {};
+}
+
+//проверить ?
+EventsListing.prototype.append = function(property,theComparisonValue,operation){
+    if(!this.list[property]){
+        this.list[property] = {};
+    }
+    if(!this.list[property][theComparisonValue]){
+        this.list[property][theComparisonValue] = [];
+    }
+    this.list[property][theComparisonValue].push(operation);
+};
+EventsListing.prototype.remove = function(property,theComparisonValue){
+    if(!theComparisonValue){
+        delete this.list[property];
+        return
+    }
+    delete this.list[property][theComparisonValue];
+    if(Object.keys(this.list[property]).length == 0){
+        delete this.list[property];
+    }
+};
+/**
+ * Created by takovoySuper on 14.04.2015.
+ */
+
+function Listing (){
+    this.list   = {};
+    this.append = function(name,data){
+        this.list[name] = data;
+    };
+    this.remove = function(name){
+        delete this.list[name];
+    };
+}
+/**
+ * Created by takovoy on 17.02.2015.
+ */
+
+function PropertyListing (append,remove,parent){
+    this.list   = {};
+    this.up     = append || function(){};
+    this.rem    = remove || function(){};
+    this.parent = parent;
+}
+
+PropertyListing.prototype.append = function (object) {
+    this.list[object.id] = object;
+    return this.up(this.parent,object);
+};
+PropertyListing.prototype.remove = function (id) {
+    delete this.list[id];
+    this.rem(this.parent);
+};
+PropertyListing.prototype.getObject = function (id,recourse) {
+    if(!recourse){
+        return this.list[id];
+    } else {
+        for(var key in this.list){
+            if(key == id)   {return this.list[key];}
+            var object = this.list[key].childrens.getObject(id,true);
+            if(object)      {return object;}
+        }
+        return false
+    }
+};
+PropertyListing.prototype.getObjectsMap = function(){
+    var map = {};
+    for(var key in this.list){
+        map[key] = this.list[key].childrens.getObjectsMap();
+    }
+    return map;
+};
 /**
  * Created by takovoy on 31.07.2016.
  */
@@ -454,6 +1208,7 @@ var formula = {
 };
 
 formula.getLengthOfCurve = function (points, step) {
+    step = step || 1;
     var result = 0;
     var lastPoint = points[0];
     for(var sift = 0;sift <= 100;sift += step){
@@ -510,10 +1265,13 @@ formula.getPointOnSpline = function (shift, points, services) {
 };
 
 formula.getLengthOfEllipticArc = function (radiusX, radiusY, startRadian, endRadian, step) {
+    step = step || 1;
     var length = 0;
     var lastPoint = this.getPointOnEllipse(radiusX,radiusY,startRadian);
-    for(var i = startRadian;i<=endRadian;i+=step){
-        var point = this.getPointOnEllipse(radiusX,radiusY,i);
+    var radianPercent = (endRadian - startRadian) / 100;
+    for(var i = 0;i<=100;i+=step){
+        var radian = startRadian + radianPercent * i;
+        var point = this.getPointOnEllipse(radiusX,radiusY,radian);
         length += this.getCenterToPointDistance([point[0]-lastPoint[0],point[1]-lastPoint[1]]);
         lastPoint = point;
     }
@@ -526,22 +1284,18 @@ formula.getMapOfPath = function (points, step) {
     var lastPoint = [];
     for(var i = 0;points[i];i++){
         var point = points[i];
-        if(points[i].length > 3){
-            map[index] = this.getLengthOfEllipticArc(point[0], point[1], point[2], point[3], 0.01);
+        if(point.length > 3){
+            map[index] = this.getLengthOfEllipticArc(point[0], point[1], point[2], point[3], step);
             if(!points[i+1]){continue}
-            var centerOfArc = this.getPointOnEllipse(
-                point[0], point[1], point[2] + Math.PI, point[4],
-                lastPoint[0] || 0, lastPoint[1] || 0
-            );
+            var centerOfArc = this.getPointOnEllipse(point[0], point[1], point[2] + Math.PI, point[4], lastPoint[0], lastPoint[1]);
             var endOfArc = this.getPointOnEllipse(point[0], point[1], point[3], point[4], centerOfArc[0], centerOfArc[1]);
             index++;
             map[index] = [endOfArc];
             lastPoint = endOfArc;
             continue;
         }
-        var curvePointsCount = map[index].length;
-        map[index][+curvePointsCount] = point;
-        if((point[2] || (points[i+1] && points[i+1].length > 3)) && i != points.length - 1){
+        map[index].push(point);
+        if(point[2] === true || (points[i+1] && points[i+1].length > 3)){
             map[index] = formula.getLengthOfCurve(map[index],step);
             index++;
             map[index] = [point];
@@ -567,33 +1321,25 @@ formula.getPointOnPath = function (shift, points, services) {
     var lastPoint = [];
     for(var pointIndex = 0; points[pointIndex] && controlPointsCounter <= lastControlPoint; pointIndex++){
         var point = points[pointIndex];
-        if(point[2] === true || point.length > 3){
+        if(point.length > 3){
+            var centerOfArc = this.getPointOnEllipse(point[0], point[1], point[2] + Math.PI, point[4], lastPoint[0], lastPoint[1]);
+            if(controlPointsCounter === lastControlPoint){
+                var percent = (shiftLength - counter) / (services.map[lastControlPoint] / 100);
+                var resultRadian = point[2] + ((point[3] - point[2])/100*percent);
+                return this.getPointOnEllipse(point[0], point[1], resultRadian, point[4], centerOfArc[0], centerOfArc[1]);
+            }
+            lastPoint = this.getPointOnEllipse(point[0], point[1], point[3], point[4], centerOfArc[0], centerOfArc[1]);
             controlPointsCounter++;
+            if(controlPointsCounter === lastControlPoint){
+                checkedCurve.push(lastPoint);
+            }
+            continue
         }
-        if(controlPointsCounter === lastControlPoint && point.length > 3){
-            var centerOfArc = this.getPointOnEllipse(
-                point[0], point[1], point[2] + Math.PI, point[4],
-                lastPoint[0] || 0, lastPoint[1] || 0
-            );
-            var radian = point[3] - point[2];
-            var len = shiftLength - counter;
-            var percent = len / (services.map[lastControlPoint] / 100);
-            var resultRadian = point[2] + (radian/100*percent);
-            return this.getPointOnEllipse(point[0], point[1], resultRadian, point[4], centerOfArc[0], centerOfArc[1]);
+        if(point[2] === true || (points[pointIndex+1] && points[pointIndex+1].length > 3)){
+            controlPointsCounter++;
         }
         if(controlPointsCounter >= lastControlPoint){
             checkedCurve.push(point);
-        }
-        if(point.length > 3){
-            lastPoint = this.getPointOnEllipse(
-                point[0],
-                point[1],
-                point[3]+Math.PI,
-                point[4],
-                lastPoint[0],
-                lastPoint[1]
-            );
-            continue
         }
         lastPoint = point;
     }
@@ -730,745 +1476,3 @@ Object.defineProperties(Transform.prototype,{
         }
     }
 });
-
-function CanvasObject ( options ) {
-    options             = options || {};
-    this.id             = options.id || '' + Math.random();
-    this.now            = options.settings || {};
-    this.now.x          = this.now.x || options.x || 0;
-    this.now.y          = this.now.y || options.y || 0;
-    this.now.radian     = this.now.radian || options.radian || 0;
-    this.services       = {};
-    this._transform     = new Listing();
-    this.childrens      = new PropertyListing(
-        function( self, object ){
-            object.parent           = self;
-            object.drawing          = self.drawing;
-            self.operationContext   = object;
-            return self;
-        },
-        function( self ){
-
-        },
-        this
-    );
-    this.drawing = options.drawing || undefined;
-}
-
-Object.defineProperties(CanvasObject.prototype,{
-    x       : {
-        get: function(){
-            if( this.parent ){
-                return (
-                    this.now.x * Math.cos( this.parent.radian ) -
-                    this.now.y * Math.sin( this.parent.radian ) +
-                    this.parent.x
-                );
-            }
-            return +this.now.x;
-        },
-        set: function( value ){
-            this.now.x = +value;
-        }
-    },
-
-    y       : {
-        get: function(){
-            if( this.parent ){
-                return (
-                    this.now.x * Math.sin( this.parent.radian ) +
-                    this.now.y * Math.cos( this.parent.radian ) +
-                    this.parent.y
-                );
-            }
-            return +this.now.y;
-        },
-        set: function( value ){
-            this.now.y = +value;
-        }
-    },
-
-    radian  : {
-        get: function(){
-            if( this.parent ){
-                return +this.parent.radian + +this.now.radian;
-            }
-            return +this.now.radian;
-        },
-        set: function( value ){
-            this.now.radian = +value;
-        }
-    },
-    points : {
-        get: function(){
-            if(!this.now.points){return}
-
-            if(!this.services.points){this.services.points = [];}
-
-            var radian = this.radian, sin = Math.sin( radian ), cos = Math.cos( radian );
-
-            for( var key = 0;this.now.points[key];key++){
-                var coordinate = this.now.points[key];
-                this.services.points[key] = [
-                    coordinate[0] * cos - coordinate[1] * sin,
-                    coordinate[0] * sin + coordinate[1] * cos,
-                    coordinate[2]
-                ]
-            }
-
-            return this.services.points;
-
-        },
-        set: function(value){}
-    }
-});
-
-CanvasObject.prototype.start        = function(){
-    this.drawing.stack.append( this );
-    return this;
-};
-CanvasObject.prototype.stop         = function(){
-    this.drawing.stack.remove( this.id );
-    return this;
-};
-CanvasObject.prototype.animate      = function(){};
-CanvasObject.prototype.transform    = function( transform ){
-    if ( !this._transform ) {
-        this._transform = new Listing();
-    }
-    if ( !transform ) {return this._transform;}
-    this._transform.append( transform.id, transform );
-    this.operationContext = transform;
-    return this;
-};
-CanvasObject.prototype.move         = function( coord, time ){
-    if( !time ){
-        this.x = coord[0];
-        this.y = coord[1];
-        return;
-    }
-    return this.transform(new Transform({
-        property: 'trajectory',
-        type    : 'line',
-        points  : [
-            [
-                this.x,
-                this.y
-            ],
-            coord
-        ],
-        time    : time
-    }));
-};
-CanvasObject.prototype.moveProperty   = function( property, value, time ){
-    if( !time ){
-        this.now[property] = value;
-        return;
-    }
-    return this.transform(new Transform({
-        property:property,
-        start   : this.now[property],
-        end     : value,
-        time    : time
-    }))
-};
-CanvasObject.prototype.append   = function( object ){
-    return this.childrens.append( object );
-};
-/**
- * Created by takovoy on 30.11.2014.
- */
-
-function Circle ( options ) {
-    CanvasObject.apply( this, arguments );
-    this.constructor    = Circle;
-    this.now.radius     = this.now.radius || options.radius || 0;
-    if(this.now.shift === 0 || options.shift === 0){
-        this.now.shift  = 0;
-    } else {
-        this.now.shift  = this.now.shift || options.shift || 100;
-    }
-}
-
-Circle.prototype = Object.create( CanvasObject.prototype );
-
-Circle.prototype.animate = function( context ){
-    context.beginPath();
-    var radian = this.radian;
-    context.arc( this.x, this.y, this.now.radius, radian, Math.PI*2/100*this.now.shift + radian );
-    changeContext( context, this.now );
-    context.closePath();
-};
-
-function Cluster ( count, correlation ){
-    this.parameters     = {
-        list        : {},
-        iteration   : false
-    };
-    CanvasObject.apply( this, [{}] );
-    this.correlation    = correlation || {};
-    this.count          = count || 0;
-    this.iteration      = 1;
-    this.constructor    = Cluster;
-}
-
-Cluster.prototype = Object.create( CanvasObject.prototype );
-
-Cluster.prototype.transform = function(){
-    if( !this._transform ){
-        this._transform = new Listing();
-    }
-    return this._transform;
-};
-
-Cluster.prototype.animate = function(){
-    if( this.iteration > this.count ){
-        this.iteration = 1;
-        return;
-    }
-    this._animate = this.parent.animate;
-    this._animate( this.drawing.context );
-    this.iteration++;
-    this.animate();
-};
-
-Object.defineProperties( Cluster.prototype,{
-    now     : {
-        get : function(){
-            if( this.parameters.iteration !== this.iteration && this.parent ) {
-                for( var key in this.parent.now ){
-                    if ( !this.correlation[key] ) {
-                        this.parameters.list[key] = this.parent.now[key];
-                        continue;
-                    }
-                    var correlation = +this.correlation[key];
-                    if( typeof this.correlation[key] == "function" ){
-                        correlation = +this.correlation[key]( this.iteration, this );
-                    }
-                    this.parameters.list[key] = this.parent.now[key] + (correlation * this.iteration);
-                }
-                this.parameters.iteration = +this.iteration;
-            }
-            return this.parameters.list;
-        },
-
-        set : function( value ){
-            return this.parameters.list;
-        }
-    },
-
-
-    x       : {
-        get : function(){
-            if( this.parent.parent ){
-                return (
-                    this.now.x * Math.cos( this.parent.parent.radian ) -
-                    this.now.y * Math.sin( this.parent.parent.radian ) +
-                    this.parent.parent.x
-                );
-            }
-            return +this.now.x;
-        },
-        set : function( value ){
-            return +this.now.x;
-        }
-    },
-
-    y       : {
-        get : function(){
-            if( this.parent.parent ){
-                return (
-                    this.now.x * Math.sin( this.parent.parent.radian ) +
-                    this.now.y * Math.cos( this.parent.parent.radian ) +
-                    this.parent.parent.y
-                );
-            }
-            return +this.now.y;
-        },
-        set : function( value ){
-            return +this.now.y;
-        }
-    },
-
-    radian  : {
-        get: function(){
-            if( this.parent.parent ){
-                return +this.parent.parent.radian + +this.now.radian;
-            }
-            return +this.now.radian;
-        },
-        set: function( value ){
-            return +this.now.radian;
-        }
-    },
-
-    services: {
-        get: function(){
-            return this.parent.services;
-        },
-        set: function( value ){
-
-        }
-    }
-});
-
-function Curve ( options ) {
-    Line.apply(this,arguments);
-    this.constructor = Curve;
-}
-
-Curve.prototype = Object.create( CanvasObject.prototype );
-
-Object.defineProperties(Curve.prototype,{
-    points : {
-        get: function(){
-            if(!this.services.points){
-                this.services.points = [];
-            }
-
-            var radian  = this.radian,
-                sin     = Math.sin( radian ),
-                cos     = Math.cos( radian );
-
-            for( var key = 0;this.now.points[key];key++){
-                var coordinate = this.now.points[key];
-                this.services.points[key] = [
-                    coordinate[0] * cos - coordinate[1] * sin,
-                    coordinate[0] * sin + coordinate[1] * cos,
-                    coordinate[2]
-                ]
-            }
-
-            return this.services.points;
-        },
-        set: function(value){
-            this.services.length = formula.getLengthOfCurve(value,this.now.step);
-            this.now.points = value;
-        }
-    }
-});
-Curve.prototype.animate = function(context){
-    var points = this.points;
-    var center = [this.x,this.y];
-    if(points.length < 2) {return}
-    context.beginPath();
-    context.moveTo(
-        points[0][0] + center[0],
-        points[0][1] + center[1]
-    );
-    if(this.now.shift > 100){
-        this.now.shift = 100;
-    }
-    var lastPoint = points[0];
-    for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnCurve(i,this.points);
-        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
-        lastPoint = coord;
-        context.lineTo(coord[0] + center[0],coord[1] + center[1]);
-    }
-    changeContext(context,this.now);
-    context.closePath();
-};
-/**
- * Created by takovoySuper on 25.06.2015.
- */
-
-function Ellipse ( options ) {
-    CanvasObject.apply(this,arguments);
-    this.constructor= Ellipse;
-    this.now.step   = this.now.step || 0.1;
-}
-
-Ellipse.prototype = Object.create(CanvasObject.prototype);
-
-Ellipse.prototype.animate = function(context){
-    context.beginPath();
-    var shift = 0;
-    var coord = formula.getPointOnEllipse(this.now.semiAxisX,this.now.semiAxisY,shift,this.now.radian,this.x,this.y);
-    context.moveTo(coord[0],coord[1]);
-
-    for(;shift <= Math.PI*2;shift += this.now.step){
-        var coordinate = formula.getPointOnEllipse(this.now.semiAxisX,this.now.semiAxisY,shift,this.now.radian,this.x,this.y);
-        context.lineTo(coordinate[0],coordinate[1]);
-    }
-    context.lineTo(coord[0],coord[1]);
-
-    changeContext(context,this.now);
-
-    context.closePath();
-};
-
-function Line ( options ) {
-    CanvasObject.apply(this,arguments);
-    this.constructor    = Line;
-    this.now.step       = +this.now.step || +options.step || 1;
-    this.points         = this.now.points || options.points || [];
-    this.services.points= [];
-    if(this.now.shift === 0 || options.shift === 0){
-        this.now.shift  = 0;
-    } else {
-        this.now.shift  = this.now.shift || options.shift || 100;
-    }
-}
-
-Line.prototype = Object.create(CanvasObject.prototype);
-
-Object.defineProperties(Line.prototype,{
-    points : {
-        get: function(){
-            if(!this.services.points){
-                this.services.points = [];
-            }
-
-            var radian  = this.radian,
-                sin     = Math.sin( radian ),
-                cos     = Math.cos( radian );
-
-            for( var key = 0;this.now.points[key];key++){
-                var coordinate = this.now.points[key];
-                this.services.points[key] = [
-                    coordinate[0] * cos - coordinate[1] * sin,
-                    coordinate[0] * sin + coordinate[1] * cos,
-                    coordinate[2]
-                ]
-            }
-
-            return this.services.points;
-        },
-        set: function(value){
-            this.now.points = value;
-        }
-    }
-});
-
-Line.prototype.animate = function(context){
-    if(this.now.points.length < 2){return;}
-    context.beginPath();
-    context.moveTo(
-        this.points[0][0] + this.x,
-        this.points[0][1] + this.y
-    );
-
-    if(this.now.shift > 101){
-        this.now.shift = 101;
-    }
-    for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnLine(i,this.points);
-        context.lineTo(coord[0] + this.x,coord[1] + this.y);
-    }
-    changeContext(context,this.now);
-    context.closePath();
-};
-
-function Path ( options ) {
-    Line.apply(this,arguments);
-    this.constructor = Path;
-}
-
-Path.prototype = Object.create( CanvasObject.prototype );
-
-Object.defineProperties(Path.prototype,{
-    points : {
-        get: function(){
-            if(!this.services.points){
-                this.services.points = [];
-            }
-
-            var radian  = this.radian,
-                sin     = Math.sin( radian ),
-                cos     = Math.cos( radian );
-
-            for( var key = 0;this.now.points[key];key++){
-                var coordinate = this.now.points[key];
-                this.services.points[key] = [
-                    coordinate[0] * cos - coordinate[1] * sin,
-                    coordinate[0] * sin + coordinate[1] * cos,
-                    coordinate[2]
-                ]
-            }
-
-            return this.services.points;
-
-        },
-        set: function(value){
-            this.services.map   = formula.getMapOfPath(value,this.now.step);
-            this.services.length= 0;
-            for(var key in this.services.map){
-                this.services.length += this.services.map[key];
-            }
-            this.now.points = value;
-        }
-    }
-});
-Path.prototype.animate = function(context){
-    var points = this.points;
-    var center = [this.x,this.y];
-    if(points.length < 2) {return}
-    context.beginPath();
-    context.moveTo(
-        points[0][0] + center[0],
-        points[0][1] + center[1]
-    );
-    if(this.now.shift > 100){
-        this.now.shift = 100;
-    }
-    var lastPoint = points[0];
-    for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnPath(i,this.points,this.services);
-        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
-        lastPoint = coord;
-        context.lineTo(coord[0] + center[0],coord[1] + center[1]);
-    }
-    changeContext(context,this.now);
-    context.closePath();
-};
-/**
- * Created by Пользователь on 21.01.2015.
- */
-
-function Polygon ( options ) {
-    CanvasObject.apply( this, arguments );
-    this.constructor        = Polygon;
-    this.now.sidesCount     = this.now.sidesCount || options.sidesCount || 3;
-    this.now.radius         = this.now.radius || options.radius || 0;
-}
-
-Polygon.prototype           = Object.create( CanvasObject.prototype );
-
-Polygon.prototype.animate   = function( context ){
-    if( this.now.sidesCount < 3 ){ return false }
-
-    var start = formula.getPointOnCircle(this.radian,this.now.radius,this.x,this.y);
-
-    context.beginPath();
-    context.moveTo( start[0], start[1] );
-
-    for( var i = 0; i < this.now.sidesCount; i++ ){
-        var coordinate = formula.getPointOnCircle( Math.PI*2/this.now.sidesCount*i+this.radian, this.now.radius, this.x, this.y );
-        context.lineTo( coordinate[0], coordinate[1] );
-    }
-
-    context.lineTo( start[0], start[1] );
-
-    changeContext(context,this.now);
-    context.closePath();
-};
-/**
- * Created by takovoy on 31.07.2016.
- */
-
-function Polyline (options){
-    CanvasObject.apply(this,arguments);
-    this.constructor    = Polyline;
-    this.now.points     = options.points;
-}
-
-Polyline.prototype = Object.create(CanvasObject.prototype);
-
-Polyline.prototype.animate = function(context){
-
-    //если массив не пустой то продолжить
-    if(this.now.points.length < 2) {
-        return
-    }
-
-    //отобразить контрольные точки на холсте
-    if(this.now.showBreakpoints){
-        context.beginPath();
-
-        markControlPoints( this.now.points, context, this);
-
-        context.fill();
-        context.closePath();
-    }
-
-    context.beginPath();
-    //переход к началу отрисовки объекта
-    context.moveTo(
-        this.now.points[0][0] + this.x,
-        this.now.points[0][1] + this.y
-    );
-
-    if(this.now.shift > 101){
-        this.now.shift = 101;
-    }
-
-    for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnCurve(i,this.now.points);
-        context.lineTo(coord[0] + this.parent.x,coord[1] + this.parent.y);
-    }
-
-    changeContext(context,this.now);
-
-    context.closePath();
-};
-/**
- * Created by takovoy on 30.11.2014.
- */
-
-function Rect ( options ) {
-    CanvasObject.apply( this, arguments );
-    this.constructor    = Rect;
-    this.now.width      = this.now.width || options.width || 0;
-    this.now.height     = this.now.height || options.height || this.now.width;
-}
-
-Rect.prototype = Object.create( CanvasObject.prototype );
-
-Rect.prototype.animate = function( context ){
-    context.beginPath();
-    var radian = this.radian;
-    var coord  = [this.x,this.y];
-    context.moveTo(coord[0],coord[1]);
-    coord = formula.getPointOnCircle(radian,this.width,coord[0],coord[1]);
-    context.lineTo(coord[0],coord[1]);
-    coord = formula.getPointOnCircle(radian + Math.PI / 2,this.height,coord[0],coord[1]);
-    context.lineTo(coord[0],coord[1]);
-    coord = formula.getPointOnCircle(radian + Math.PI / 2,this.height,this.x,this.y);
-    context.lineTo(coord[0],coord[1]);
-    context.lineTo(this.x,this.y);
-    changeContext( context, this.now );
-    context.closePath();
-};
-
-function Spline ( options ) {
-    Line.apply(this,arguments);
-    this.constructor    = Spline;
-}
-
-Spline.prototype = Object.create( CanvasObject.prototype );
-
-Object.defineProperties(Spline.prototype,{
-    points : {
-        get: function(){
-            if(!this.services.points){
-                this.services.points = [];
-            }
-
-            var radian  = this.radian,
-                sin     = Math.sin( radian ),
-                cos     = Math.cos( radian );
-
-            for( var key = 0;this.now.points[key];key++){
-                var coordinate = this.now.points[key];
-                this.services.points[key] = [
-                    coordinate[0] * cos - coordinate[1] * sin,
-                    coordinate[0] * sin + coordinate[1] * cos,
-                    coordinate[2]
-                ]
-            }
-
-            return this.services.points;
-
-        },
-        set: function(value){
-            this.services.map   = formula.getMapOfSpline(value,this.now.step);
-            this.services.length= 0;
-            for(var key in this.services.map){
-                this.services.length += this.services.map[key];
-            }
-            this.now.points = value;
-        }
-    }
-});
-Spline.prototype.animate = function(context){
-    var points = this.points;
-    var center = [this.x,this.y];
-    if(points.length < 2) {return}
-    context.beginPath();
-    context.moveTo(
-        points[0][0] + center[0],
-        points[0][1] + center[1]
-    );
-    if(this.now.shift > 100){
-        this.now.shift = 100;
-    }
-    var lastPoint = points[0];
-    for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnSpline(i,points,this.services);
-        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
-        lastPoint = coord;
-        context.lineTo(coord[0] + center[0],coord[1] + center[1]);
-    }
-    changeContext(context,this.now);
-    context.closePath();
-};
-/**
- * Created by takovoySuper on 12.05.2015.
- */
-
-function EventsListing (){
-    this.list   = {};
-}
-
-//проверить ?
-EventsListing.prototype.append = function(property,theComparisonValue,operation){
-    if(!this.list[property]){
-        this.list[property] = {};
-    }
-    if(!this.list[property][theComparisonValue]){
-        this.list[property][theComparisonValue] = [];
-    }
-    this.list[property][theComparisonValue].push(operation);
-};
-EventsListing.prototype.remove = function(property,theComparisonValue){
-    if(!theComparisonValue){
-        delete this.list[property];
-        return
-    }
-    delete this.list[property][theComparisonValue];
-    if(Object.keys(this.list[property]).length == 0){
-        delete this.list[property];
-    }
-};
-/**
- * Created by takovoySuper on 14.04.2015.
- */
-
-function Listing (){
-    this.list   = {};
-    this.append = function(name,data){
-        this.list[name] = data;
-    };
-    this.remove = function(name){
-        delete this.list[name];
-    };
-}
-/**
- * Created by takovoy on 17.02.2015.
- */
-
-function PropertyListing (append,remove,parent){
-    this.list   = {};
-    this.up     = append || function(){};
-    this.rem    = remove || function(){};
-    this.parent = parent;
-}
-
-PropertyListing.prototype.append = function (object) {
-    this.list[object.id] = object;
-    return this.up(this.parent,object);
-};
-PropertyListing.prototype.remove = function (id) {
-    delete this.list[id];
-    this.rem(this.parent);
-};
-PropertyListing.prototype.getObject = function (id,recourse) {
-    if(!recourse){
-        return this.list[id];
-    } else {
-        for(var key in this.list){
-            if(key == id)   {return this.list[key];}
-            var object = this.list[key].childrens.getObject(id,true);
-            if(object)      {return object;}
-        }
-        return false
-    }
-};
-PropertyListing.prototype.getObjectsMap = function(){
-    var map = {};
-    for(var key in this.list){
-        map[key] = this.list[key].childrens.getObjectsMap();
-    }
-    return map;
-};

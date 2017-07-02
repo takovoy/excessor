@@ -114,6 +114,7 @@ var formula = {
 };
 
 formula.getLengthOfCurve = function (points, step) {
+    step = step || 1;
     var result = 0;
     var lastPoint = points[0];
     for(var sift = 0;sift <= 100;sift += step){
@@ -170,10 +171,13 @@ formula.getPointOnSpline = function (shift, points, services) {
 };
 
 formula.getLengthOfEllipticArc = function (radiusX, radiusY, startRadian, endRadian, step) {
+    step = step || 1;
     var length = 0;
     var lastPoint = this.getPointOnEllipse(radiusX,radiusY,startRadian);
-    for(var i = startRadian;i<=endRadian;i+=step){
-        var point = this.getPointOnEllipse(radiusX,radiusY,i);
+    var radianPercent = (endRadian - startRadian) / 100;
+    for(var i = 0;i<=100;i+=step){
+        var radian = startRadian + radianPercent * i;
+        var point = this.getPointOnEllipse(radiusX,radiusY,radian);
         length += this.getCenterToPointDistance([point[0]-lastPoint[0],point[1]-lastPoint[1]]);
         lastPoint = point;
     }
@@ -186,22 +190,18 @@ formula.getMapOfPath = function (points, step) {
     var lastPoint = [];
     for(var i = 0;points[i];i++){
         var point = points[i];
-        if(points[i].length > 3){
-            map[index] = this.getLengthOfEllipticArc(point[0], point[1], point[2], point[3], 0.01);
+        if(point.length > 3){
+            map[index] = this.getLengthOfEllipticArc(point[0], point[1], point[2], point[3], step);
             if(!points[i+1]){continue}
-            var centerOfArc = this.getPointOnEllipse(
-                point[0], point[1], point[2] + Math.PI, point[4],
-                lastPoint[0] || 0, lastPoint[1] || 0
-            );
+            var centerOfArc = this.getPointOnEllipse(point[0], point[1], point[2] + Math.PI, point[4], lastPoint[0], lastPoint[1]);
             var endOfArc = this.getPointOnEllipse(point[0], point[1], point[3], point[4], centerOfArc[0], centerOfArc[1]);
             index++;
             map[index] = [endOfArc];
             lastPoint = endOfArc;
             continue;
         }
-        var curvePointsCount = map[index].length;
-        map[index][+curvePointsCount] = point;
-        if((point[2] || (points[i+1] && points[i+1].length > 3)) && i != points.length - 1){
+        map[index].push(point);
+        if(point[2] === true || (points[i+1] && points[i+1].length > 3)){
             map[index] = formula.getLengthOfCurve(map[index],step);
             index++;
             map[index] = [point];
@@ -227,33 +227,25 @@ formula.getPointOnPath = function (shift, points, services) {
     var lastPoint = [];
     for(var pointIndex = 0; points[pointIndex] && controlPointsCounter <= lastControlPoint; pointIndex++){
         var point = points[pointIndex];
-        if(point[2] === true || point.length > 3){
+        if(point.length > 3){
+            var centerOfArc = this.getPointOnEllipse(point[0], point[1], point[2] + Math.PI, point[4], lastPoint[0], lastPoint[1]);
+            if(controlPointsCounter === lastControlPoint){
+                var percent = (shiftLength - counter) / (services.map[lastControlPoint] / 100);
+                var resultRadian = point[2] + ((point[3] - point[2])/100*percent);
+                return this.getPointOnEllipse(point[0], point[1], resultRadian, point[4], centerOfArc[0], centerOfArc[1]);
+            }
+            lastPoint = this.getPointOnEllipse(point[0], point[1], point[3], point[4], centerOfArc[0], centerOfArc[1]);
             controlPointsCounter++;
+            if(controlPointsCounter === lastControlPoint){
+                checkedCurve.push(lastPoint);
+            }
+            continue
         }
-        if(controlPointsCounter === lastControlPoint && point.length > 3){
-            var centerOfArc = this.getPointOnEllipse(
-                point[0], point[1], point[2] + Math.PI, point[4],
-                lastPoint[0] || 0, lastPoint[1] || 0
-            );
-            var radian = point[3] - point[2];
-            var len = shiftLength - counter;
-            var percent = len / (services.map[lastControlPoint] / 100);
-            var resultRadian = point[2] + (radian/100*percent);
-            return this.getPointOnEllipse(point[0], point[1], resultRadian, point[4], centerOfArc[0], centerOfArc[1]);
+        if(point[2] === true || (points[pointIndex+1] && points[pointIndex+1].length > 3)){
+            controlPointsCounter++;
         }
         if(controlPointsCounter >= lastControlPoint){
             checkedCurve.push(point);
-        }
-        if(point.length > 3){
-            lastPoint = this.getPointOnEllipse(
-                point[0],
-                point[1],
-                point[3]+Math.PI,
-                point[4],
-                lastPoint[0],
-                lastPoint[1]
-            );
-            continue
         }
         lastPoint = point;
     }

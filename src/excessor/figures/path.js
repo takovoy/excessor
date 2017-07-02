@@ -19,6 +19,11 @@ Object.defineProperties(Path.prototype,{
 
             for( var key = 0;this.now.points[key];key++){
                 var coordinate = this.now.points[key];
+                if(this.now.points[key].length > 3){
+                    this.services.points[key] = this.now.points[key];
+                    this.services.points[key][4] = (this.services.points[key][4] || 0) + radian;
+                    continue;
+                }
                 this.services.points[key] = [
                     coordinate[0] * cos - coordinate[1] * sin,
                     coordinate[0] * sin + coordinate[1] * cos,
@@ -42,18 +47,21 @@ Object.defineProperties(Path.prototype,{
 Path.prototype.animate = function(context){
     var points = this.points;
     var center = [this.x,this.y];
-    if(points.length < 2) {return}
     context.beginPath();
+    var toMovePoint = points[0];
+    if(toMovePoint.length > 3){
+        toMovePoint = [0,0];
+    }
     context.moveTo(
-        points[0][0] + center[0],
-        points[0][1] + center[1]
+        toMovePoint[0] + center[0],
+        toMovePoint[1] + center[1]
     );
     if(this.now.shift > 100){
         this.now.shift = 100;
     }
     var lastPoint = points[0];
     for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnPath(i,this.points,this.services);
+        var coord = formula.getPointOnPath(i,points,this.services);
         if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
         lastPoint = coord;
         context.lineTo(coord[0] + center[0],coord[1] + center[1]);
