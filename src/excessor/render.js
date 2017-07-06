@@ -21,11 +21,13 @@ Drawing.prototype.render = function(canvasObject,id){
 
     //динамика
     dynamic.move(canvasObject);
+    this.context.beginPath();
     canvasObject.animate(this.context);
 
     for(var child in canvasObject.childrens.list){
         this.render(canvasObject.childrens.list[child],child);
     }
+    this.context.closePath();
 };
 
 Drawing.prototype.pause = function(){

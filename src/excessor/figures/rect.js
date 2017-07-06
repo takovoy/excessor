@@ -12,7 +12,6 @@ function Rect ( options ) {
 Rect.prototype = Object.create( CanvasObject.prototype );
 
 Rect.prototype.animate = function( context ){
-    context.beginPath();
     var radian = this.radian;
     var coord  = [this.x,this.y];
     context.moveTo(coord[0],coord[1]);
@@ -24,5 +23,4 @@ Rect.prototype.animate = function( context ){
     context.lineTo(coord[0],coord[1]);
     context.lineTo(this.x,this.y);
     changeContext( context, this.now );
-    context.closePath();
 };

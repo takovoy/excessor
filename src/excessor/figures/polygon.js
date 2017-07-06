@@ -16,7 +16,6 @@ Polygon.prototype.animate   = function( context ){
 
     var start = formula.getPointOnCircle(this.radian,this.now.radius,this.x,this.y);
 
-    context.beginPath();
     context.moveTo( start[0], start[1] );
 
     for( var i = 0; i < this.now.sidesCount; i++ ){
@@ -27,5 +26,4 @@ Polygon.prototype.animate   = function( context ){
     context.lineTo( start[0], start[1] );
 
     changeContext(context,this.now);
-    context.closePath();
 };

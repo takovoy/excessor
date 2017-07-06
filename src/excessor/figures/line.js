@@ -46,7 +46,6 @@ Line.prototype.animate = function(context){
     var points = this.points;
     var center = [this.x,this.y];
     if(points.length < 2) {return}
-    context.beginPath();
     context.moveTo(
         points[0][0] + center[0],
         points[0][1] + center[1]
@@ -62,5 +61,4 @@ Line.prototype.animate = function(context){
         context.lineTo(coord[0] + this.x,coord[1] + this.y);
     }
     changeContext(context,this.now);
-    context.closePath();
 };

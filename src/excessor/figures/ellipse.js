@@ -11,7 +11,6 @@ function Ellipse ( options ) {
 Ellipse.prototype = Object.create(CanvasObject.prototype);
 
 Ellipse.prototype.animate = function(context){
-    context.beginPath();
     var shift = 0;
     var coord = formula.getPointOnEllipse(this.now.semiAxisX,this.now.semiAxisY,shift,this.now.radian,this.x,this.y);
     context.moveTo(coord[0],coord[1]);
@@ -23,6 +22,4 @@ Ellipse.prototype.animate = function(context){
     context.lineTo(coord[0],coord[1]);
 
     changeContext(context,this.now);
-
-    context.closePath();
 };

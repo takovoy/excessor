@@ -47,7 +47,6 @@ Object.defineProperties(Path.prototype,{
 Path.prototype.animate = function(context){
     var points = this.points;
     var center = [this.x,this.y];
-    context.beginPath();
     var toMovePoint = points[0];
     if(toMovePoint.length > 3){
         toMovePoint = [0,0];
@@ -67,5 +66,4 @@ Path.prototype.animate = function(context){
         context.lineTo(coord[0] + center[0],coord[1] + center[1]);
     }
     changeContext(context,this.now);
-    context.closePath();
 };

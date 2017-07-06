@@ -16,12 +16,32 @@ var dataContextChanges = {
         context.fill();
     },
 
+    lineWidth   : function(context,value){
+        context.lineWidth = +value;
+    },
+
+    lineCap     : function(context,value){
+        context.lineCap = value;
+    },
+
+    lineJoin    : function(context,value){
+        context.lineJoin = value;
+    },
+
+    lineDash    : function(context,value){
+        context.setLineDash(value);
+    },
+
+    dashOffset  : function(context,value){
+        context.lineDashOffset = value;
+    },
+
     stroke      : function(context,value){
         context.strokeStyle = value;
         context.stroke();
     },
 
-    lineWidth   : function(context,value){
-        context.lineWidth = +value;
+    clip        : function(context){
+        context.clip();
     }
 };

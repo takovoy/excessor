@@ -11,24 +11,10 @@ function Polyline (options){
 Polyline.prototype = Object.create(CanvasObject.prototype);
 
 Polyline.prototype.animate = function(context){
-
-    //если массив не пустой то продолжить
     if(this.now.points.length < 2) {
         return
     }
 
-    //отобразить контрольные точки на холсте
-    if(this.now.showBreakpoints){
-        context.beginPath();
-
-        markControlPoints( this.now.points, context, this);
-
-        context.fill();
-        context.closePath();
-    }
-
-    context.beginPath();
-    //переход к началу отрисовки объекта
     context.moveTo(
         this.now.points[0][0] + this.x,
         this.now.points[0][1] + this.y
@@ -44,6 +30,4 @@ Polyline.prototype.animate = function(context){
     }
 
     changeContext(context,this.now);
-
-    context.closePath();
 };
