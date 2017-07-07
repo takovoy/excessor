@@ -50,8 +50,8 @@ Line.prototype.animate = function(context){
         points[0][0] + center[0],
         points[0][1] + center[1]
     );
-    if(this.now.shift > 101){
-        this.now.shift = 101;
+    if(this.now.shift > 100){
+        this.now.shift = 100;
     }
     var lastPoint = points[0];
     for(var i = 0;i <= this.now.shift;i += this.now.step){

@@ -39,9 +39,5 @@ var dataContextChanges = {
     stroke      : function(context,value){
         context.strokeStyle = value;
         context.stroke();
-    },
-
-    clip        : function(context){
-        context.clip();
     }
 };
