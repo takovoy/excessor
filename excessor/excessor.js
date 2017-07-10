@@ -59,6 +59,42 @@ Object.defineProperty(Drawing.prototype,'fps',{
     }
 });
 
+var excessor = {
+    SVGParser: {}
+};
+
+(function () {
+    var parser = excessor.SVGParser;
+
+    parser.url = function(url){
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET',url,true);
+
+        xhr.send();
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState != 4) return;
+
+            if (xhr.status == 200) {
+                parser.string(xhr.responseText);
+            }
+        }
+    };
+
+    parser.string = function (string) {
+        if(!string){return false;}
+        var Parser = new DOMParser();
+        var DOM;
+        if(typeof string === "string"){
+            DOM = Parser.parseFromString(string, "image/svg+xml");
+        } else {
+            DOM = string;
+        }
+        console.log(DOM);
+        return DOM;
+    }
+})();
+
 function CanvasObject ( options ) {
     options             = options || {};
     this.id             = options.id || '' + Math.random();
@@ -470,8 +506,8 @@ Line.prototype.animate = function(context){
         points[0][0] + center[0],
         points[0][1] + center[1]
     );
-    if(this.now.shift > 101){
-        this.now.shift = 101;
+    if(this.now.shift > 100){
+        this.now.shift = 100;
     }
     var lastPoint = points[0];
     for(var i = 0;i <= this.now.shift;i += this.now.step){
