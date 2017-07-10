@@ -48,8 +48,10 @@ var excessor = {
             var nodeAttr = node.getAttribute(attr);
             if(!nodeAttr){continue;}
             var correlation = parser.services.attrCorrelation[attr];
+            var elseChecker = null;
+            if(node.nodeName === 'polygon'){elseChecker = true}
 
-            canvasObject.now[correlation.property] = correlation.init(nodeAttr);
+            canvasObject.now[correlation.property] = correlation.init(nodeAttr,elseChecker);
         }
         return canvasObject;
     };
@@ -59,7 +61,9 @@ var excessor = {
         path: Path,
         circle: Circle,
         rect: Rect,
-        ellipse: Ellipse
+        ellipse: Ellipse,
+        polygon: Spline,
+        polyline: Spline
     };
 
     services.attrCorrelation = {
@@ -117,6 +121,26 @@ var excessor = {
             property: 'y',
             init: function (value) {
                 return +value.match(/\d*/)[0];
+            }
+        },
+        points: {
+            property: 'points',
+            init: function (value,closed) {
+                var points = value.split(' ');
+                for(var i = 0;points[i];i++){
+                    var coord = points[i].split(',');
+                    points[i] = [+coord[0],+coord[1],true];
+                }
+                if(!!closed){
+                    points.push([points[0][0],points[0][1]]);
+                }
+                return points;
+            }
+        },
+        g: {
+            property: 'points',
+            init: function (value) {
+
             }
         }
     }
