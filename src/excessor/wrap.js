@@ -98,7 +98,25 @@ var excessor = {
         'stroke-dashoffset': {
             property: 'dashOffset',
             init: function (value) {
-                return value;
+                return +value.match(/\d*/)[0];
+            }
+        },
+        r: {
+            property: 'radius',
+            init: function (value) {
+                return +value.match(/\d*/)[0];
+            }
+        },
+        cx: {
+            property: 'x',
+            init: function (value) {
+                return +value.match(/\d*/)[0];
+            }
+        },
+        cy: {
+            property: 'y',
+            init: function (value) {
+                return +value.match(/\d*/)[0];
             }
         }
     }
