@@ -47,23 +47,41 @@ Object.defineProperties(Path.prototype,{
 Path.prototype.animate = function(context){
     var points = this.points;
     var center = [this.x,this.y];
-    var toMovePoint = points[0];
-    if(toMovePoint.length > 3){
-        toMovePoint = [0,0];
-    }
-    context.moveTo(
-        toMovePoint[0] + center[0],
-        toMovePoint[1] + center[1]
-    );
     if(this.now.shift > 100){
         this.now.shift = 100;
     }
-    var lastPoint = points[0];
-    for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnPath(i,points,this.services);
-        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
-        lastPoint = coord;
-        context.lineTo(coord[0] + center[0],coord[1] + center[1]);
+
+    var paths = [[]];
+    var pathIndex = 0;
+    for(var index = 0;points[index];index++){
+        if(points[index] === false){
+            if(points[index + 1] && points[index + 1].length <= 3){
+                pathIndex++;
+            }
+            continue;
+        }
+        paths[pathIndex].push(points[index]);
+    }
+    for(pathIndex = 0;paths[pathIndex];pathIndex++) {
+        var path = paths[pathIndex];
+
+        var toMovePoint = points[0];
+        if (toMovePoint.length > 3) {
+            toMovePoint = [0, 0];
+        }
+        context.moveTo(
+            toMovePoint[0] + center[0],
+            toMovePoint[1] + center[1]
+        );
+        var lastPoint = points[0];
+        for (var i = 0; i <= this.now.shift; i += this.now.step) {
+            var coord = formula.getPointOnPath(i, points, this.services);
+            if (Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1) {
+                continue
+            }
+            lastPoint = coord;
+            context.lineTo(coord[0] + center[0], coord[1] + center[1]);
+        }
     }
     changeContext(context,this.now);
 };

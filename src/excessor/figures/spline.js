@@ -43,19 +43,33 @@ Spline.prototype.animate = function(context){
     var points = this.points;
     var center = [this.x,this.y];
     if(points.length < 2) {return}
-    context.moveTo(
-        points[0][0] + center[0],
-        points[0][1] + center[1]
-    );
     if(this.now.shift > 100){
         this.now.shift = 100;
     }
-    var lastPoint = points[0];
-    for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnSpline(i,points,this.services);
-        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
-        lastPoint = coord;
-        context.lineTo(coord[0] + center[0],coord[1] + center[1]);
+
+    var splines = [[]];
+    var splineIndex = 0;
+    for(var index = 0;points[index];index++){
+        if(points[index] === false){
+            splineIndex++;
+            continue;
+        }
+        splines[splineIndex].push(points[index]);
+    }
+
+    for(splineIndex = 0;splines[splineIndex];splineIndex++){
+        var spline = splines[splineIndex];
+        context.moveTo(
+            spline[0][0] + center[0],
+            spline[0][1] + center[1]
+        );
+        var lastPoint = spline[0];
+        for(var shift = 0;shift <= this.now.shift;shift += this.now.step){
+            var coord = formula.getPointOnSpline(shift,spline,this.services);
+            if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
+            lastPoint = coord;
+            context.lineTo(coord[0] + center[0],coord[1] + center[1]);
+        }
     }
     changeContext(context,this.now);
 };

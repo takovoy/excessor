@@ -60,11 +60,12 @@ Object.defineProperty(Drawing.prototype,'fps',{
 });
 
 var excessor = {
-    SVGParser: {}
+    SVGParser: {services:{}}
 };
 
 (function () {
     var parser = excessor.SVGParser;
+    var services = parser.services;
 
     parser.url = function(url){
         var xhr = new XMLHttpRequest();
@@ -81,17 +82,103 @@ var excessor = {
         }
     };
 
-    parser.string = function (string) {
+    parser.string = function (string,parent) {
+        parent = parent || new CanvasObject();
         if(!string){return false;}
         var Parser = new DOMParser();
-        var DOM;
+        var document;
         if(typeof string === "string"){
-            DOM = Parser.parseFromString(string, "image/svg+xml");
+            document = Parser.parseFromString(string, "image/svg+xml");
         } else {
-            DOM = string;
+            document = string;
         }
-        console.log(DOM);
-        return DOM;
+
+        var levelNodes = document.childNodes;
+
+        for(var index = 0;levelNodes[index];index++){
+            parent.append(parser.initNode(levelNodes[index]));
+        }
+
+        return document;
+    };
+
+    parser.initNode = function (node) {
+        var canvasObject = new parser.services.nodeCorrelation[node.nodeName]();
+        for(var attr in parser.services.attrCorrelation){
+            var nodeAttr = node.getAttribute(attr);
+            if(!nodeAttr){continue;}
+            var correlation = parser.services.attrCorrelation[attr];
+
+            canvasObject.now[correlation.property] = correlation.init(nodeAttr);
+        }
+        return canvasObject;
+    };
+
+    services.nodeCorrelation = {
+        g: CanvasObject,
+        path: Path,
+        circle: Circle,
+        rect: Rect,
+        ellipse: Ellipse
+    };
+
+    services.attrCorrelation = {
+        fill: {
+            property: 'fill',
+            init: function (value) {
+                return value;
+            }
+        },
+        stroke: {
+            property: 'stroke',
+            init: function (value) {
+                return value;
+            }
+        },
+        'stroke-linecap': {
+            property: 'lineCap',
+            init: function (value) {
+                return value;
+            }
+        },
+        'stroke-linejoin': {
+            property: 'lineJoin',
+            init: function (value) {
+                return value;
+            }
+        },
+        'stroke-dasharray': {
+            property: 'lineDash',
+            init: function (value) {
+                var dashArray = value.match(/\d*(\.{\d*)?/g);
+                for(var i = 0;dashArray[i];i++){dashArray[i] = +dashArray[i];}
+                return dashArray;
+            }
+        },
+        'stroke-dashoffset': {
+            property: 'dashOffset',
+            init: function (value) {
+                return +value.match(/\d*/)[0];
+            }
+        },
+        r: {
+            property: 'radius',
+            init: function (value) {
+                return +value.match(/\d*/)[0];
+            }
+        },
+        cx: {
+            property: 'x',
+            init: function (value) {
+                return +value.match(/\d*/)[0];
+            }
+        },
+        cy: {
+            property: 'y',
+            init: function (value) {
+                return +value.match(/\d*/)[0];
+            }
+        }
     }
 })();
 
@@ -567,23 +654,41 @@ Object.defineProperties(Path.prototype,{
 Path.prototype.animate = function(context){
     var points = this.points;
     var center = [this.x,this.y];
-    var toMovePoint = points[0];
-    if(toMovePoint.length > 3){
-        toMovePoint = [0,0];
-    }
-    context.moveTo(
-        toMovePoint[0] + center[0],
-        toMovePoint[1] + center[1]
-    );
     if(this.now.shift > 100){
         this.now.shift = 100;
     }
-    var lastPoint = points[0];
-    for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnPath(i,points,this.services);
-        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
-        lastPoint = coord;
-        context.lineTo(coord[0] + center[0],coord[1] + center[1]);
+
+    var paths = [[]];
+    var pathIndex = 0;
+    for(var index = 0;points[index];index++){
+        if(points[index] === false){
+            if(points[index + 1] && points[index + 1].length <= 3){
+                pathIndex++;
+            }
+            continue;
+        }
+        paths[pathIndex].push(points[index]);
+    }
+    for(pathIndex = 0;paths[pathIndex];pathIndex++) {
+        var path = paths[pathIndex];
+
+        var toMovePoint = points[0];
+        if (toMovePoint.length > 3) {
+            toMovePoint = [0, 0];
+        }
+        context.moveTo(
+            toMovePoint[0] + center[0],
+            toMovePoint[1] + center[1]
+        );
+        var lastPoint = points[0];
+        for (var i = 0; i <= this.now.shift; i += this.now.step) {
+            var coord = formula.getPointOnPath(i, points, this.services);
+            if (Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1) {
+                continue
+            }
+            lastPoint = coord;
+            context.lineTo(coord[0] + center[0], coord[1] + center[1]);
+        }
     }
     changeContext(context,this.now);
 };
@@ -687,19 +792,33 @@ Spline.prototype.animate = function(context){
     var points = this.points;
     var center = [this.x,this.y];
     if(points.length < 2) {return}
-    context.moveTo(
-        points[0][0] + center[0],
-        points[0][1] + center[1]
-    );
     if(this.now.shift > 100){
         this.now.shift = 100;
     }
-    var lastPoint = points[0];
-    for(var i = 0;i <= this.now.shift;i += this.now.step){
-        var coord = formula.getPointOnSpline(i,points,this.services);
-        if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
-        lastPoint = coord;
-        context.lineTo(coord[0] + center[0],coord[1] + center[1]);
+
+    var splines = [[]];
+    var splineIndex = 0;
+    for(var index = 0;points[index];index++){
+        if(points[index] === false){
+            splineIndex++;
+            continue;
+        }
+        splines[splineIndex].push(points[index]);
+    }
+
+    for(splineIndex = 0;splines[splineIndex];splineIndex++){
+        var spline = splines[splineIndex];
+        context.moveTo(
+            spline[0][0] + center[0],
+            spline[0][1] + center[1]
+        );
+        var lastPoint = spline[0];
+        for(var shift = 0;shift <= this.now.shift;shift += this.now.step){
+            var coord = formula.getPointOnSpline(shift,spline,this.services);
+            if(Math.abs(lastPoint[0] - coord[0]) < 1 && Math.abs(lastPoint[1] - coord[1]) < 1){continue}
+            lastPoint = coord;
+            context.lineTo(coord[0] + center[0],coord[1] + center[1]);
+        }
     }
     changeContext(context,this.now);
 };

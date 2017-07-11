@@ -94,7 +94,7 @@ var excessor = {
         'stroke-dasharray': {
             property: 'lineDash',
             init: function (value) {
-                var dashArray = value.match(/\d*(\.{\d*)?/g);
+                var dashArray = value.match(/\d+(\.\d+)?/g);
                 for(var i = 0;dashArray[i];i++){dashArray[i] = +dashArray[i];}
                 return dashArray;
             }
@@ -102,33 +102,33 @@ var excessor = {
         'stroke-dashoffset': {
             property: 'dashOffset',
             init: function (value) {
-                return +value.match(/\d*/)[0];
+                return +value.match(/\d+/)[0];
             }
         },
         r: {
             property: 'radius',
             init: function (value) {
-                return +value.match(/\d*/)[0];
+                return +value.match(/\d+/)[0];
             }
         },
         cx: {
             property: 'x',
             init: function (value) {
-                return +value.match(/\d*/)[0];
+                return +value.match(/\d+/)[0];
             }
         },
         cy: {
             property: 'y',
             init: function (value) {
-                return +value.match(/\d*/)[0];
+                return +value.match(/\d+/)[0];
             }
         },
         points: {
             property: 'points',
             init: function (value,closed) {
-                var points = value.split(' ');
+                var points = value.match(/\d+(\.\d+)?( |,|, )\d+(\.\d+)?/g);
                 for(var i = 0;points[i];i++){
-                    var coord = points[i].split(',');
+                    var coord = points[i].match(/\d+(\.\d+)?/g);
                     points[i] = [+coord[0],+coord[1],true];
                 }
                 if(!!closed){
