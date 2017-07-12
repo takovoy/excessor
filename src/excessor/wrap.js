@@ -94,7 +94,7 @@ var excessor = {
         'stroke-dasharray': {
             property: 'lineDash',
             init: function (value) {
-                var dashArray = value.match(/\d+(\.\d+)?/g);
+                var dashArray = value.match(services.regexp.realNumbers);
                 for(var i = 0;dashArray[i];i++){dashArray[i] = +dashArray[i];}
                 return dashArray;
             }
@@ -102,33 +102,33 @@ var excessor = {
         'stroke-dashoffset': {
             property: 'dashOffset',
             init: function (value) {
-                return +value.match(/\d+/)[0];
+                return +value.match(services.regexp.intNumbers)[0];
             }
         },
         r: {
             property: 'radius',
             init: function (value) {
-                return +value.match(/\d+/)[0];
+                return +value.match(services.regexp.intNumbers)[0];
             }
         },
         cx: {
             property: 'x',
             init: function (value) {
-                return +value.match(/\d+/)[0];
+                return +value.match(services.regexp.intNumbers)[0];
             }
         },
         cy: {
             property: 'y',
             init: function (value) {
-                return +value.match(/\d+/)[0];
+                return +value.match(services.regexp.intNumbers)[0];
             }
         },
         points: {
             property: 'points',
             init: function (value,closed) {
-                var points = value.match(/\d+(\.\d+)?( |,|, )\d+(\.\d+)?/g);
+                var points = value.match(services.regexp.points);
                 for(var i = 0;points[i];i++){
-                    var coord = points[i].match(/\d+(\.\d+)?/g);
+                    var coord = points[i].match(services.regexp.realNumbers);
                     points[i] = [+coord[0],+coord[1],true];
                 }
                 if(!!closed){
@@ -137,10 +137,94 @@ var excessor = {
                 return points;
             }
         },
-        g: {
+        d: {
             property: 'points',
             init: function (value) {
+                value = value.match(services.regexp.segment);
+                var points = [];
+                var lastPoint = [0,0];
+                for(var i = 0;value[i];i++){
+                    var operationType = value[i][0].toLowerCase();
+                    var segment = services.pathDataCorrelation[operationType](value[i],points,lastPoint);
+                    for(var pointIndex = 0;segment[pointIndex];pointIndex++){
+                        var point = segment[pointIndex];
+                        points.push(point);
+                        if(point.length > 3){
+                            var centerOfArc = this.getPointOnEllipse(point[0], point[1], point[2] + Math.PI, point[4], lastPoint[0], lastPoint[1]);
+                            lastPoint = this.getPointOnEllipse(point[0], point[1], point[3], point[4], centerOfArc[0], centerOfArc[1]);
+                            continue;
+                        }
+                        lastPoint = point;
+                    }
+                }
+                return points;
+            }
+        }
+    };
 
+    services.regexp = {
+        intNumbers  : /\-?\d+/g,
+        realNumbers : /\-?\d+(\.\d+)?/g,
+        points      : /\-?\d+(\.\d+)?( |,|, )\-?\d+(\.\d+)?/g,
+        segment     : /[A-Za-z]( |,|, |\-?\d+(\.\d+)?)+/g
+    };
+
+    services.pathDataCorrelation = {
+        m: function (value, path) {
+            var point = value.match(services.regexp.realNumbers);
+            point = [+point[0],+point[1]];
+            if(!path.length){
+                return [false,point];
+            }
+            return [point];
+        },
+        l: function (value) {
+            var points = value.match(services.regexp.points);
+            for(var i = 0;points[i];i++){
+                var coord = points[i].match(services.regexp.realNumbers);
+                points[i] = [+coord[0],+coord[1],true];
+            }
+            return points;
+        },
+        h: function (value,path,lastPoint) {
+            var points = value.match(services.regexp.realNumbers);
+            var segment = lastPoint[0];
+            for(var i = 0;points[i];i++){
+                segment += +points[i];
+            }
+            return [[segment,lastPoint[1]]];
+        },
+        v: function (value,path,lastPoint) {
+            var points = value.match(services.regexp.realNumbers);
+            var segment = lastPoint[1];
+            for(var i = 0;points[i];i++){
+                segment += +points[i];
+            }
+            return [[lastPoint[0],segment]];
+        },
+        c: function (value) {
+            var points = value.match(services.regexp.points);
+            for(var i = 0;points[i];i++){
+                var coord = points[i].match(services.regexp.realNumbers);
+                points[i] = [+coord[0],+coord[1],!((i+1)%3)];
+            }
+            return points;
+        },
+        q: function (value) {
+            var points = value.match(services.regexp.points);
+            for(var i = 0;points[i];i++){
+                var coord = points[i].match(services.regexp.realNumbers);
+                points[i] = [+coord[0],+coord[1],!((i+1)%2)];
+            }
+            return points;
+        },
+        a: function (value,path,lastPoint) {
+            value = value.match(services.regexp.realNumbers);
+            var arcs = [];
+            var index = 0;
+            for(var i = 0;value[i];i++){
+                if(!(i%5) && !!i){index++}
+                arcs[index].push(+value[i]);
             }
         }
     }
