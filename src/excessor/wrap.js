@@ -223,9 +223,46 @@ var excessor = {
             var arcs = [];
             var index = 0;
             for(var i = 0;value[i];i++){
-                if(!(i%5) && !!i){index++}
+                if(!(i%7) && !!i){index++}
                 arcs[index].push(+value[i]);
             }
+            var arcLastPoint = false;
+            for(var arcIndex = 0;arcs[arcIndex];arcIndex++){
+                var arc = arcs[arcIndex];
+                var arcFirstPoint = arcLastPoint || lastPoint;
+                arcLastPoint = [arc[5],arc[6]];
+                var derivative = [];
+                var tilt = arc[2];
+                derivative[0] = Math.cos(tilt)*((arcFirstPoint[0] - arcLastPoint[0])/2) + Math.sin(tilt)*((arcFirstPoint[1] - arcLastPoint[1])/2);
+                derivative[1] = -Math.sin(tilt)*((arcFirstPoint[0] - arcLastPoint[0])/2) + Math.cos(tilt)*((arcFirstPoint[1] - arcLastPoint[1])/2);
+                var derivativeOfCenter = [];
+                var coefficient = Math.sqrt(
+                    (
+                        Math.pow(arc[0],2)*Math.pow(arc[1],2) -
+                        Math.pow(arc[0],2)*Math.pow(derivative[1],2) -
+                        Math.pow(arc[1],2)*Math.pow(derivative[0],2)
+                    ) / (
+                        Math.pow(arc[0],2)*Math.pow(derivative[1],2) +
+                        Math.pow(arc[1],2)*Math.pow(derivative[0],2)
+                    )
+                );
+                if(arc[3] === arc[4]){
+                    coefficient = -coefficient;
+                }
+                derivativeOfCenter[0] = coefficient * ((arc[0]*derivative[1])/arc[1]);
+                derivativeOfCenter[1] = coefficient * -((arc[1]*derivative[0])/arc[0]);
+                var center = [];
+                center[0] = Math.cos(tilt)*derivativeOfCenter[0] - Math.sin(tilt)*derivativeOfCenter[1] + ((arcFirstPoint[0] + arcLastPoint[0])/2);
+                center[1] = Math.sin(tilt)*derivativeOfCenter[0] + Math.cos(tilt)*derivativeOfCenter[1] + ((arcFirstPoint[1] + arcLastPoint[1])/2);
+
+                var startRadian = formula.getAngleOfVector(arcFirstPoint,center) + tilt;
+                var endRadian   = formula.getAngleOfVector(arcLastPoint,center) + tilt;
+                if(!arc[3] && Math.abs(startRadian - endRadian) < Math.PI){
+                    endRadian = Math.PI - endRadian;
+                }
+                arcs[arcIndex] = [arc[0],arc[1],startRadian,endRadian,tilt];
+            }
+            return arcs;
         }
     }
 })();
