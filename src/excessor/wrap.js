@@ -146,12 +146,12 @@ var excessor = {
                 for(var i = 0;value[i];i++){
                     var operationType = value[i][0].toLowerCase();
                     var segment = services.pathDataCorrelation[operationType](value[i],points,lastPoint);
-                    for(var pointIndex = 0;segment[pointIndex];pointIndex++){
+                    for(var pointIndex = 0;pointIndex < segment.length;pointIndex++){
                         var point = segment[pointIndex];
                         points.push(point);
                         if(point.length > 3){
-                            var centerOfArc = this.getPointOnEllipse(point[0], point[1], point[2] + Math.PI, point[4], lastPoint[0], lastPoint[1]);
-                            lastPoint = this.getPointOnEllipse(point[0], point[1], point[3], point[4], centerOfArc[0], centerOfArc[1]);
+                            var centerOfArc = formula.getPointOnEllipse(point[0], point[1], point[2] + Math.PI, point[4], lastPoint[0], lastPoint[1]);
+                            lastPoint = formula.getPointOnEllipse(point[0], point[1], point[3], point[4], centerOfArc[0], centerOfArc[1]);
                             continue;
                         }
                         lastPoint = point;
@@ -174,9 +174,9 @@ var excessor = {
             var point = value.match(services.regexp.realNumbers);
             point = [+point[0],+point[1]];
             if(!path.length){
-                return [false,point];
+                return [point];
             }
-            return [point];
+            return [false,point];
         },
         l: function (value) {
             var points = value.match(services.regexp.points);
@@ -192,7 +192,7 @@ var excessor = {
             for(var i = 0;points[i];i++){
                 segment += +points[i];
             }
-            return [[segment,lastPoint[1]]];
+            return [[segment,lastPoint[1],true]];
         },
         v: function (value,path,lastPoint) {
             var points = value.match(services.regexp.realNumbers);
@@ -200,7 +200,7 @@ var excessor = {
             for(var i = 0;points[i];i++){
                 segment += +points[i];
             }
-            return [[lastPoint[0],segment]];
+            return [[lastPoint[0],segment,true]];
         },
         c: function (value) {
             var points = value.match(services.regexp.points);
@@ -220,19 +220,22 @@ var excessor = {
         },
         a: function (value,path,lastPoint) {
             value = value.match(services.regexp.realNumbers);
-            var arcs = [];
+            var arcs = [[]];
             var index = 0;
             for(var i = 0;value[i];i++){
-                if(!(i%7) && !!i){index++}
+                if(i%7 === 0 && i !== 0){
+                    index++;
+                    arcs[index] = [];
+                }
                 arcs[index].push(+value[i]);
             }
             var arcLastPoint = false;
             for(var arcIndex = 0;arcs[arcIndex];arcIndex++){
                 var arc = arcs[arcIndex];
-                var arcFirstPoint = arcLastPoint || lastPoint;
+                var arcFirstPoint = arcLastPoint || lastPoint || [0,0];
                 arcLastPoint = [arc[5],arc[6]];
                 var derivative = [];
-                var tilt = arc[2];
+                var tilt = Math.PI/180*arc[2];
                 derivative[0] = Math.cos(tilt)*((arcFirstPoint[0] - arcLastPoint[0])/2) + Math.sin(tilt)*((arcFirstPoint[1] - arcLastPoint[1])/2);
                 derivative[1] = -Math.sin(tilt)*((arcFirstPoint[0] - arcLastPoint[0])/2) + Math.cos(tilt)*((arcFirstPoint[1] - arcLastPoint[1])/2);
                 var derivativeOfCenter = [];
@@ -257,8 +260,8 @@ var excessor = {
 
                 var startRadian = formula.getAngleOfVector(arcFirstPoint,center) + tilt;
                 var endRadian   = formula.getAngleOfVector(arcLastPoint,center) + tilt;
-                if(!arc[3] && Math.abs(startRadian - endRadian) < Math.PI){
-                    endRadian = Math.PI - endRadian;
+                if(!!arc[4]){
+                    endRadian = 2*Math.PI + endRadian;
                 }
                 arcs[arcIndex] = [arc[0],arc[1],startRadian,endRadian,tilt];
             }

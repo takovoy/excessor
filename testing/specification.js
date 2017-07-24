@@ -21,8 +21,6 @@ describe('Расчёт сплайна', function () {
                 services.length += services.map[key];
             }
 
-            console.log('services: ',services);
-
             for(var i = 0;i <= 100;i += step){
                 formula.getPointOnSpline(i,points,services);
             }
@@ -98,6 +96,99 @@ describe('Валидация цвета', function () {
             assert(!isRGBA('rgba(120,30,1)'));
         });
 
+    });
+});
+
+describe('Конвертация SVG', function () {
+    describe('Служебные функции', function () {
+        describe('Обработка данных пути. По умолчанию начальная точка [0,0]', function () {
+            it('Переместить курсор "M100,50"', function () {
+                var result = excessor.SVGParser.services.pathDataCorrelation.v('M100,50',[],[0,0]);
+                console.log('Переместить курсор "M100,50"',result);
+                assert.isNotNaN(result);
+            });
+            it('Линия "L100,50"', function () {
+                var result = excessor.SVGParser.services.pathDataCorrelation.l('L100,50',[],[0,0]);
+                console.log('Линия "L100,50"',result);
+                assert.isNotNaN(result);
+            });
+            it('Горизонтальная линия "H100"', function () {
+                var result = excessor.SVGParser.services.pathDataCorrelation.h('H100',[],[0,0]);
+                console.log('Горизонтальная линия "H100"',result);
+                assert.isNotNaN(result);
+            });
+            it('Вертикальная линия "V100"', function () {
+                var result = excessor.SVGParser.services.pathDataCorrelation.v('V100',[],[0,0]);
+                console.log('Вертикальная линия "V100"',result);
+                assert.isNotNaN(result);
+            });
+            it('Квадратичные кривые "Q100,50,0,0"', function () {
+                var result = excessor.SVGParser.services.pathDataCorrelation.q('Q100,50,0,0',[],[0,0]);
+                console.log('Квадратичные кривые "Q100,50,0,0"',result);
+                assert.isNotNaN(result);
+            });
+            it('Кубические кривые "C100,50,0,0,1,180"', function () {
+                var result = excessor.SVGParser.services.pathDataCorrelation.c('C100,50,0,0,1,180',[],[0,0]);
+                console.log('Кубические кривые "C100,50,0,0,1,180"',result);
+                assert.isNotNaN(result);
+            });
+            it('Эллиптические дуги "A100,50,0,0,1,180,0"', function () {
+                var arc = 'A100,50,0,0,1,180,0'.match(excessor.SVGParser.services.regexp.realNumbers);
+                for(var i = 0;arc[i];i++){
+                    arc[i] = +arc[i];
+                }
+                var arcFirstPoint = [0,0];
+                var arcLastPoint = [arc[5],arc[6]];
+                var tilt = Math.PI/180*arc[2];
+                var derivative = [];
+                assert.deepEqual(arc,[100,50,0,0,1,180,0]);
+                derivative[0] = Math.cos(tilt)*((arcFirstPoint[0] - arcLastPoint[0])/2) + Math.sin(tilt)*((arcFirstPoint[1] - arcLastPoint[1])/2);
+                derivative[1] = -Math.sin(tilt)*((arcFirstPoint[0] - arcLastPoint[0])/2) + Math.cos(tilt)*((arcFirstPoint[1] - arcLastPoint[1])/2);
+                assert.isNotNaN(derivative[0]);
+                assert.isNotNaN(derivative[1]);
+                var derivativeOfCenter = [];
+                var coefficient = Math.sqrt(
+                    (
+                        Math.pow(arc[0],2)*Math.pow(arc[1],2) -
+                        Math.pow(arc[0],2)*Math.pow(derivative[1],2) -
+                        Math.pow(arc[1],2)*Math.pow(derivative[0],2)
+                    ) / (
+                        Math.pow(arc[0],2)*Math.pow(derivative[1],2) +
+                        Math.pow(arc[1],2)*Math.pow(derivative[0],2)
+                    )
+                );
+                if(arc[3] === arc[4]){
+                    coefficient = -coefficient;
+                }
+                assert.isNotNaN(coefficient);
+                derivativeOfCenter[0] = coefficient * ((arc[0]*derivative[1])/arc[1]);
+                derivativeOfCenter[1] = coefficient * -((arc[1]*derivative[0])/arc[0]);
+                assert.isNotNaN(derivativeOfCenter[0]);
+                assert.isNotNaN(derivativeOfCenter[1]);
+                var center = [];
+                center[0] = Math.cos(tilt)*derivativeOfCenter[0] - Math.sin(tilt)*derivativeOfCenter[1] + ((arcFirstPoint[0] + arcLastPoint[0])/2);
+                center[1] = Math.sin(tilt)*derivativeOfCenter[0] + Math.cos(tilt)*derivativeOfCenter[1] + ((arcFirstPoint[1] + arcLastPoint[1])/2);
+                assert.isNotNaN(center[0]);
+                assert.isNotNaN(center[1]);
+
+                var startRadian = formula.getAngleOfVector(arcFirstPoint,center) + tilt;
+                var endRadian   = formula.getAngleOfVector(arcLastPoint,center) + tilt;
+                if(!!arc[4]){
+                    endRadian = 2*Math.PI + endRadian;
+                }
+                assert.isNotNaN(startRadian);
+                assert.isNotNaN(endRadian);
+
+                var result = excessor.SVGParser.services.pathDataCorrelation.a('A100,50,0,0,1,180,0',[],[0,0]);
+                console.log('Эллиптические дуги "A100,50,0,0,1,180,0"',result);
+                assert.deepEqual(result[0],[100,50,startRadian,endRadian,0]);
+            });
+            it('Полный путь "M100,100C100,50,0,0,1,180,100,50,0,0,100,0A100,50,0,0,1,180,0M100,100Q100,50,0,0"', function () {
+                var result = excessor.SVGParser.services.attrCorrelation.d.init('M100,100C100,50,0,0,1,180,100,50,0,0,100,0A100,50,0,0,1,180,0M100,100Q100,50,0,0',[],[0,0]);
+                console.log('Полный путь "M100,100C100,50,0,0,1,180,100,50,0,0,100,0A100,50,0,0,1,180,0M100,100Q100,50,0,0"',result);
+                assert.isNotNaN(result);
+            });
+        });
     });
 });
 

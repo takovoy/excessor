@@ -114,9 +114,11 @@ var formula = {
 
     getAngleOfVector: function (point, center) {
         center = center || [0,0];
+        point = point || [0,0];
         point = [point[0] - center[0],point[1] - center[1]];
-        var angle = Math.asin(point[1]);
-        var acos  = Math.acos(point[0]);
+        var distance = formula.getCenterToPointDistance(point);
+        var angle = Math.asin(point[1]/distance);
+        var acos  = Math.acos(point[0]/distance);
         if(acos > Math.PI/2){
             return Math.PI - angle;
         }
