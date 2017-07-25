@@ -111,6 +111,30 @@ var excessor = {
                 return +value.match(services.regexp.intNumbers)[0];
             }
         },
+        rx: {
+            property: 'semiAxisX',
+            init: function (value) {
+                return +value.match(services.regexp.intNumbers)[0];
+            }
+        },
+        ry: {
+            property: 'semiAxisY',
+            init: function (value) {
+                return +value.match(services.regexp.intNumbers)[0];
+            }
+        },
+        x: {
+            property: 'x',
+            init: function (value) {
+                return +value.match(services.regexp.intNumbers)[0];
+            }
+        },
+        y: {
+            property: 'y',
+            init: function (value) {
+                return +value.match(services.regexp.intNumbers)[0];
+            }
+        },
         cx: {
             property: 'x',
             init: function (value) {

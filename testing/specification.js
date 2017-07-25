@@ -1,3 +1,4 @@
+
 describe('Расчёт сплайна', function () {
     var points = [
         [0,0],
@@ -71,7 +72,6 @@ describe('Валидация цвета', function () {
             assert(!isRGB('rgb(120,30)'));
         });
     });
-
 
     describe('RGBA', function () {
         it('isRGBA rgba( 0, 0, 0, 1)', function () {
@@ -183,9 +183,28 @@ describe('Конвертация SVG', function () {
                 console.log('Эллиптические дуги "A100,50,0,0,1,180,0"',result);
                 assert.deepEqual(result[0],[100,50,startRadian,endRadian,0]);
             });
-            it('Полный путь "M100,100C100,50,0,0,1,180,100,50,0,0,100,0A100,50,0,0,1,180,0M100,100Q100,50,0,0"', function () {
-                var result = excessor.SVGParser.services.attrCorrelation.d.init('M100,100C100,50,0,0,1,180,100,50,0,0,100,0A100,50,0,0,1,180,0M100,100Q100,50,0,0',[],[0,0]);
-                console.log('Полный путь "M100,100C100,50,0,0,1,180,100,50,0,0,100,0A100,50,0,0,1,180,0M100,100Q100,50,0,0"',result);
+            it('Полный путь "M100,100C100,50 0,0 1,180 100,50 0,0 100,0A100,50 0 0 1 180,0M100,100Q100,50 0,0"', function () {
+                var result = excessor.SVGParser.services.attrCorrelation.d.init('M100,100C100,50 0,0 1,180 100,50 0,0 100,0A100,50 0 0 1 180,0M100,100Q100,50 0,0');
+                console.log('Полный путь "M100,100C100,50 0,0 1,180 100,50 0,0 100,0A100,50 0 0 1 180,0M100,100Q100,50 0,0"',result);
+                assert.isNotNaN(result);
+            });
+        });
+        describe('Обработка атрибута points', function () {
+            it('Ломаная линия "350,75  379,161 469,161 397,215 423,301 350,250 277,301 303,215 231,161 321,161"', function () {
+                var result = excessor.SVGParser.services.attrCorrelation.points.init('350,75  379,161 469,161 397,215 423,301 350,250 277,301 303,215 231,161 321,161');
+                console.log('Ломаная линия "350,75  379,161 469,161 397,215 423,301 350,250 277,301 303,215 231,161 321,161"',result);
+                assert.isNotNaN(result);
+            });
+            it('Полигон (закрытая ломаная линия) "350,75  379,161 469,161 397,215 423,301 350,250 277,301 303,215 231,161 321,161"', function () {
+                var result = excessor.SVGParser.services.attrCorrelation.points.init('350,75  379,161 469,161 397,215 423,301 350,250 277,301 303,215 231,161 321,161',true);
+                console.log('Полигон (закрытая ломаная линия) "350,75  379,161 469,161 397,215 423,301 350,250 277,301 303,215 231,161 321,161"',result);
+                assert.isNotNaN(result);
+            });
+        });
+        describe('Обработка атрибута stroke-dasharray', function () {
+            it('Массив (не поддерживает проценты) "350,75  379"', function () {
+                var result = excessor.SVGParser.services.attrCorrelation['stroke-dasharray'].init('350,75  379');
+                console.log('Массив (не поддерживает проценты) "350,75  379"',result);
                 assert.isNotNaN(result);
             });
         });
