@@ -22,13 +22,15 @@ var excessor = {
         }
     };
 
-    parser.string = function (string,parent) {
+    parser.string = function (string,parent,globalStyles) {
         parent = parent || new CanvasObject();
         if(!string){return false;}
         var Parser = new DOMParser();
         var document;
         if(typeof string === "string"){
             document = Parser.parseFromString(string, "image/svg+xml");
+            globalStyles = document.getElementsByTagName('style');
+            globalStyles = CSSJSON.toJSON(globalStyles);
         } else {
             document = string;
         }
@@ -36,14 +38,21 @@ var excessor = {
         var levelNodes = document.childNodes;
 
         for(var index = 0;levelNodes[index];index++){
-            parent.append(parser.initNode(levelNodes[index]));
+            if(!parser.services.nodeCorrelation[levelNodes[index].nodeName]){continue}
+            parent.append(parser.initNode(levelNodes[index],globalStyles));
         }
 
-        return document;
+        return parent;
     };
 
-    parser.initNode = function (node) {
+    parser.initNode = function (node,globalStyles) {
         var canvasObject = new parser.services.nodeCorrelation[node.nodeName]();
+        var styles = [];
+        for(var selector in globalStyles.children){
+            if(node.matches(selector)){
+                styles.push(globalStyles.children[selector]['attributes']);
+            }
+        }
         for(var attr in parser.services.attrCorrelation){
             var nodeAttr = node.getAttribute(attr);
             if(!nodeAttr){continue;}
@@ -189,7 +198,7 @@ var excessor = {
     services.regexp = {
         intNumbers  : /\-?\d+/g,
         realNumbers : /\-?\d+(\.\d+)?/g,
-        points      : /\-?\d+(\.\d+)?( |,|, )\-?\d+(\.\d+)?/g,
+        points      : /\-?\d+(\.\d+)?( |,|, |\-)\d+(\.\d+)?/g,
         segment     : /[A-Za-z]( |,|, |\-?\d+(\.\d+)?)+/g
     };
 
